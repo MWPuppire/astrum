@@ -15,15 +15,15 @@ namespace Astrum
 
 Font::Font(int size, Color color, int style)
 {
-	SDL_RWops *rw = SDL_RWFromConstMem(_Vera_ttf, _Vera_ttf_len);
-	if (rw == NULL) {
+	SDL_RWops *rw = SDL_RWFromConstMem(Vera_ttf, Vera_ttf_len);
+	if (rw == nullptr) {
 		SDL_Log("Could not load default font: %s\n", SDL_GetError());
-		font = NULL;
+		font = nullptr;
 	} else {
 		font = TTF_OpenFontRW(rw, 0, size);
 		SDL_RWclose(rw);
 	}
-	if (font == NULL)
+	if (font == nullptr)
 		return;
 	TTF_SetFontStyle(font, style & ~OUTLINE);
 	if (style & OUTLINE)
@@ -33,7 +33,7 @@ Font::Font(int size, Color color, int style)
 Font::Font(std::string path, int size, Color color, int style)
 {
 	font = TTF_OpenFont(path.c_str(), size);
-	if (font == NULL)
+	if (font == nullptr)
 		return;
 	TTF_SetFontStyle(font, style & ~OUTLINE);
 	if (style & OUTLINE)
@@ -43,7 +43,7 @@ Font::Font(std::string path, int size, Color color, int style)
 Font::Font(const char *path, int size, Color color, int style)
 {
 	font = TTF_OpenFont(path, size);
-	if (font == NULL)
+	if (font == nullptr)
 		return;
 	TTF_SetFontStyle(font, style & ~OUTLINE);
 	if (style & OUTLINE)
@@ -53,7 +53,7 @@ Font::Font(const char *path, int size, Color color, int style)
 Font::Font(SDL_RWops *rw, int size, Color color, int style)
 {
 	font = TTF_OpenFontRW(rw, 0, size);
-	if (font == NULL)
+	if (font == nullptr)
 		return;
 	TTF_SetFontStyle(font, style & ~OUTLINE);
 	if (style & OUTLINE)
@@ -72,11 +72,11 @@ GPU_Image *Font::renderText(const char *text)
 }
 GPU_Image *Font::renderText(const char *text, Color color)
 {
-	if (font == NULL)
-		return NULL;
+	if (font == nullptr)
+		return nullptr;
 	SDL_Surface *surfaceMessage = TTF_RenderUTF8_Solid(font, text, color);
-	if (surfaceMessage == NULL)
-		return NULL;
+	if (surfaceMessage == nullptr)
+		return nullptr;
 	GPU_Image *out = GPU_CopyImageFromSurface(surfaceMessage);
 	SDL_FreeSurface(surfaceMessage);
 	return out;

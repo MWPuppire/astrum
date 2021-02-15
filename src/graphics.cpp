@@ -40,10 +40,10 @@ namespace graphics
 
 	int InitGraphics()
 	{
-		if (window::window != NULL)
+		if (window::window != nullptr)
 			glcontext = SDL_GL_CreateContext(window::window);
 		else
-			glcontext = NULL;
+			glcontext = nullptr;
 
 		backgroundColor = { .r = 0x00, .g = 0x00, .b = 0x00, .a = 0xFF };
 		currentColor = { .r = 0x00, .g = 0x00, .b = 0x00, .a = 0xFF };
@@ -54,7 +54,7 @@ namespace graphics
 
 		ondraw(drawevent);
 
-		if (window::window == NULL) {
+		if (window::window == nullptr) {
 			screen = GPU_Init(0, 0, GPU_DEFAULT_INIT_FLAGS);
 		} else {
 			GPU_SetInitWindow(SDL_GetWindowID(window::window));
@@ -294,13 +294,13 @@ namespace graphics
 	void print(const char *str, float x, float y, Font *font)
 	{
 		GPU_Image *rendered = font->renderText(str);
-		if (rendered == NULL)
+		if (rendered == nullptr)
 			return;
 		int offsetX, offsetY;
 		font->textSize(str, &offsetX, &offsetY);
 		x += 0.5 * (float) offsetX;
 		y += 0.5 * (float) offsetY;
-		GPU_Blit(rendered, NULL, screen, x, y);
+		GPU_Blit(rendered, nullptr, screen, x, y);
 		GPU_FreeImage(rendered);
 	}
 	void print(const char *str, float x, float y, Color col)
@@ -310,13 +310,13 @@ namespace graphics
 	void print(const char *str, float x, float y, Font *font, Color col)
 	{
 		GPU_Image *rendered = font->renderText(str, col);
-		if (rendered == NULL)
+		if (rendered == nullptr)
 			return;
 		int offsetX, offsetY;
 		font->textSize(str, &offsetX, &offsetY);
 		x += 0.5 * (float) offsetX;
 		y += 0.5 * (float) offsetY;
-		GPU_Blit(rendered, NULL, screen, x, y);
+		GPU_Blit(rendered, nullptr, screen, x, y);
 		GPU_FreeImage(rendered);
 	}
 

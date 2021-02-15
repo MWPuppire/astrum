@@ -33,15 +33,19 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_include_directories(astrumDemo PRIVATE astrum)
 	target_link_libraries(astrumDemo astrum)
 
-	enable_testing()
-	find_package(GTest REQUIRED)
-	add_executable(astrumTests tests/test.cpp)
-	add_dependencies(astrumTests astrum)
-	target_include_directories(astrumTests PRIVATE astrum)
-	target_link_libraries(astrumTests astrum)
-	target_link_libraries(astrumTests GTest::GTest GTest::Main)
-	add_test(NAME astrumRunTests COMMAND astrumTests)
+#	Haven't written any tests yet
+#	So testing code is irrelevant
+
+#	enable_testing()
+#	find_package(GTest REQUIRED)
+#	add_executable(astrumTests tests/test.cpp)
+#	add_dependencies(astrumTests astrum)
+#	target_include_directories(astrumTests PRIVATE astrum)
+#	target_link_libraries(astrumTests astrum)
+#	target_link_libraries(astrumTests GTest::GTest GTest::Main)
+#	add_test(NAME astrumRunTests COMMAND astrumTests)
 
 	find_package(Doxygen)
+	set(DOXYGEN_EXTRACT_ALL YES)
 	doxygen_add_docs(astrumDocs include ALL)
 endif()

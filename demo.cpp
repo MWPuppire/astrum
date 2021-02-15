@@ -15,9 +15,9 @@ void update(double dt, double fps)
 		lastColor = 0.0;
 		Astrum::Color col = Astrum::color(Astrum::math::random(255), Astrum::math::random(255), Astrum::math::random(255));
 		Astrum::graphics::setBackgroundColor(col);
-		int red   = col.r - Astrum::math::max((col.r - (~col.r & 0xFF)) & 0xFF, (int) col.r, 0xFF - col.r);
-		int green = col.g - Astrum::math::max((col.g - (~col.g & 0xFF)) & 0xFF, (int) col.g, 0xFF - col.g);
-		int blue  = col.b - Astrum::math::max((col.b - (~col.b & 0xFF)) & 0xFF, (int) col.b, 0xFF - col.b);
+		int red    = col.r - Astrum::math::max((col.r - (~col.r & 0xFF)) & 0xFF, (int) col.r, 0xFF - col.r);
+		int green  = col.g - Astrum::math::max((col.g - (~col.g & 0xFF)) & 0xFF, (int) col.g, 0xFF - col.g);
+		int blue   = col.b - Astrum::math::max((col.b - (~col.b & 0xFF)) & 0xFF, (int) col.b, 0xFF - col.b);
 		shapeColor = Astrum::color(red & 0xFF, green & 0xFF, blue & 0xFF);
 	}
 	const int width = Astrum::window::getWidth();
@@ -64,6 +64,15 @@ void keypressed(Astrum::Keycode key)
 		shape = (shape + 1) % 5;
 }
 
+void startup()
+{
+	lastColor = 0.0;
+	shape = 0;
+	shapeX = Astrum::window::getWidth() / 2.0;
+	shapeY = Astrum::window::getHeight() / 2.0;
+	shapeColor = Astrum::color(0xFF, 0xFF, 0xFF);
+}
+
 int main()
 {
 	Astrum::Config conf;
@@ -71,12 +80,7 @@ int main()
 
 	Astrum::Init(&conf);
 
-	lastColor = 0.0;
-	shape = 0;
-	shapeX = Astrum::window::getWidth() / 2.0;
-	shapeY = Astrum::window::getHeight() / 2.0;
-	shapeColor = Astrum::color(0xFF, 0xFF, 0xFF);
-
+	Astrum::onstartup(startup);
 	Astrum::ondraw(draw);
 	Astrum::onkeypressed(keypressed);
 

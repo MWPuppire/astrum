@@ -63,17 +63,17 @@ namespace mouse
 
 	void setMouseX(int x)
 	{
-		SDL_WarpMouseInWindow(NULL, x, getMouseY());
+		SDL_WarpMouseInWindow(nullptr, x, getMouseY());
 	}
 
 	void setMouseY(int y)
 	{
-		SDL_WarpMouseInWindow(NULL, getMouseX(), y);
+		SDL_WarpMouseInWindow(nullptr, getMouseX(), y);
 	}
 
 	void setMousePosition(int x, int y)
 	{
-		SDL_WarpMouseInWindow(NULL, x, y);
+		SDL_WarpMouseInWindow(nullptr, x, y);
 	}
 
 	bool isVisible()

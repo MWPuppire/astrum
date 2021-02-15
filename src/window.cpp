@@ -28,7 +28,7 @@ namespace window
 	{
 		settings = conf;
 		if (conf->windowHeadless) {
-			window = NULL;
+			window = nullptr;
 			return -1;
 		}
 
@@ -44,7 +44,7 @@ namespace window
 				| (conf->windowBorderless ? SDL_WINDOW_BORDERLESS : 0)
 		);
 
-		if (window == NULL) {
+		if (window == nullptr) {
 			SDL_Log("Could not create window: %s\n", SDL_GetError());
 			if (conf->allowNoWindow)
 				return 0;
@@ -64,7 +64,7 @@ namespace window
 
 	void QuitWindow()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return;
 
 		SDL_DestroyWindow(window);
@@ -72,7 +72,7 @@ namespace window
 
 	void setFullscreen(bool fullscreen)
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return;
 
 		SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
@@ -81,7 +81,7 @@ namespace window
 
 	void setSize(int width, int height)
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return;
 
 		SDL_SetWindowSize(window, width, height);
@@ -90,7 +90,7 @@ namespace window
 
 	void setTitle(const char *title)
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return;
 
 		SDL_SetWindowTitle(window, title);
@@ -98,7 +98,7 @@ namespace window
 
 	bool getFullscreen()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return false;
 
 		return (bool) (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN);
@@ -106,7 +106,7 @@ namespace window
 
 	const char *getTitle()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return "";
 
 		return SDL_GetWindowTitle(window);
@@ -114,7 +114,7 @@ namespace window
 
 	int getWidth()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return 0;
 
 		return windowWidth;
@@ -122,7 +122,7 @@ namespace window
 
 	int getHeight()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return 0;
 
 		return windowHeight;
@@ -130,7 +130,7 @@ namespace window
 
 	std::tuple<int, int> getDimensions()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return std::make_tuple(0, 0);
 
 		return std::make_tuple(windowWidth, windowHeight);
@@ -138,7 +138,7 @@ namespace window
 
 	std::tuple<int, int> getDesktopDimensions()
 	{
-		if (window == NULL) {
+		if (window == nullptr) {
 			SDL_DisplayMode mode;
 			SDL_GetDesktopDisplayMode(0, &mode);
 			return std::make_tuple(mode.w, mode.h);
@@ -152,7 +152,7 @@ namespace window
 
 	void setPosition(int x, int y)
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return;
 
 		SDL_SetWindowPosition(window, x, y);
@@ -160,7 +160,7 @@ namespace window
 
 	std::tuple<int, int> getPosition()
 	{
-		if (window == NULL)
+		if (window == nullptr)
 			return std::make_tuple(0, 0);
 
 		int x;

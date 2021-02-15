@@ -46,6 +46,7 @@ namespace
 	bool isrunning = false;
 	bool doquit = false;
 
+	std::vector<std::function<void()> > cb_startup;
 	std::vector<std::function<void()> > cb_draw;
 	std::vector<std::function<bool()> > cb_quit;
 	std::vector<std::function<void(Sint32, Sint32)> > cb_resize;
@@ -234,6 +235,10 @@ void run(std::function<void(double, double)> update)
 	isrunning = true;
 	SDL_Event e;
 	doquit = false;
+
+	for (size_t i = 0; i < cb_startup.size(); i++)
+		cb_startup[i]();
+
 	while (!doquit) {
 		Uint32 frametimesindex = framecount % FRAME_VALUES;
 		Uint32 getticks = SDL_GetTicks();
@@ -433,6 +438,11 @@ void ondirectorydropped(std::function<void(const char *)> cb)
 {
 	auto lambda = [cb](std::filesystem::path p) { cb(p.c_str()); };
 	cb_directorydropped.push_back(lambda);
+}
+
+void onstartup(std::function<void()> cb)
+{
+	cb_startup.push_back(cb);
 }
 
 void ongamepadaxis();

@@ -32,7 +32,7 @@ namespace event
 	{
 		auto lambda = [cb](void *UNUSED(data), Event *e) { return cb(e); };
 		std::function<int(void *data, Event *e)> func(lambda);
-		SDL_SetEventFilter(func.target<int(void *, Event *)>(), NULL);
+		SDL_SetEventFilter(func.target<int(void *, Event *)>(), nullptr);
 	}
 	void filter(std::function<int(void *data, Event *e)> cb, void *data)
 	{
@@ -49,11 +49,11 @@ namespace event
 		int success = SDL_PeepEvents(e, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 		if (success < 0) {
 			SDL_Log("Error peeking events: %s\n", SDL_GetError());
-			return NULL;
+			return nullptr;
 		} else if (success == 1) {
 			return e;
 		} else {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -64,7 +64,7 @@ namespace event
 		if (success)
 			return e;
 		else
-			return NULL;
+			return nullptr;
 	}
 
 	void pump()
@@ -108,7 +108,7 @@ namespace event
 			return e;
 		} else {
 			SDL_Log("Error waiting for events: %s\n", SDL_GetError());
-			return NULL;
+			return nullptr;
 		}
 	}
 

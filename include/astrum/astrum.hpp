@@ -32,6 +32,8 @@ void onquit(std::function<void()> cb);
 
 void ondraw(std::function<void()> cb);
 
+void onstartup(std::function<void()> cb);
+
 void onkeypressed(std::function<void(SDL_Keycode, Uint16, bool)> cb);
 void onkeypressed(std::function<void(SDL_Keycode, Uint16)> cb);
 void onkeypressed(std::function<void(SDL_Keycode)> cb);

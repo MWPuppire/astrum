@@ -1,8 +1,6 @@
 #ifndef INCLUDE_ASTRUM_CONSTANTS
 #define INCLUDE_ASTRUM_CONSTANTS
 
-#include <cstdlib>
-
 namespace Astrum {
 
 extern const char *VERSION;
@@ -24,7 +22,7 @@ class Config {
 public:
 	bool gammacorrect       = false;
 	const char *windowTitle = DEFAULT_TITLE;
-	const char *icon        = NULL;
+	const char *icon        = nullptr;
 	int windowWidth         = DEFAULT_WIDTH;
 	int windowHeight        = DEFAULT_HEIGHT;
 	bool windowBorderless   = false;
