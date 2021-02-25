@@ -239,6 +239,8 @@ void run(std::function<void(double, double)> update)
 	for (size_t i = 0; i < cb_startup.size(); i++)
 		cb_startup[i]();
 
+	currenttime = SDL_GetPerformanceCounter();
+
 	while (!doquit) {
 		Uint32 frametimesindex = framecount % FRAME_VALUES;
 		Uint32 getticks = SDL_GetTicks();

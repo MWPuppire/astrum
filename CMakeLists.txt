@@ -33,6 +33,11 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_include_directories(astrumDemo PRIVATE astrum)
 	target_link_libraries(astrumDemo astrum)
 
+	add_executable(astrumPong pong.cpp)
+	add_dependencies(astrumPong astrum)
+	target_include_directories(astrumPong PRIVATE astrum)
+	target_link_libraries(astrumPong astrum)
+
 #	Haven't written any tests yet
 #	So testing code is irrelevant
 

@@ -18,6 +18,7 @@ namespace math {
 	unsigned random(unsigned max);
 	unsigned random(unsigned min, unsigned max);
 	double randfloat();
+	double randfloat(double val);
 	void randomseed(unsigned s);
 
 	template <typename T1>

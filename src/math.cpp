@@ -46,7 +46,11 @@ namespace math
 
 	double randfloat()
 	{
-		return rng() / std::mt19937::max();
+		return (double) rng() / (double) std::mt19937::max();
+	}
+	double randfloat(double value)
+	{
+		return randfloat() * value;
 	}
 
 	void randomseed(unsigned s)

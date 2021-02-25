@@ -23,13 +23,13 @@ void update(double dt, double fps)
 	const int width = Astrum::window::getWidth();
 	const int height = Astrum::window::getHeight();
 	const double speed = (double) width / 4.0;
-	if (Astrum::keyboard::isdown("down"))
+	if (Astrum::keyboard::isdown("down") || Astrum::keyboard::isdown("s"))
 		shapeY += speed * dt;
-	if (Astrum::keyboard::isdown("up"))
+	if (Astrum::keyboard::isdown("up") || Astrum::keyboard::isdown("w"))
 		shapeY -= speed * dt;
-	if (Astrum::keyboard::isdown("left"))
+	if (Astrum::keyboard::isdown("left") || Astrum::keyboard::isdown("a"))
 		shapeX -= speed * dt;
-	if (Astrum::keyboard::isdown("right"))
+	if (Astrum::keyboard::isdown("right") || Astrum::keyboard::isdown("d"))
 		shapeX += speed * dt;
 	shapeX = (shapeX < 0.0 ? 0.0 : (shapeX > width ? width : shapeX));
 	shapeY = (shapeY < 0.0 ? 0.0 : (shapeY > height ? height : shapeY));
