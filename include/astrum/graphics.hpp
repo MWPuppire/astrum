@@ -20,6 +20,7 @@ Color color (unsigned char r, unsigned char g, unsigned char b, unsigned char a 
 namespace graphics {
 	extern GPU_Target *screen;
 	extern void *glcontext;
+	extern Font *font;
 
 	int InitGraphics();
 	void QuitGraphics();
@@ -65,8 +66,6 @@ namespace graphics {
 	void arcFilled(float x, float y, float r, float a1, float a2, Color col);
 	void clear();
 	void clear(Color col);
-	Font *getFont();
-	void setFont(Font *font);
 	void print(const char *str, float x = 0, float y = 0);
 	void print(const char *str, float x, float y, Font *font);
 	void print(const char *str, float x, float y, Color col);

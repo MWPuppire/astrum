@@ -15,15 +15,20 @@ extern "C" {
 #include "math.hpp"
 #include "mouse.hpp"
 #include "window.hpp"
+#include "util.hpp"
+#include "image.hpp"
 
 namespace Astrum {
 
-int Init(Config *conf = new Config);
-void Close();
+int init(Config *conf = new Config);
+void exit();
 
 void run(std::function<void(double, double)> update);
 void run(std::function<void(double)> update);
 void run(std::function<void()> update);
+
+double getDeltaTime();
+double getFramesPerSecond();
 
 void quit(bool checkonquit = false);
 

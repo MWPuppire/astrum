@@ -19,10 +19,24 @@ namespace Astrum
 namespace event
 {
 
-	void clear()
+	/**
+         * @brief Clears all events from the event queue.
+         *
+         * Clears the event queue of all events,
+         * regardless of the type of event.
+         */
+	void clear(void)
 	{
 		SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 	}
+
+	/**
+         * @brief Clears events of the specified type from the queue.
+         *
+         * Clears the event queue of all events of the specified type.
+         *
+         * @param type The type of event to remove.
+         */
 	void clear(EventType type)
 	{
 		SDL_FlushEvent(type);
@@ -43,7 +57,7 @@ namespace event
 		SDL_SetEventFilter(cb, data);
 	}
 
-	Event *peek()
+	Event *peek(void)
 	{
 		Event *e = (Event *) malloc(sizeof(Event));
 		int success = SDL_PeepEvents(e, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
@@ -57,7 +71,7 @@ namespace event
 		}
 	}
 
-	Event *poll()
+	Event *poll(void)
 	{
 		Event *e = (Event *) malloc(sizeof(Event));
 		int success = SDL_PollEvent(e);
@@ -67,7 +81,7 @@ namespace event
 			return nullptr;
 	}
 
-	void pump()
+	void pump(void)
 	{
 		SDL_PumpEvents();
 	}
@@ -100,7 +114,7 @@ namespace event
 		return SDL_RegisterEvents(num);
 	}
 
-	Event *wait()
+	Event *wait(void)
 	{
 		Event *e = (Event *) malloc(sizeof(Event));
 		int success = SDL_WaitEvent(e);
@@ -112,6 +126,6 @@ namespace event
 		}
 	}
 
-}
+};
 
 }; // namespace Astrum

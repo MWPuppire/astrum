@@ -77,8 +77,9 @@ int main()
 {
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
+	conf.windowResizable = true;
 
-	Astrum::Init(&conf);
+	Astrum::init(&conf);
 
 	Astrum::onstartup(startup);
 	Astrum::ondraw(draw);
@@ -86,7 +87,7 @@ int main()
 
 	Astrum::run(update);
 
-	Astrum::Close();
+	Astrum::exit();
 
 	return 0;
 }

@@ -6,6 +6,9 @@
 
 extern "C" {
 	#include "SDL.h"
+	#include "SDL_gpu.h"
+	#include "SDL_image.h"
+	#include "SDL_ttf.h"
 }
 
 #include <functional>
@@ -64,6 +67,9 @@ namespace
 	std::vector<std::function<void(bool)> > cb_mousefocus;
 	std::vector<std::function<void(std::filesystem::path)> > cb_filedropped;
 	std::vector<std::function<void(std::filesystem::path)> > cb_directorydropped;
+
+	double fps;
+	double dt;
 };
 
 bool handle_event(SDL_Event e)
@@ -76,8 +82,8 @@ bool handle_event(SDL_Event e)
 			term = cb_quit[i]() && term;
 		break;
 	case SDL_KEYDOWN:
-			if (e.key.repeat && !keyboard::hasKeyRepeat())
-				break;
+		if (e.key.repeat && !keyboard::hasKeyRepeat())
+			break;
 		for (size_t i = 0; i < cb_keypressed.size(); i++)
 			cb_keypressed[i](e.key.keysym.sym, e.key.keysym.mod, (bool) e.key.repeat);
 		break;
@@ -163,7 +169,7 @@ bool handle_event(SDL_Event e)
 	return term;
 }
 
-int Init(Config *conf)
+int init(Config *conf)
 {
 	if (hasInit)
 		return 0;
@@ -178,6 +184,13 @@ int Init(Config *conf)
 	if (init != 0) {
 		SDL_Log("Unable to initialize SDL_TTF: %s\n", TTF_GetError());
 		return init;
+	}
+
+	int imageFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF;
+	int imageInit = IMG_Init(imageFlags);
+	if ((imageInit & imageFlags) != imageFlags) {
+		SDL_Log("Failed to initialize SDL_image: %s\n", IMG_GetError());
+		return 1;
 	}
 
 	init = window::InitWindow(conf);
@@ -216,10 +229,11 @@ int Init(Config *conf)
 	return 0;
 }
 
-void Close()
+void exit()
 {
 	SDL_Quit();
 	TTF_Quit();
+	IMG_Quit();
 
 	window::QuitWindow();
 	mouse::QuitMouse();
@@ -253,10 +267,12 @@ void run(std::function<void(double, double)> update)
 			framespersecond += frametimes[i];
 		framespersecond /= count;
 		framespersecond = 1000.0 / framespersecond;
+		fps = framespersecond;
 
 		lasttime = currenttime;
 		currenttime = SDL_GetPerformanceCounter();
 		double deltatime = (double) ((currenttime - lasttime) / (double) SDL_GetPerformanceFrequency());
+		dt = deltatime;
 
 		update(deltatime, framespersecond);
 
@@ -282,6 +298,15 @@ void run(std::function<void()> update)
 {
 	auto lambda = [update](double UNUSED(dt), double UNUSED(fps)) { update(); };
 	run(lambda);
+}
+
+double getDeltaTime()
+{
+	return dt;
+}
+double getFramesPerSecond()
+{
+	return fps;
 }
 
 void quit(bool checkonquit)

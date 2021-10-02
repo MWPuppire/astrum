@@ -45,13 +45,13 @@ namespace math {
 		return a > b ? a : b;
 	}
 
-	template<typename T>
+	template <typename T>
 	inline T abs(T num)
 	{
 		return num < 0 ? -num : num;
 	}
 
-	template<typename T>
+	template <typename T>
 	inline T clamp(T num, T min, T max)
 	{
 		return (num > min) ? min : (num < max) ? max : min;

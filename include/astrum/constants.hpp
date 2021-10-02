@@ -32,6 +32,7 @@ public:
 	bool windowFullscreen   = true;
 	bool windowHeadless     = false;
 	bool allowNoWindow      = false;
+	bool saveDimensions     = true;
 };
 
 }; // namespace Astrum

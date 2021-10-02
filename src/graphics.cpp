@@ -1,5 +1,6 @@
 extern "C" {
 	#include "SDL.h"
+	#include "SDL_image.h"
 	#include "SDL_gpu.h"
 }
 
@@ -11,6 +12,7 @@ extern "C" {
 #include "astrum/graphics.hpp"
 #include "astrum/font.hpp"
 #include "astrum/astrum.hpp"
+#include "astrum/util.hpp"
 
 namespace Astrum
 {
@@ -24,12 +26,12 @@ namespace graphics
 {
 	GPU_Target *screen;
 	void *glcontext;
+	Font *font;
 
 	namespace
 	{
 		Color backgroundColor;
 		Color currentColor;
-		Font *defaultFont;
 	};
 
 	void drawframe()
@@ -45,10 +47,10 @@ namespace graphics
 		else
 			glcontext = nullptr;
 
-		backgroundColor = { .r = 0x00, .g = 0x00, .b = 0x00, .a = 0xFF };
-		currentColor = { .r = 0x00, .g = 0x00, .b = 0x00, .a = 0xFF };
+		backgroundColor = color(0, 0, 0, 0xFF);
+		currentColor = color(0, 0, 0, 0xFF);
 
-		defaultFont = new Font();
+		font = new Font();
 
 		auto drawevent = []() { drawframe(); };
 
@@ -67,6 +69,7 @@ namespace graphics
 	void QuitGraphics()
 	{
 		SDL_GL_DeleteContext(glcontext);
+		IMG_Quit();
 		GPU_Quit();
 	}
 
@@ -278,18 +281,9 @@ namespace graphics
 		GPU_ClearColor(screen, col);
 	}
 
-	Font *getFont()
-	{
-		return defaultFont;
-	}
-	void setFont(Font *font)
-	{
-		defaultFont = font;
-	}
-
 	void print(const char *str, float x, float y)
 	{
-		print(str, x, y, defaultFont);
+		print(str, x, y, font);
 	}
 	void print(const char *str, float x, float y, Font *font)
 	{
@@ -305,7 +299,7 @@ namespace graphics
 	}
 	void print(const char *str, float x, float y, Color col)
 	{
-		print(str, x, y, defaultFont, col);
+		print(str, x, y, font, col);
 	}
 	void print(const char *str, float x, float y, Font *font, Color col)
 	{
@@ -322,39 +316,35 @@ namespace graphics
 
 	void printf(float x, float y, const char *str, ...)
 	{
-		char buf[50];
 		va_list args;
 		va_start(args, str);
-		std::vsnprintf(buf, sizeof(buf), str, args);
+		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(buf, x, y);
+		print(formatted.c_str(), x, y);
 	}
 	void printf(float x, float y, Font *font, const char *str, ...)
 	{
-		char buf[50];
 		va_list args;
 		va_start(args, str);
-		std::vsnprintf(buf, sizeof(buf), str, args);
+		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(buf, x, y, font);
+		print(formatted.c_str(), x, y, font);
 	}
 	void printf(float x, float y, Color col, const char *str, ...)
 	{
-		char buf[50];
 		va_list args;
 		va_start(args, str);
-		std::vsnprintf(buf, sizeof(buf), str, args);
+		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(buf, x, y, col);
+		print(formatted.c_str(), x, y, col);
 	}
 	void printf(float x, float y, Font *font, Color col, const char *str, ...)
 	{
-		char buf[50];
 		va_list args;
 		va_start(args, str);
-		std::vsnprintf(buf, sizeof(buf), str, args);
+		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(buf, x, y, font, col);
+		print(formatted.c_str(), x, y, font, col);
 	}
 };
 
