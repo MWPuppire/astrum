@@ -29,7 +29,7 @@ namespace window
 		settings = conf;
 		if (conf->windowHeadless) {
 			window = nullptr;
-			return -1;
+			return 0;
 		}
 
 		window = SDL_CreateWindow(

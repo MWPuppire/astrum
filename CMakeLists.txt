@@ -6,8 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -Wall -Wextra -Wshadow -fno-omit-frame-pointer -fsanitize=address -g")
-string(APPEND CMAKE_LINKER_FLAGS_DEBUG " -fno-omit-frame-pointer -fsanitize=address -g")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -Wall -Wextra -Wshadow -fno-omit-frame-pointer -fsanitize=undefined -g")
 
 if(EMSCRIPTEN)
 	add_definitions("-s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2")

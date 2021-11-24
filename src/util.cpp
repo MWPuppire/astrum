@@ -1,6 +1,8 @@
 #include <string>
 #include <cstdarg>
 #include <cstdio>
+#include <stdexcept>
+#include <memory>
 
 #include "astrum/constants.hpp"
 #include "astrum/util.hpp"
@@ -36,12 +38,15 @@ namespace util {
 		// extra space for NULL terminator
 		std::va_list tmpArgs;
 		va_copy(tmpArgs, args);
-		int size = std::vsnprintf(nullptr, 0, format, tmpArgs) + 1;
+		int size_i = std::vsnprintf(nullptr, 0, format, tmpArgs) + 1;
 		va_end(tmpArgs);
-		char buf[size];
-		std::vsnprintf(buf, size, format, args);
+		if (size_i <= 0)
+			throw std::runtime_error("Error during formatting.");
+		auto size = static_cast<size_t>(size_i);
+		auto buf = std::make_unique<char[]>(size);
+		std::vsnprintf(buf.get(), size, format, args);
 		// exclude final NULL terminator in string
-		return std::string(buf, buf + size);
+		return std::string(buf.get(), buf.get() + size - 1);
 	}
 
 	std::string vstrformat(std::string format, std::va_list args)

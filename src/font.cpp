@@ -25,8 +25,7 @@ Font::Font(int size, Color color, int style)
 		this->font = nullptr;
 		return;
 	} else {
-		this->font = TTF_OpenFontRW(rw, 0, size);
-		SDL_RWclose(rw);
+		this->font = TTF_OpenFontRW(rw, 1, size);
 	}
 	TTF_SetFontStyle(this->font, style & ~OUTLINE);
 	if (style & OUTLINE)

@@ -15,7 +15,6 @@ double player, computer;
 double ballX, ballY;
 double ballAngle, ballMove, ballSpeed, ballPow;
 int playerScore, computerScore;
-Astrum::Font *font;
 
 void initBall(int lastScore)
 {
@@ -156,23 +155,24 @@ void draw()
 	const double lineHeight  = (double) height / 20.0;
 	const double lineWidth   = (double) width / 64.0;
 
-	Astrum::graphics::rectangle(0, player - shapeHeight, shapeWidth,
-		shapeHeight, white, true);
-	Astrum::graphics::rectangle(width - shapeWidth, computer - shapeHeight,
-		shapeWidth, shapeHeight, white, true);
-	Astrum::graphics::circle(ballX, ballY, circleSize, white, true);
+	Astrum::graphics::rectangleFilled(0, player - shapeHeight, shapeWidth,
+		shapeHeight, white);
+	Astrum::graphics::rectangleFilled(width - shapeWidth,
+		computer - shapeHeight, shapeWidth, shapeHeight, white);
+	Astrum::graphics::circleFilled(ballX, ballY, circleSize, white);
 
 	for (int i = 0; i < 10; i++) {
 		Astrum::graphics::rectangleFilled((width - lineWidth) / 2,
 			lineHeight * (i * 2 + 1), lineWidth, lineHeight, white);
 	}
 
+	Astrum::Font *font = Astrum::graphics::font;
 	std::string str = Astrum::util::strformat("Player: %d - Computer: %d",
 		playerScore, computerScore);
 	const char *cstr = str.c_str();
 	int textWidth, textHeight;
 	if (font == nullptr) {
-		printf("howdy! score: %s\n", str.c_str());
+		printf("howdy! score: %s\n", cstr);
 		return;
 	}
 	std::tie(textWidth, textHeight) = font->textSize(cstr);
@@ -186,7 +186,6 @@ void startup()
 	const double center = (double) (height - shapeHeight) / 2.0 + shapeHeight;
 	player = computer = center;
 	playerScore = computerScore = 0;
-	font = Astrum::graphics::font;
 	initBall(0);
 }
 
