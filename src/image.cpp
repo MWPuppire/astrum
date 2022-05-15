@@ -70,4 +70,14 @@ SDL_Surface *Image::getImage()
 	return this->image;
 }
 
+int Image::width()
+{
+	return this->image->w;
+}
+
+int Image::height()
+{
+	return this->image->h;
+}
+
 }

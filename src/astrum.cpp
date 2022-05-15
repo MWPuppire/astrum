@@ -504,7 +504,7 @@ void onfiledropped(std::function<void(std::filesystem::path)> cb)
 }
 void onfiledropped(std::function<void(const char *)> cb)
 {
-	auto lambda = [cb](std::filesystem::path p) { cb(p.c_str()); };
+	auto lambda = [cb](std::filesystem::path p) { cb(p.string().c_str()); };
 	cb_filedropped.push_back(lambda);
 }
 
@@ -514,7 +514,7 @@ void ondirectorydropped(std::function<void(std::filesystem::path)> cb)
 }
 void ondirectorydropped(std::function<void(const char *)> cb)
 {
-	auto lambda = [cb](std::filesystem::path p) { cb(p.c_str()); };
+	auto lambda = [cb](std::filesystem::path p) { cb(p.string().c_str()); };
 	cb_directorydropped.push_back(lambda);
 }
 

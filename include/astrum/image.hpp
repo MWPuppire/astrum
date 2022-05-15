@@ -25,7 +25,10 @@ public:
 	Image(const unsigned char *buf, int bufLen, std::string type = "");
 	Image(SDL_Surface *surf);
 	~Image();
+
 	SDL_Surface *getImage();
+	int width();
+	int height();
 };
 
 } // namespace Astrum

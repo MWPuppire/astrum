@@ -4,9 +4,9 @@
 #include <astrum/astrum.hpp>
 
 class Circle {
-	float xPos;
-	float yPos;
-	float radius;
+	int xPos;
+	int yPos;
+	int radius;
 	Astrum::Color color;
 
 public:
@@ -14,8 +14,8 @@ public:
 	{
 		int width = Astrum::window::getWidth(), height =
 			Astrum::window::getHeight();
-		this->xPos = Astrum::math::randfloat() * width;
-		this->yPos = Astrum::math::randfloat() * height;
+		this->xPos = Astrum::math::random(1, width);
+		this->yPos = Astrum::math::random(1, height);
 		this->radius = 5 * Astrum::math::random(15, 30);
 		this->color = Astrum::color(Astrum::math::random(256),
 			Astrum::math::random(256), Astrum::math::random(256));

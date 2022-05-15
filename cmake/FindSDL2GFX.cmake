@@ -65,7 +65,7 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-SET(SDL2IMAGE_SEARCH_PATHS
+SET(SDL2GFX_SEARCH_PATHS
 	~/Library/Frameworks
 	/Library/Frameworks
 	/usr/local
@@ -77,38 +77,38 @@ SET(SDL2IMAGE_SEARCH_PATHS
 	/opt/homebrew # Apple M1 Homebrew
 )
 
-FIND_PATH(SDL2IMAGE_INCLUDE_DIR SDL_image.h
+FIND_PATH(SDL2GFX_INCLUDE_DIR SDL2_gfxPrimitives.h
 	HINTS
-	$ENV{SDL2IMAGEDIR}
+	$ENV{SDL2GFXDIR}
 	PATH_SUFFIXES include/SDL2 include
-	PATHS ${SDL2IMAGE_SEARCH_PATHS}
+	PATHS ${SDL2GFX_SEARCH_PATHS}
 )
 
-FIND_LIBRARY(SDL2IMAGE_LIBRARY_TEMP
-	NAMES SDL2_image
+FIND_LIBRARY(SDL2GFX_LIBRARY_TEMP
+	NAMES SDL2_GFX
 	HINTS
-	$ENV{SDL2IMAGEDIR}
+	$ENV{SDL2GFXDIR}
 	PATH_SUFFIXES lib64 lib
-	PATHS ${SDL2IMAGE_SEARCH_PATHS}
+	PATHS ${SDL2GFX_SEARCH_PATHS}
 )
 
-IF(NOT SDL2IMAGE_BUILDING_LIBRARY)
-	IF(NOT ${SDL2IMAGE_INCLUDE_DIR} MATCHES ".framework")
+IF(NOT SDL2GFX_BUILDING_LIBRARY)
+	IF(NOT ${SDL2GFX_INCLUDE_DIR} MATCHES ".framework")
 		# Non-OS X framework versions expect you to also dynamically link to
-		# SDL2IMAGEmain. This is mainly for Windows and OS X. Other (Unix) platforms
-		# seem to provide SDL2IMAGEmain for compatibility even though they don't
+		# SDL2GFXmain. This is mainly for Windows and OS X. Other (Unix) platforms
+		# seem to provide SDL2GFXmain for compatibility even though they don't
 		# necessarily need it.
-		FIND_LIBRARY(SDL2IMAGEMAIN_LIBRARY
-			NAMES SDL2_image
+		FIND_LIBRARY(SDL2GFXMAIN_LIBRARY
+			NAMES SDL2_GFX
 			HINTS
-			$ENV{SDL2IMAGEDIR}
+			$ENV{SDL2GFXDIR}
 			PATH_SUFFIXES lib64 lib
-			PATHS ${SDL2IMAGE_SEARCH_PATHS}
+			PATHS ${SDL2GFX_SEARCH_PATHS}
 		)
-	ENDIF(NOT ${SDL2IMAGE_INCLUDE_DIR} MATCHES ".framework")
-ENDIF(NOT SDL2IMAGE_BUILDING_LIBRARY)
+	ENDIF(NOT ${SDL2GFX_INCLUDE_DIR} MATCHES ".framework")
+ENDIF(NOT SDL2GFX_BUILDING_LIBRARY)
 
-# SDL2IMAGE may require threads on your system.
+# SDL2GFX may require threads on your system.
 # The Apple build may not need an explicit flag because one of the
 # frameworks may already provide it.
 # But for non-OSX systems, I will use the CMake Threads package.
@@ -117,48 +117,48 @@ IF(NOT APPLE)
 ENDIF(NOT APPLE)
 
 # MinGW needs an additional library, mwindows
-# It's total link flags should look like -lmingw32 -lSDL2IMAGEmain -lSDL2IMAGE -lmwindows
+# It's total link flags should look like -lmingw32 -lSDL2GFXmain -lSDL2GFX -lmwindows
 # (Actually on second look, I think it only needs one of the m* libraries.)
 IF(MINGW)
 	SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
 ENDIF(MINGW)
 
-IF(SDL2IMAGE_LIBRARY_TEMP)
-	# For SDL2IMAGEmain
-	IF(NOT SDL2IMAGE_BUILDING_LIBRARY)
-		IF(SDL2IMAGEMAIN_LIBRARY)
-			SET(SDL2IMAGE_LIBRARY_TEMP ${SDL2IMAGEMAIN_LIBRARY} ${SDL2IMAGE_LIBRARY_TEMP})
-		ENDIF(SDL2IMAGEMAIN_LIBRARY)
-	ENDIF(NOT SDL2IMAGE_BUILDING_LIBRARY)
+IF(SDL2GFX_LIBRARY_TEMP)
+	# For SDL2GFXmain
+	IF(NOT SDL2GFX_BUILDING_LIBRARY)
+		IF(SDL2GFXMAIN_LIBRARY)
+			SET(SDL2GFX_LIBRARY_TEMP ${SDL2GFXMAIN_LIBRARY} ${SDL2GFX_LIBRARY_TEMP})
+		ENDIF(SDL2GFXMAIN_LIBRARY)
+	ENDIF(NOT SDL2GFX_BUILDING_LIBRARY)
 
-	# For OS X, SDL2IMAGE uses Cocoa as a backend so it must link to Cocoa.
+	# For OS X, SDL2GFX uses Cocoa as a backend so it must link to Cocoa.
 	# CMake doesn't display the -framework Cocoa string in the UI even
 	# though it actually is there if I modify a pre-used variable.
 	# I think it has something to do with the CACHE STRING.
 	# So I use a temporary variable until the end so I can set the
 	# "real" variable in one-shot.
 	IF(APPLE)
-		SET(SDL2IMAGE_LIBRARY_TEMP ${SDL2IMAGE_LIBRARY_TEMP} "-framework Cocoa")
+		SET(SDL2GFX_LIBRARY_TEMP ${SDL2GFX_LIBRARY_TEMP} "-framework Cocoa")
 	ENDIF(APPLE)
 
 	# For threads, as mentioned Apple doesn't need this.
 	# In fact, there seems to be a problem if I used the Threads package
 	# and try using this line, so I'm just skipping it entirely for OS X.
 	IF(NOT APPLE)
-		SET(SDL2IMAGE_LIBRARY_TEMP ${SDL2IMAGE_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
+		SET(SDL2GFX_LIBRARY_TEMP ${SDL2GFX_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
 	ENDIF(NOT APPLE)
 
 	# For MinGW library
 	IF(MINGW)
-		SET(SDL2IMAGE_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2IMAGE_LIBRARY_TEMP})
+		SET(SDL2GFX_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2GFX_LIBRARY_TEMP})
 	ENDIF(MINGW)
 
 	# Set the final string here so the GUI reflects the final state.
-	SET(SDL2IMAGE_LIBRARY ${SDL2IMAGE_LIBRARY_TEMP} CACHE STRING "Where the SDL2IMAGE Library can be found")
+	SET(SDL2GFX_LIBRARY ${SDL2GFX_LIBRARY_TEMP} CACHE STRING "Where the SDL2GFX Library can be found")
 	# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
-	SET(SDL2IMAGE_LIBRARY_TEMP "${SDL2IMAGE_LIBRARY_TEMP}" CACHE INTERNAL "")
-ENDIF(SDL2IMAGE_LIBRARY_TEMP)
+	SET(SDL2GFX_LIBRARY_TEMP "${SDL2GFX_LIBRARY_TEMP}" CACHE INTERNAL "")
+ENDIF(SDL2GFX_LIBRARY_TEMP)
 
 INCLUDE(FindPackageHandleStandardArgs)
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2IMAGE REQUIRED_VARS SDL2IMAGE_LIBRARY SDL2IMAGE_INCLUDE_DIR)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2GFX REQUIRED_VARS SDL2GFX_LIBRARY SDL2GFX_INCLUDE_DIR)

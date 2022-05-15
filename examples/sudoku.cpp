@@ -540,7 +540,7 @@ void update(double dt)
 
 void pushEvent(int x, int y, PuzzleEventType kind)
 {
-	PuzzleEvent event = { .x = x, .y = y, .type = kind };
+	PuzzleEvent event = { .x = x, .y = y, .original = 0, .type = kind };
 	if (puzzle.redoLength) {
 		puzzle.eventStack.erase(puzzle.eventStack.begin()
 			+ puzzle.eventLength, puzzle.eventStack.end());

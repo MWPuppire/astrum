@@ -12,42 +12,40 @@ set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g -fsanitize=undefined -Werror")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g -Werror")
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-omit-frame-pointer")
 
 string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra")
 
 if(EMSCRIPTEN)
-	add_definitions("-s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2")
-	add_definitions("-DEMSCRIPTEN")
+	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_GFX=2)
+	add_compile_definitions("EMSCRIPTEN")
 	set(CMAKE_EXECUTABLE_SUFFIX .html)
 else(EMSCRIPTEN)
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2TTF REQUIRED)
 	find_package(SDL2IMAGE REQUIRED)
+	find_package(SDL2GFX REQUIRED)
 	find_package(OpenGL REQUIRED)
 endif(EMSCRIPTEN)
-
-add_subdirectory(SDL-gpu)
 
 add_library(astrum)
 target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/keyboard.cpp src/math.cpp src/mouse.cpp src/window.cpp src/event.cpp
 	src/util.cpp src/image.cpp)
 target_include_directories(astrum PUBLIC include)
-target_include_directories(astrum PUBLIC ${PROJECT_BINARY_DIR}/SDL_gpu/include)
-target_link_libraries(astrum PUBLIC ${PROJECT_BINARY_DIR}/SDL_gpu/lib/libSDL2_gpu.a)
 
 if(NOT EMSCRIPTEN)
 	target_include_directories(astrum PUBLIC ${SDL2_INCLUDE_DIRS})
 	target_include_directories(astrum PUBLIC ${OPENGL_INCLUDE_DIRS})
 	target_include_directories(astrum PUBLIC ${SDL2TTF_INCLUDE_DIR})
 	target_include_directories(astrum PUBLIC ${SDL2IMAGE_INCLUDE_DIR})
-#	target_link_libraries(astrum PUBLIC ${SDL2_LIBRARIES})
+	target_include_directories(astrum PUBLIC ${SDL2GFX_INCLUDE_DIR})
 	target_link_libraries(astrum PUBLIC ${SDL2_LIBRARY})
 	target_link_libraries(astrum PUBLIC ${OPENGL_gl_LIBRARY})
 	target_link_libraries(astrum PUBLIC ${SDL2TTF_LIBRARY})
 	target_link_libraries(astrum PUBLIC ${SDL2IMAGE_LIBRARY})
+	target_link_libraries(astrum PUBLIC ${SDL2GFX_LIBRARY})
 endif(NOT EMSCRIPTEN)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
