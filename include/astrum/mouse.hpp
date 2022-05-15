@@ -2,8 +2,11 @@
 #define INCLUDE_ASTRUM_MOUSE
 
 extern "C" {
-	#include "SDL.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
+
+#include <tuple>
 
 #include "constants.hpp"
 
@@ -17,11 +20,12 @@ namespace mouse {
 	int InitMouse();
 	void QuitMouse();
 	bool isdown(int key);
-	int getMouseX();
-	int getMouseY();
-	void setMouseX(int x);
-	void setMouseY(int y);
-	void setMousePosition(int x, int y);
+	int getX();
+	int getY();
+	std::tuple<int, int> getCoordinates();
+	void setX(int x);
+	void setY(int y);
+	void setPosition(int x, int y);
 	bool isVisible();
 	void setVisible(bool state);
 	Cursor *newCursor(SDL_Surface *surface, int hotX, int hotY);

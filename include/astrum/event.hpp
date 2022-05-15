@@ -2,7 +2,8 @@
 #define INCLUDE_ASTRUM_EVENT
 
 extern "C" {
-	#include "SDL.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
 
 #include <functional>

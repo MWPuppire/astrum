@@ -2,14 +2,15 @@
 #define INCLUDE_ASTRUM_GRAPHICS
 
 extern "C" {
-	#include "SDL.h"
-	#include "SDL_gpu.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
 
 #include <vector>
 
 #include "constants.hpp"
 #include "font.hpp"
+#include "image.hpp"
 
 namespace Astrum {
 
@@ -18,11 +19,8 @@ typedef SDL_Color Color;
 Color color (unsigned char r, unsigned char g, unsigned char b, unsigned char a = 0xFF);
 
 namespace graphics {
-	extern GPU_Target *screen;
-	extern void *glcontext;
-	extern Font *font;
 
-	int InitGraphics();
+	int InitGraphics(Config *conf);
 	void QuitGraphics();
 	Color getBackgroundColor();
 	void setBackgroundColor(Color color);
@@ -74,6 +72,10 @@ namespace graphics {
 	void printf(float x, float y, Font *font, const char *str, ...);
 	void printf(float x, float y, Color col, const char *str, ...);
 	void printf(float x, float y, Font *font, Color col, const char *str, ...);
+	Font *getFont();
+	void setFont(Font *newFont);
+	void render(Image *image, float x, float y);
+	void getVirtualCoords(int x, int y, int *virtX, int *virtY);
 
 };
 

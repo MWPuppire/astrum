@@ -1,7 +1,8 @@
 extern "C" {
-	#include "SDL.h"
-	#include "SDL_image.h"
-	#include "SDL_gpu.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_image.h>
+	#include <SDL_gpu.h>
 }
 
 #include <cstdio>
@@ -24,14 +25,17 @@ Color color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 
 namespace graphics
 {
-	GPU_Target *screen;
-	void *glcontext;
-	Font *font;
-
 	namespace
 	{
+//		SDL_Renderer *renderer;
+		GPU_Target *screen;
+		void *glcontext;
+		Font *defaultFont;
+
 		Color backgroundColor;
 		Color currentColor;
+
+		Config *settings;
 	};
 
 	void drawframe()
@@ -40,8 +44,10 @@ namespace graphics
 		GPU_ClearColor(screen, backgroundColor);
 	}
 
-	int InitGraphics()
+	int InitGraphics(Config *conf)
 	{
+		settings = conf;
+
 		if (window::window != nullptr)
 			glcontext = SDL_GL_CreateContext(window::window);
 		else
@@ -50,7 +56,11 @@ namespace graphics
 		backgroundColor = color(0, 0, 0, 0xFF);
 		currentColor = color(0, 0, 0, 0xFF);
 
-		font = new Font();
+#ifndef NO_DEFAULT_FONT
+		defaultFont = new Font();
+#else
+		defaultFont = nullptr;
+#endif
 
 		auto drawevent = []() { drawframe(); };
 
@@ -58,16 +68,33 @@ namespace graphics
 
 		if (window::window == nullptr) {
 			screen = GPU_Init(0, 0, GPU_DEFAULT_INIT_FLAGS);
+//			renderer = NULL;
 		} else {
 			GPU_SetInitWindow(SDL_GetWindowID(window::window));
 			screen = GPU_Init(window::getWidth(), window::getHeight(), GPU_DEFAULT_INIT_FLAGS);
+//			renderer = SDL_CreateRenderer(window::window, -1, 0);
 		}
+
+		if (conf->scaleToSize) {
+//			SDL_RenderSetLogicalSize(renderer, conf->windowWidth, conf->windowHeight);
+//			SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
+			GPU_SetVirtualResolution(screen, conf->windowWidth, conf->windowHeight);
+		}
+
+		auto resizeevent = [](int w, int h)
+		{
+			GPU_SetWindowResolution(w, h);
+			if (settings->scaleToSize)
+				GPU_SetVirtualResolution(screen, settings->windowWidth, settings->windowHeight);
+		};
+		onresize(resizeevent);
 
 		return 0;
 	}
 
 	void QuitGraphics()
 	{
+		GPU_FreeTarget(screen);
 		SDL_GL_DeleteContext(glcontext);
 		IMG_Quit();
 		GPU_Quit();
@@ -283,35 +310,26 @@ namespace graphics
 
 	void print(const char *str, float x, float y)
 	{
-		print(str, x, y, font);
+		print(str, x, y, defaultFont, currentColor);
 	}
 	void print(const char *str, float x, float y, Font *font)
 	{
-		GPU_Image *rendered = font->renderText(str);
-		if (rendered == nullptr)
-			return;
-		int offsetX, offsetY;
-		font->textSize(str, &offsetX, &offsetY);
-		x += 0.5 * (float) offsetX;
-		y += 0.5 * (float) offsetY;
-		GPU_Blit(rendered, nullptr, screen, x, y);
-		GPU_FreeImage(rendered);
+		print(str, x, y, font, currentColor);
 	}
 	void print(const char *str, float x, float y, Color col)
 	{
-		print(str, x, y, font, col);
+		print(str, x, y, defaultFont, col);
 	}
 	void print(const char *str, float x, float y, Font *font, Color col)
 	{
-		GPU_Image *rendered = font->renderText(str, col);
-		if (rendered == nullptr)
+		Image *image = font->renderText(str, col);
+		if (image == nullptr)
 			return;
 		int offsetX, offsetY;
 		font->textSize(str, &offsetX, &offsetY);
 		x += 0.5 * (float) offsetX;
 		y += 0.5 * (float) offsetY;
-		GPU_Blit(rendered, nullptr, screen, x, y);
-		GPU_FreeImage(rendered);
+		render(image, x, y);
 	}
 
 	void printf(float x, float y, const char *str, ...)
@@ -320,7 +338,7 @@ namespace graphics
 		va_start(args, str);
 		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(formatted.c_str(), x, y);
+		print(formatted.c_str(), x, y, defaultFont, currentColor);
 	}
 	void printf(float x, float y, Font *font, const char *str, ...)
 	{
@@ -328,7 +346,7 @@ namespace graphics
 		va_start(args, str);
 		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(formatted.c_str(), x, y, font);
+		print(formatted.c_str(), x, y, font, currentColor);
 	}
 	void printf(float x, float y, Color col, const char *str, ...)
 	{
@@ -336,7 +354,7 @@ namespace graphics
 		va_start(args, str);
 		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
-		print(formatted.c_str(), x, y, col);
+		print(formatted.c_str(), x, y, defaultFont, col);
 	}
 	void printf(float x, float y, Font *font, Color col, const char *str, ...)
 	{
@@ -345,6 +363,32 @@ namespace graphics
 		std::string formatted = util::vstrformat(str, args);
 		va_end(args);
 		print(formatted.c_str(), x, y, font, col);
+	}
+
+	Font *getFont()
+	{
+		return defaultFont;
+	}
+
+	void setFont(Font *newFont)
+	{
+		defaultFont = newFont;
+	}
+
+	void render(Image *image, float x, float y)
+	{
+		SDL_Surface *surf = image->getImage();
+		GPU_Image *blit = GPU_CopyImageFromSurface(surf);
+		GPU_Blit(blit, nullptr, screen, x, y);
+		GPU_FreeImage(blit);
+	}
+
+	void getVirtualCoords(int x, int y, int *virtX, int *virtY)
+	{
+		float modifiedX, modifiedY;
+		GPU_GetVirtualCoords(screen, &modifiedX, &modifiedY, x, y);
+		*virtX = (int) modifiedX;
+		*virtY = (int) modifiedY;
 	}
 };
 

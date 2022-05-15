@@ -2,7 +2,8 @@
 #define INCLUDE_ASTRUM_WINDOW
 
 extern "C" {
-	#include "SDL.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
 
 #include <tuple>
@@ -14,7 +15,7 @@ namespace Astrum {
 namespace window {
 	extern SDL_Window *window;
 
-	int InitWindow(Config *game);
+	int InitWindow(Config *conf);
 	void QuitWindow();
 	void setFullscreen(bool fullscreen);
 	void setSize(int width, int height);

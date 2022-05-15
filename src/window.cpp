@@ -1,6 +1,6 @@
 extern "C" {
-	#include "SDL.h"
-	#include "SDL_gpu.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
 
 #include <tuple>
@@ -60,7 +60,6 @@ namespace window
 		{
 			windowWidth = w;
 			windowHeight = h;
-			GPU_SetWindowResolution(w, h);
 		};
 		onresize(resizeevent);
 
@@ -243,7 +242,6 @@ namespace window
 		SDL_bool flag = toggle ? SDL_TRUE : SDL_FALSE;
 		SDL_SetWindowResizable(window, flag);
 	}
-
 };
 
 }; // namespace Astrum

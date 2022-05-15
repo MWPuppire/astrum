@@ -1,7 +1,7 @@
 extern "C" {
-	#include "SDL.h"
-	#include "SDL_ttf.h"
-	#include "SDL_gpu.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_ttf.h>
 }
 
 #include <string>
@@ -10,13 +10,18 @@ extern "C" {
 #include <tuple>
 
 #include "astrum/constants.hpp"
-#include "astrum/assets/vera_font.hpp"
 #include "astrum/font.hpp"
 #include "astrum/util.hpp"
+#include "astrum/image.hpp"
+
+#ifndef NO_DEFAULT_FONT
+#include "astrum/assets/vera_font.hpp"
+#endif
 
 namespace Astrum
 {
 
+#ifndef NO_DEFAULT_FONT
 Font::Font(int size, Color color, int style)
 {
 	SDL_RWops *rw = SDL_RWFromConstMem(Vera_ttf, Vera_ttf_len);
@@ -32,6 +37,8 @@ Font::Font(int size, Color color, int style)
 		TTF_SetFontOutline(this->font, 1);
 	this->defaultColor = color;
 }
+#endif
+
 Font::Font(std::string path, int size, Color color, int style)
 {
 	this->font = TTF_OpenFont(path.c_str(), size);
@@ -84,28 +91,24 @@ Font::~Font()
 		TTF_CloseFont(this->font);
 }
 
-GPU_Image *Font::renderText(const char *text)
+Image *Font::renderText(const char *text)
 {
 	return this->renderText(text, this->defaultColor);
 }
-GPU_Image *Font::renderText(const char *text, Color color)
+Image *Font::renderText(const char *text, Color color)
 {
 	if (this->font == nullptr)
 		return nullptr;
 	if (text == nullptr)
 		return nullptr;
-	SDL_Surface *surfaceMessage = TTF_RenderUTF8_Solid(this->font, text, color);
-	if (surfaceMessage == nullptr)
-		return nullptr;
-	GPU_Image *out = GPU_CopyImageFromSurface(surfaceMessage);
-	SDL_FreeSurface(surfaceMessage);
-	return out;
+	SDL_Surface *surf = TTF_RenderUTF8_Solid(this->font, text, color);
+	return new Image(surf);
 }
-GPU_Image *Font::renderText(std::string text)
+Image *Font::renderText(std::string text)
 {
 	return this->renderText(text.c_str(), this->defaultColor);
 }
-GPU_Image *Font::renderText(std::string text, Color color)
+Image *Font::renderText(std::string text, Color color)
 {
 	return this->renderText(text.c_str(), color);
 }

@@ -2,15 +2,16 @@
 #define INCLUDE_ASTRUM_FONT
 
 extern "C" {
-	#include "SDL.h"
-	#include "SDL_ttf.h"
-	#include "SDL_gpu.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_ttf.h>
 }
 
 #include <string>
 #include <tuple>
 
 #include "constants.hpp"
+#include "image.hpp"
 
 namespace Astrum {
 
@@ -21,16 +22,18 @@ class Font {
 	Color defaultColor;
 
 public:
+#ifndef NO_DEFAULT_FONT
 	Font(int size = 18, Color color = { .r = 0, .g = 0, .b = 0, .a = 255 }, int style = NORMAL);
+#endif
 	Font(std::string path, int size = 18, Color color = { .r = 0, .g = 0, .b = 0, .a = 255 }, int style = NORMAL);
 	Font(const char *path, int size = 18, Color color = { .r = 0, .g = 0, .b = 0, .a = 255 }, int style = NORMAL);
 	Font(SDL_RWops *rw, int size = 18, Color color = { .r = 0, .g = 0, .b = 0, .a = 255 }, int style = NORMAL);
 	Font(const unsigned char *buf, int bufLen, int size = 18, Color color = { .r = 0, .g = 0, .b = 0, .a = 255 }, int style = NORMAL);
 	~Font();
-	GPU_Image *renderText(const char *text);
-	GPU_Image *renderText(const char *text, Color color);
-	GPU_Image *renderText(std::string text);
-	GPU_Image *renderText(std::string text, Color color);
+	Image *renderText(const char *text);
+	Image *renderText(const char *text, Color color);
+	Image *renderText(std::string text);
+	Image *renderText(std::string text, Color color);
 	int textSize(const char *text, int *w, int *h);
 	std::tuple<int, int> textSize(const char *text);
 	int textSize(std::string text, int *w, int *h);

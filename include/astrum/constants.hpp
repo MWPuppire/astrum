@@ -4,13 +4,13 @@
 namespace Astrum {
 
 extern const char *VERSION;
-const int VERSION_MAJOR = 0;
-const int VERSION_MINOR = 1;
-const int VERSION_PATCH = 0;
+#define VERSION_MAJOR (VERSION[0] - '0')
+#define VERSION_MINOR (VERSION[2] - '0')
+#define VERSION_PATCH (VERSION[4] - '0')
 
 extern const char *DEFAULT_TITLE;
-const int DEFAULT_WIDTH = 640;
-const int DEFAULT_HEIGHT = 480;
+extern const int DEFAULT_WIDTH;
+extern const int DEFAULT_HEIGHT;
 
 /**
  * @brief Configuration for the game.
@@ -33,6 +33,7 @@ public:
 	bool windowHeadless     = false;
 	bool allowNoWindow      = false;
 	bool saveDimensions     = true;
+	bool scaleToSize        = false;
 };
 
 }; // namespace Astrum

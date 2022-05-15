@@ -1,13 +1,16 @@
 extern "C" {
-	#include "SDL.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
 
 #include <map>
 #include <vector>
+#include <tuple>
 
 #include "astrum/constants.hpp"
 #include "astrum/mouse.hpp"
 #include "astrum/astrum.hpp"
+#include "astrum/graphics.hpp"
 
 namespace Astrum
 {
@@ -45,33 +48,36 @@ namespace mouse
 		return mousedown[key];
 	}
 
-	int getMouseX()
+	int getX()
 	{
-		int x;
-		int y;
-		SDL_GetRelativeMouseState(&x, &y);
-		return x;
+		return std::get<0>(getCoordinates());
 	}
 
-	int getMouseY()
+	int getY()
 	{
-		int x;
-		int y;
-		SDL_GetRelativeMouseState(&x, &y);
-		return y;
+		return std::get<1>(getCoordinates());
 	}
 
-	void setMouseX(int x)
+	std::tuple<int, int> getCoordinates()
 	{
-		SDL_WarpMouseInWindow(nullptr, x, getMouseY());
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		int virtX, virtY;
+		graphics::getVirtualCoords(x, y, &virtX, &virtY);
+		return std::make_tuple(virtX, virtY);
 	}
 
-	void setMouseY(int y)
+	void setX(int x)
 	{
-		SDL_WarpMouseInWindow(nullptr, getMouseX(), y);
+		SDL_WarpMouseInWindow(nullptr, x, getY());
 	}
 
-	void setMousePosition(int x, int y)
+	void setY(int y)
+	{
+		SDL_WarpMouseInWindow(nullptr, getX(), y);
+	}
+
+	void setPosition(int x, int y)
 	{
 		SDL_WarpMouseInWindow(nullptr, x, y);
 	}

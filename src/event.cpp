@@ -5,7 +5,8 @@
 #endif
 
 extern "C" {
-	#include "SDL.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL.h>
 }
 
 #include <functional>

@@ -1,8 +1,13 @@
 #ifndef INCLUDE_ASTRUM
 #define INCLUDE_ASTRUM
 
+#ifdef EMSCRIPTEN
+	#include <emscripten/emscripten.h>
+#endif
+
 extern "C" {
-  #include "SDL.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
 }
 
 #include <filesystem>

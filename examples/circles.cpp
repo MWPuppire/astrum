@@ -1,4 +1,5 @@
 #include <vector>
+#include <memory>
 
 #include <astrum/astrum.hpp>
 
@@ -32,13 +33,13 @@ public:
 	}
 };
 
-std::vector<Circle *> circles;
+std::vector<std::unique_ptr<Circle>> circles;
 
 void load()
 {
 	int numCircles = Astrum::math::random(17, 24);
 	for (int i = 0; i < numCircles; i++)
-		circles.push_back(new Circle());
+		circles.push_back(std::make_unique<Circle>());
 }
 
 void update(double dt)
@@ -46,22 +47,23 @@ void update(double dt)
 	if (Astrum::keyboard::isdown("escape"))
 		Astrum::quit();
 
-	for (Circle *circle : circles)
+	for (const auto &circle : circles)
 		circle->update(dt);
 
 	if (Astrum::math::randfloat() < 4 * dt)
-		circles.push_back(new Circle());
+		circles.push_back(std::make_unique<Circle>());
 }
 
 void draw()
 {
-	for (Circle *circle : circles)
+	for (const auto &circle : circles)
 		circle->draw();
 }
 
 int main()
 {
 	Astrum::Config conf;
+	conf.windowTitle = "Astrum Circles";
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
 

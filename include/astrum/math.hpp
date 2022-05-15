@@ -54,7 +54,7 @@ namespace math {
 	template <typename T>
 	inline T clamp(T num, T min, T max)
 	{
-		return (num > min) ? min : (num < max) ? max : min;
+		return (num < min) ? min : (num > max) ? max : min;
 	}
 
 	inline double log(double val);

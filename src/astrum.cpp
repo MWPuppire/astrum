@@ -5,10 +5,10 @@
 #endif
 
 extern "C" {
-	#include "SDL.h"
-	#include "SDL_gpu.h"
-	#include "SDL_image.h"
-	#include "SDL_ttf.h"
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_image.h>
+	#include <SDL2/SDL_ttf.h>
 }
 
 #include <functional>
@@ -30,7 +30,9 @@ namespace Astrum
 {
 
 const char *VERSION = "0.1.0";
-const char *DEFAULT_TITLE = "Astrum";
+const char *DEFAULT_TITLE = "Untitled";
+const int DEFAULT_WIDTH = 640;
+const int DEFAULT_HEIGHT = 480;
 
 namespace
 {
@@ -67,6 +69,9 @@ namespace
 	std::vector<std::function<void(bool)> > cb_mousefocus;
 	std::vector<std::function<void(std::filesystem::path)> > cb_filedropped;
 	std::vector<std::function<void(std::filesystem::path)> > cb_directorydropped;
+#ifdef EMSCRIPTEN
+	std::function<void(double, double)> cb_update;
+#endif
 
 	double fps;
 	double dt;
@@ -75,6 +80,7 @@ namespace
 bool handle_event(SDL_Event e)
 {
 	bool term = false;
+	int virtX, virtY;
 	switch (e.type) {
 	case SDL_QUIT:
 		term = true;
@@ -100,16 +106,19 @@ bool handle_event(SDL_Event e)
 			cb_textinput[i](e.edit.text);
 		break;
 	case SDL_MOUSEMOTION:
+		graphics::getVirtualCoords(e.motion.x, e.motion.y, &virtX, &virtY);
 		for (size_t i = 0; i < cb_mousemoved.size(); i++)
-			cb_mousemoved[i](e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
+			cb_mousemoved[i](virtX, virtY, e.motion.xrel, e.motion.yrel);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
+		graphics::getVirtualCoords(e.motion.x, e.motion.y, &virtX, &virtY);
 		for (size_t i = 0; i < cb_mousepressed.size(); i++)
-			cb_mousepressed[i](e.button.button, e.button.x, e.button.y, e.button.clicks);
+			cb_mousepressed[i](e.button.button, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEBUTTONUP:
+		graphics::getVirtualCoords(e.motion.x, e.motion.y, &virtX, &virtY);
 		for (size_t i = 0; i < cb_mousereleased.size(); i++)
-			cb_mousereleased[i](e.button.button, e.button.x, e.button.y, e.button.clicks);
+			cb_mousereleased[i](e.button.button, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEWHEEL: {
 		Sint32 mul = e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1;
@@ -174,7 +183,9 @@ int init(Config *conf)
 	if (hasInit)
 		return 0;
 
-	int init = SDL_Init(SDL_INIT_EVERYTHING);
+	SDL_SetMainReady();
+	int init = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO
+		| SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 	if (init != 0) {
 		SDL_Log("Unable to initialize SDL: %s\n", SDL_GetError());
 		return init;
@@ -205,6 +216,12 @@ int init(Config *conf)
 		return init;
 	}
 
+	init = graphics::InitGraphics(conf);
+	if (init != 0) {
+		SDL_Log("Unable to initialize graphics submodule\n");
+		return init;
+	}
+
 	init = mouse::InitMouse();
 	if (init != 0) {
 		SDL_Log("Unable to initialize mouse submodule\n");
@@ -214,12 +231,6 @@ int init(Config *conf)
 	init = math::InitMath();
 	if (init != 0) {
 		SDL_Log("Unable to initialize math submodule\n");
-		return init;
-	}
-
-	init = graphics::InitGraphics();
-	if (init != 0) {
-		SDL_Log("Unable to initialize graphics submodule\n");
 		return init;
 	}
 
@@ -246,8 +257,8 @@ void run(std::function<void(double, double)> update)
 {
 	if (isrunning)
 		return;
+
 	isrunning = true;
-	SDL_Event e;
 	doquit = false;
 
 	for (size_t i = 0; i < cb_startup.size(); i++)
@@ -255,6 +266,45 @@ void run(std::function<void(double, double)> update)
 
 	currenttime = SDL_GetPerformanceCounter();
 
+#ifdef EMSCRIPTEN
+	cb_update = update;
+
+	void (*main_loop)() = []() {
+		SDL_Event e;
+		Uint32 frametimesindex = framecount % FRAME_VALUES;
+		Uint32 getticks = SDL_GetTicks();
+		frametimes[frametimesindex] = getticks - frametimelast;
+		frametimelast = getticks;
+		framecount++;
+		Uint32 count = framecount < FRAME_VALUES ? framecount : FRAME_VALUES;
+		framespersecond = 0;
+		for (Uint32 i = 0; i < count; i++)
+			framespersecond += frametimes[i];
+		framespersecond /= count;
+		framespersecond = 1000.0 / framespersecond;
+		fps = framespersecond;
+
+		lasttime = currenttime;
+		currenttime = SDL_GetPerformanceCounter();
+		double deltatime = (double) ((currenttime - lasttime) / (double) SDL_GetPerformanceFrequency());
+		dt = deltatime;
+
+		cb_update(deltatime, framespersecond);
+
+		while (SDL_PollEvent(&e)) {
+			doquit = handle_event(e);
+			if (doquit) {
+				isrunning = false;
+				emscripten_cancel_main_loop();
+			}
+		}
+
+		for (size_t i = 0; i < cb_draw.size(); i++)
+			cb_draw[i]();
+	};
+	emscripten_set_main_loop(main_loop, 0, 1);
+#else
+	SDL_Event e;
 	while (!doquit) {
 		Uint32 frametimesindex = framecount % FRAME_VALUES;
 		Uint32 getticks = SDL_GetTicks();
@@ -288,6 +338,7 @@ void run(std::function<void(double, double)> update)
 		SDL_Delay(1);
 	}
 	isrunning = false;
+#endif
 }
 void run(std::function<void(double)> update)
 {
