@@ -11,6 +11,10 @@ extern "C" {
 	#include <SDL2/SDL_ttf.h>
 }
 
+#ifdef __EMSCRIPTEN__
+	#include <emscripten.h>
+#endif
+
 #include <functional>
 #include <map>
 #include <vector>
@@ -37,7 +41,6 @@ const int DEFAULT_HEIGHT = 480;
 namespace
 {
 	int hasInit = 0;
-	Config *settings;
 
 	const int FRAME_VALUES = 16;
 
@@ -69,7 +72,7 @@ namespace
 	std::vector<std::function<void(bool)> > cb_mousefocus;
 	std::vector<std::function<void(std::filesystem::path)> > cb_filedropped;
 	std::vector<std::function<void(std::filesystem::path)> > cb_directorydropped;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 	std::function<void(double, double)> cb_update;
 #endif
 
@@ -106,17 +109,17 @@ bool handle_event(SDL_Event e)
 			cb_textinput[i](e.edit.text);
 		break;
 	case SDL_MOUSEMOTION:
-		graphics::getVirtualCoords(e.motion.x, e.motion.y, &virtX, &virtY);
+		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		for (size_t i = 0; i < cb_mousemoved.size(); i++)
 			cb_mousemoved[i](virtX, virtY, e.motion.xrel, e.motion.yrel);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		graphics::getVirtualCoords(e.motion.x, e.motion.y, &virtX, &virtY);
+		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		for (size_t i = 0; i < cb_mousepressed.size(); i++)
 			cb_mousepressed[i](e.button.button, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		graphics::getVirtualCoords(e.motion.x, e.motion.y, &virtX, &virtY);
+		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		for (size_t i = 0; i < cb_mousereleased.size(); i++)
 			cb_mousereleased[i](e.button.button, virtX, virtY, e.button.clicks);
 		break;
@@ -178,7 +181,7 @@ bool handle_event(SDL_Event e)
 	return term;
 }
 
-int init(Config *conf)
+int init(Config &conf)
 {
 	if (hasInit)
 		return 0;
@@ -197,7 +200,11 @@ int init(Config *conf)
 		return init;
 	}
 
+#ifdef __EMSCRIPTEN__
+	int imageFlags = 0;
+#else
 	int imageFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF;
+#endif
 	int imageInit = IMG_Init(imageFlags);
 	if ((imageInit & imageFlags) != imageFlags) {
 		SDL_Log("Failed to initialize SDL_image: %s\n", IMG_GetError());
@@ -234,8 +241,6 @@ int init(Config *conf)
 		return init;
 	}
 
-	settings = conf;
-
 	hasInit = 1;
 	return 0;
 }
@@ -266,7 +271,7 @@ void run(std::function<void(double, double)> update)
 
 	currenttime = SDL_GetPerformanceCounter();
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 	cb_update = update;
 
 	void (*main_loop)() = []() {

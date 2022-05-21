@@ -1,12 +1,13 @@
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 #include <astrum/astrum.hpp>
 
 class Circle {
 	int xPos;
 	int yPos;
-	int radius;
+	double radius;
 	Astrum::Color color;
 
 public:
@@ -23,13 +24,18 @@ public:
 
 	void update(double dt)
 	{
-		this->radius = radius - 5 * dt;
+		this->radius = radius - 50 * dt;
 	}
 
 	void draw()
 	{
 		Astrum::graphics::circle(this->xPos, this->yPos, this->radius,
 			this->color, true);
+	}
+
+	bool isDead()
+	{
+		return this->radius <= 1;
 	}
 };
 
@@ -49,8 +55,11 @@ void update(double dt)
 
 	for (const auto &circle : circles)
 		circle->update(dt);
+	circles.erase(std::remove_if(circles.begin(), circles.end(),
+		[](std::unique_ptr<Circle> const &c) { return c->isDead(); }),
+		circles.end());
 
-	if (Astrum::math::randfloat() < 4 * dt)
+	if (Astrum::math::randfloat() < 10 * dt)
 		circles.push_back(std::make_unique<Circle>());
 }
 
@@ -66,8 +75,9 @@ int main()
 	conf.windowTitle = "Astrum Circles";
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
+	conf.scaleToSize = true;
 
-	Astrum::init(&conf);
+	Astrum::init(conf);
 	Astrum::onstartup(load);
 	Astrum::ondraw(draw);
 	Astrum::run(update);

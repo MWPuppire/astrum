@@ -20,6 +20,7 @@ typedef SDL_Color Color;
 class Font {
 	TTF_Font *font;
 	Color defaultColor;
+	SDL_RWops *rw;
 
 public:
 #ifndef NO_DEFAULT_FONT
@@ -34,13 +35,13 @@ public:
 	Image *renderText(const char *text, Color color);
 	Image *renderText(std::string text);
 	Image *renderText(std::string text, Color color);
-	int textSize(const char *text, int *w, int *h);
+	int textSize(const char *text, int &w, int &h);
 	std::tuple<int, int> textSize(const char *text);
-	int textSize(std::string text, int *w, int *h);
+	int textSize(std::string text, int &w, int &h);
 	std::tuple<int, int> textSize(std::string text);
-	int textSizef(int *w, int *h, const char *text, ...);
+	int textSizef(int &w, int &h, const char *text, ...);
 	std::tuple<int, int> textSizef(const char *text, ...);
-	int textSizef(int *w, int *h, std::string text, ...);
+	int textSizef(int &w, int &h, std::string text, ...);
 	std::tuple<int, int> textSizef(std::string text, ...);
 	void setColor(Color col);
 	Color getColor();

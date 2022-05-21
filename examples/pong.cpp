@@ -218,9 +218,8 @@ int main()
 	conf.windowResizable = true;
 	conf.windowTitle = "Pong Test";
 
-	Astrum::init(&conf);
+	Astrum::init(conf);
 	Astrum::graphics::setBackgroundColor(black);
-
 	Astrum::onstartup(startup);
 	Astrum::ondraw(draw);
 

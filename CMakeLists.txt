@@ -19,7 +19,7 @@ string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra")
 
 if(EMSCRIPTEN)
 	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_GFX=2)
-	add_compile_definitions("EMSCRIPTEN")
+	add_link_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_GFX=2)
 	set(CMAKE_EXECUTABLE_SUFFIX .html)
 else(EMSCRIPTEN)
 	find_package(SDL2 REQUIRED)
@@ -32,7 +32,7 @@ endif(EMSCRIPTEN)
 add_library(astrum)
 target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/keyboard.cpp src/math.cpp src/mouse.cpp src/window.cpp src/event.cpp
-	src/util.cpp src/image.cpp)
+	src/util.cpp src/image.cpp src/timer.cpp)
 target_include_directories(astrum PUBLIC include)
 
 if(NOT EMSCRIPTEN)

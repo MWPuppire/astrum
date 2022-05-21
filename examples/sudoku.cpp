@@ -88,15 +88,15 @@ public:
 	Button(const char *text, float x, float y, std::function<void()> onclick)
 		: text(text), x(x), y(y), onclick(onclick), mouseDown(false)
 	{
-		Astrum::graphics::getFont()->textSize(text, &textWidth, &textHeight);
+		Astrum::graphics::getFont()->textSize(text, textWidth, textHeight);
 	}
 	void draw(bool shaded = false)
 	{
-		Astrum::graphics::rectangle(x, y, textWidth + 4, textHeight + 4, black);
 		if (shaded || mouseDown) {
 			Astrum::graphics::rectangleFilled(x, y, textWidth + 4,
 				textHeight + 4, lgray);
 		}
+		Astrum::graphics::rectangle(x, y, textWidth + 4, textHeight + 4, black);
 		Astrum::graphics::print(text, x + 2, y + 2);
 	}
 	void update(bool disabled = false)
@@ -124,6 +124,7 @@ Button *notesButton;
 Button *solveButton;
 Button *undoButton;
 Button *redoButton;
+Button *pauseButton;
 
 int randint(int low, int high)
 {
@@ -463,8 +464,18 @@ std::string prettyTime(double seconds)
 
 void draw()
 {
-	printGrid(puzzle.problem, puzzle.notes, puzzle.x, puzzle.y,
-		puzzleConfig.showErrors);
+	if (puzzleConfig.paused) {
+		int width = 9 * boxSize + 3 * bigLineSize;
+		Astrum::graphics::rectangle(gridOffset, gridOffset, width, width, black);
+		const char *str = "Paused";
+		int textWidth, textHeight;
+		std::tie(textWidth, textHeight) = bigFont->textSize(str);
+		Astrum::graphics::print(str, gridOffset + (width / 2) - (textWidth / 2),
+			gridOffset + (width / 2) - (textHeight / 2), bigFont, black);
+	} else {
+		printGrid(puzzle.problem, puzzle.notes, puzzle.x, puzzle.y,
+			puzzleConfig.showErrors);
+	}
 
 	if (puzzle.won) {
 		// show "You finished the puzzle!" in black over the puzzle
@@ -507,6 +518,8 @@ void draw()
 
 	undoButton->draw(puzzle.eventPointer == 0);
 	redoButton->draw(puzzle.redoLength == 0);
+
+	pauseButton->draw(puzzleConfig.paused);
 }
 
 void update(double dt)
@@ -522,6 +535,7 @@ void update(double dt)
 	solveButton->update();
 	undoButton->update(puzzle.eventPointer == 0);
 	redoButton->update(puzzle.redoLength == 0);
+	pauseButton->update();
 
 	puzzleConfig.givingUp += dt;
 
@@ -650,7 +664,7 @@ int main()
 	conf.minWindowHeight = 480;
 	conf.scaleToSize = true;
 
-	Astrum::init(&conf);
+	Astrum::init(conf);
 	Astrum::graphics::setBackgroundColor(white);
 	bigFont = new Astrum::Font(24);
 	smallFont = new Astrum::Font(10);
@@ -689,6 +703,10 @@ int main()
 		190 + gridOffset * 2, undo);
 	redoButton = new Button("Redo", gridSize + gridOffset * 2 + 50,
 		190 + gridOffset * 2, redo);
+	pauseButton = new Button("Pause", gridSize + gridOffset * 2,
+		226 + gridOffset * 2, [&]() {
+			puzzleConfig.paused = !puzzleConfig.paused;
+		});
 
 	Astrum::onstartup(startup);
 	Astrum::ondraw(draw);

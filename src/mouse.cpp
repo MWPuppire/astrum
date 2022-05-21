@@ -63,7 +63,7 @@ namespace mouse
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		int virtX, virtY;
-		graphics::getVirtualCoords(x, y, &virtX, &virtY);
+		graphics::getVirtualCoords(x, y, virtX, virtY);
 		return std::make_tuple(virtX, virtY);
 	}
 

@@ -35,8 +35,6 @@ namespace graphics
 		Color backgroundColor;
 		Color currentColor;
 		int lineThickness;
-
-		Config *settings;
 	};
 
 	void drawframe()
@@ -47,10 +45,8 @@ namespace graphics
 		SDL_RenderClear(renderer);
 	}
 
-	int InitGraphics(Config *conf)
+	int InitGraphics(Config &conf)
 	{
-		settings = conf;
-
 		if (window::window != nullptr)
 			glcontext = SDL_GL_CreateContext(window::window);
 		else
@@ -73,11 +69,14 @@ namespace graphics
 		if (window::window == nullptr) {
 			renderer = NULL;
 		} else {
-			renderer = SDL_CreateRenderer(window::window, -1, 0);
+			if (conf.existingWindow != nullptr)
+				renderer = SDL_GetRenderer(window::window);
+			if (renderer == nullptr)
+				renderer = SDL_CreateRenderer(window::window, -1, 0);
 		}
 
-		if (conf->scaleToSize) {
-			SDL_RenderSetLogicalSize(renderer, conf->windowWidth, conf->windowHeight);
+		if (conf.scaleToSize) {
+			SDL_RenderSetLogicalSize(renderer, conf.windowWidth, conf.windowHeight);
 			SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
 		}
 
@@ -333,6 +332,7 @@ namespace graphics
 		if (image == nullptr)
 			return;
 		render(image, x, y);
+		delete image;
 	}
 
 	void printf(int x, int y, const char *str, ...)
@@ -387,12 +387,23 @@ namespace graphics
 		SDL_DestroyTexture(tex);
 	}
 
-	void getVirtualCoords(int x, int y, int *virtX, int *virtY)
+	void getVirtualCoords(int x, int y, int &virtX, int &virtY)
 	{
 		float logicalX, logicalY;
 		SDL_RenderWindowToLogical(renderer, x, y, &logicalX, &logicalY);
-		*virtX = (int) logicalX;
-		*virtY = (int) logicalY;
+		virtX = (int) logicalX;
+		virtY = (int) logicalY;
+	}
+
+	Image *screenshot()
+	{
+		int w, h;
+		SDL_GetRendererOutputSize(renderer, &w, &h);
+		SDL_Surface *sshot = SDL_CreateRGBSurface(0, w, h, 32,
+			0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888,
+			sshot->pixels, sshot->pitch);
+		return new Image(sshot);
 	}
 };
 

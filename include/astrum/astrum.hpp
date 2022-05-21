@@ -1,8 +1,8 @@
 #ifndef INCLUDE_ASTRUM
 #define INCLUDE_ASTRUM
 
-#ifdef EMSCRIPTEN
-	#include <emscripten/emscripten.h>
+#ifdef __EMSCRIPTEN__
+	#include <emscripten.h>
 #endif
 
 extern "C" {
@@ -22,10 +22,11 @@ extern "C" {
 #include "window.hpp"
 #include "util.hpp"
 #include "image.hpp"
+#include "timer.hpp"
 
 namespace Astrum {
 
-int init(Config *conf = new Config);
+int init(Config &conf);
 void exit();
 
 void run(std::function<void(double, double)> update);

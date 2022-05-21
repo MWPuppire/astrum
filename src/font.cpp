@@ -26,11 +26,12 @@ Font::Font(int size, Color color, int style)
 {
 	SDL_RWops *rw = SDL_RWFromConstMem(Vera_ttf, Vera_ttf_len);
 	if (rw == nullptr) {
-		SDL_Log("Could not load default font: %s\n", SDL_GetError());
 		this->font = nullptr;
+		this->rw = nullptr;
 		return;
 	} else {
 		this->font = TTF_OpenFontRW(rw, 1, size);
+		this->rw = rw;
 	}
 	TTF_SetFontStyle(this->font, style & ~OUTLINE);
 	if (style & OUTLINE)
@@ -41,6 +42,7 @@ Font::Font(int size, Color color, int style)
 
 Font::Font(std::string path, int size, Color color, int style)
 {
+	this->rw = nullptr;
 	this->font = TTF_OpenFont(path.c_str(), size);
 	if (this->font == nullptr)
 		return;
@@ -51,6 +53,7 @@ Font::Font(std::string path, int size, Color color, int style)
 }
 Font::Font(const char *path, int size, Color color, int style)
 {
+	this->rw = nullptr;
 	this->font = TTF_OpenFont(path, size);
 	if (this->font == nullptr)
 		return;
@@ -61,6 +64,7 @@ Font::Font(const char *path, int size, Color color, int style)
 }
 Font::Font(SDL_RWops *rw, int size, Color color, int style)
 {
+	this->rw = rw;
 	font = TTF_OpenFontRW(rw, 0, size);
 	if (font == nullptr)
 		return;
@@ -74,10 +78,11 @@ Font::Font(const unsigned char *buf, int bufLen, int size, Color color, int styl
 	SDL_RWops *rw = SDL_RWFromConstMem(buf, bufLen);
 	if (rw == nullptr) {
 		this->font = nullptr;
+		this->rw = nullptr;
 		return;
 	} else {
 		this->font = TTF_OpenFontRW(rw, 0, size);
-		SDL_RWclose(rw);
+		this->rw = rw;
 	}
 	TTF_SetFontStyle(this->font, style & ~OUTLINE);
 	if (style & OUTLINE)
@@ -89,6 +94,8 @@ Font::~Font()
 {
 	if (this->font != nullptr)
 		TTF_CloseFont(this->font);
+	if (this->rw != nullptr)
+		SDL_RWclose(this->rw);
 }
 
 Image *Font::renderText(const char *text)
@@ -113,23 +120,27 @@ Image *Font::renderText(std::string text, Color color)
 	return this->renderText(text.c_str(), color);
 }
 
-int Font::textSize(const char *text, int *w, int *h)
+int Font::textSize(const char *text, int &w, int &h)
 {
 	if (this->font == nullptr)
 		return -1;
 	if (text == nullptr)
 		return -1;
-	return TTF_SizeUTF8(this->font, text, w, h);
+	int width, height;
+	int out = TTF_SizeUTF8(this->font, text, &width, &height);
+	w = width;
+	h = height;
+	return out;
 }
 std::tuple<int, int> Font::textSize(const char *text)
 {
 	int w, h;
-	int out = this->textSize(text, &w, &h);
+	int out = this->textSize(text, w, h);
 	if (out != 0)
 		return std::make_tuple(0, 0);
 	return std::make_tuple(w, h);
 }
-int Font::textSize(std::string text, int *w, int *h)
+int Font::textSize(std::string text, int &w, int &h)
 {
 	return this->textSize(text.c_str(), w, h);
 }
@@ -138,7 +149,7 @@ std::tuple<int, int> Font::textSize(std::string text)
 	return this->textSize(text.c_str());
 }
 
-int Font::textSizef(int *w, int *h, const char *text, ...)
+int Font::textSizef(int &w, int &h, const char *text, ...)
 {
 	va_list args;
 	va_start(args, text);
@@ -154,7 +165,7 @@ std::tuple<int, int> Font::textSizef(const char *text, ...)
 	va_end(args);
 	return this->textSize(str);
 }
-int Font::textSizef(int *w, int *h, std::string text, ...)
+int Font::textSizef(int &w, int &h, std::string text, ...)
 {
 	std::va_list args;
 	va_start(args, text);

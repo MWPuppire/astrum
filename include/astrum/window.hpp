@@ -15,7 +15,7 @@ namespace Astrum {
 namespace window {
 	extern SDL_Window *window;
 
-	int InitWindow(Config *conf);
+	int InitWindow(Config &conf);
 	void QuitWindow();
 	void setFullscreen(bool fullscreen);
 	void setSize(int width, int height);
@@ -25,16 +25,16 @@ namespace window {
 	int getWidth();
 	int getHeight();
 	std::tuple<int, int> getDimensions();
-	void getDimensions(int *w, int *h);
+	void getDimensions(int &width, int &height);
 	std::tuple<int, int> getDesktopDimensions();
-	void getDesktopDimensions(int *w, int *h);
+	void getDesktopDimensions(int &width, int &height);
 	void setPosition(int x, int y);
 	std::tuple<int, int> getPosition();
-	void getPosition(int *x, int *y);
+	void getPosition(int &x, int &y);
 	int getMinWidth();
 	int getMinHeight();
 	std::tuple<int, int> getMinDimensions();
-	void getMinDimensions(int *w, int *h);
+	void getMinDimensions(int &width, int &height);
 	bool isResizable();
 	void setResizable(bool toggle);
 };

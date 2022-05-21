@@ -20,7 +20,7 @@ Color color (unsigned char r, unsigned char g, unsigned char b, unsigned char a 
 
 namespace graphics {
 
-	int InitGraphics(Config *conf);
+	int InitGraphics(Config &conf);
 	void QuitGraphics();
 	Color getBackgroundColor();
 	void setBackgroundColor(Color color);
@@ -71,7 +71,8 @@ namespace graphics {
 	Font *getFont();
 	void setFont(Font *newFont);
 	void render(Image *image, int x, int y);
-	void getVirtualCoords(int x, int y, int *virtX, int *virtY);
+	void getVirtualCoords(int x, int y, int &virtX, int &virtY);
+	Image *screenshot();
 
 };
 

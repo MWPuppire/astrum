@@ -15,6 +15,7 @@ namespace Astrum {
 
 class Image {
 	SDL_Surface *image;
+	SDL_RWops *rw;
 
 public:
 	Image(const char *filename);
