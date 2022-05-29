@@ -1,19 +1,12 @@
 #ifndef INCLUDE_ASTRUM_KEYBOARD
 #define INCLUDE_ASTRUM_KEYBOARD
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
-#include <map>
+#include <string>
 
 #include "constants.hpp"
+#include "key.hpp"
 
 namespace Astrum {
-
-typedef SDL_Keycode Keycode;
-typedef SDL_Scancode Scancode;
 
 /**
  * @brief Class for handling the keyboard
@@ -25,9 +18,9 @@ typedef SDL_Scancode Scancode;
 namespace keyboard {
 
 	int InitKeyboard();
-	bool isdown(Keycode key);
-	bool isdown(Scancode key);
-	bool isdown(const char *name);
+	bool isdown(Key key);
+	bool isdown(const char *keystr);
+	bool isdown(std::string keystr);
 	bool hasClipboardText();
 	char *getClipboardText();
 	int setClipboardText(char *text);

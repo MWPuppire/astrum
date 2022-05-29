@@ -29,6 +29,8 @@ extern "C" {
 #include "astrum/math.hpp"
 #include "astrum/graphics.hpp"
 #include "astrum/event.hpp"
+#include "astrum/log.hpp"
+#include "internals.hpp"
 
 namespace Astrum
 {
@@ -64,8 +66,8 @@ namespace
 	std::vector<std::function<void(bool)> > cb_visible;
 	std::vector<std::function<void(bool)> > cb_focus;
 	std::vector<std::function<void(Sint32, Sint32)> > cb_moved;
-	std::vector<std::function<void(SDL_Keycode, Uint16, bool)> > cb_keypressed;
-	std::vector<std::function<void(SDL_Keycode)> > cb_keyreleased;
+	std::vector<std::function<void(Key, Uint16, bool)> > cb_keypressed;
+	std::vector<std::function<void(Key)> > cb_keyreleased;
 	std::vector<std::function<void(char *)> > cb_textinput;
 	std::vector<std::function<void(char *, Sint32, Sint32)> > cb_textedited;
 	std::vector<std::function<void(Sint32, Sint32, Sint32, Sint32)> > cb_mousemoved;
@@ -97,11 +99,12 @@ bool handle_event(SDL_Event e)
 		if (e.key.repeat && !keyboard::hasKeyRepeat())
 			break;
 		for (size_t i = 0; i < cb_keypressed.size(); i++)
-			cb_keypressed[i](e.key.keysym.sym, e.key.keysym.mod, (bool) e.key.repeat);
+			cb_keypressed[i](fromKeycode(e.key.keysym.sym),
+				e.key.keysym.mod, (bool) e.key.repeat);
 		break;
 	case SDL_KEYUP:
 		for (size_t i = 0; i < cb_keyreleased.size(); i++)
-			cb_keyreleased[i](e.key.keysym.sym);
+			cb_keyreleased[i](fromKeycode(e.key.keysym.sym));
 		break;
 	case SDL_TEXTEDITING:
 		for (size_t i = 0; i < cb_textedited.size(); i++)
@@ -193,13 +196,13 @@ int init(Config &conf)
 	int init = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO
 		| SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 	if (init != 0) {
-		SDL_Log("Unable to initialize SDL: %s\n", SDL_GetError());
+		log::error("Unable to initialize SDL: %s\n", SDL_GetError());
 		return init;
 	}
 
 	init = TTF_Init();
 	if (init != 0) {
-		SDL_Log("Unable to initialize SDL_TTF: %s\n", TTF_GetError());
+		log::error("Unable to initialize SDL_TTF: %s\n", TTF_GetError());
 		return init;
 	}
 
@@ -210,37 +213,37 @@ int init(Config &conf)
 #endif
 	int imageInit = IMG_Init(imageFlags);
 	if ((imageInit & imageFlags) != imageFlags) {
-		SDL_Log("Failed to initialize SDL_image: %s\n", IMG_GetError());
+		log::error("Failed to initialize SDL_image: %s\n", IMG_GetError());
 		return 1;
 	}
 
 	init = window::InitWindow(conf);
 	if (init != 0) {
-		SDL_Log("Unable to initialize window submodule\n");
+		log::error("Unable to initialize window submodule\n");
 		return init;
 	}
 
 	init = keyboard::InitKeyboard();
 	if (init != 0) {
-		SDL_Log("Unable to initialize keyboard submodule\n");
+		log::error("Unable to initialize keyboard submodule\n");
 		return init;
 	}
 
 	init = graphics::InitGraphics(conf);
 	if (init != 0) {
-		SDL_Log("Unable to initialize graphics submodule\n");
+		log::error("Unable to initialize graphics submodule\n");
 		return init;
 	}
 
 	init = mouse::InitMouse();
 	if (init != 0) {
-		SDL_Log("Unable to initialize mouse submodule\n");
+		log::error("Unable to initialize mouse submodule\n");
 		return init;
 	}
 
 	init = math::InitMath();
 	if (init != 0) {
-		SDL_Log("Unable to initialize math submodule\n");
+		log::error("Unable to initialize math submodule\n");
 		return init;
 	}
 
@@ -396,22 +399,22 @@ void ondraw(std::function<void()> cb)
 	cb_draw.push_back(cb);
 }
 
-void onkeypressed(std::function<void(SDL_Keycode, Uint16, bool)> cb)
+void onkeypressed(std::function<void(Key, Uint16, bool)> cb)
 {
 	cb_keypressed.push_back(cb);
 }
-void onkeypressed(std::function<void(SDL_Keycode, Uint16)> cb)
+void onkeypressed(std::function<void(Key, Uint16)> cb)
 {
-	auto lambda = [cb](SDL_Keycode k, Uint16 m, bool UNUSED(r)) { cb(k, m); };
+	auto lambda = [cb](Key k, Uint16 m, bool UNUSED(r)) { cb(k, m); };
 	cb_keypressed.push_back(lambda);
 }
-void onkeypressed(std::function<void(SDL_Keycode)> cb)
+void onkeypressed(std::function<void(Key)> cb)
 {
-	auto lambda = [cb](SDL_Keycode k, Uint16 UNUSED(m), bool UNUSED(r)) { cb(k); };
+	auto lambda = [cb](Key k, Uint16 UNUSED(m), bool UNUSED(r)) { cb(k); };
 	cb_keypressed.push_back(lambda);
 }
 
-void onkeyreleased(std::function<void(SDL_Keycode)> cb)
+void onkeyreleased(std::function<void(Key)> cb)
 {
 	cb_keyreleased.push_back(cb);
 }

@@ -3,7 +3,15 @@
 #include <cstdarg>
 #include <cstdio>
 
+extern "C" {
+	#define SDL_MAIN_HANDLED
+	#include <SDL2/SDL.h>
+};
+
 #include "astrum/log.hpp"
+#include "astrum/util.hpp"
+
+namespace Astrum {
 
 namespace log {
 	void defaultWriteFunction(LogCategory cat, std::string str)
@@ -24,7 +32,7 @@ namespace log {
 			break;
 		}
 		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority,
-			str.c_str());
+			"%s", str.c_str());
 	}
 
 	namespace {
@@ -96,4 +104,6 @@ namespace log {
 		va_end(args);
 	}
 
-};
+}
+
+}; // namespace Astrum

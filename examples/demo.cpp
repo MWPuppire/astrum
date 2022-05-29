@@ -58,9 +58,9 @@ void draw()
 	}
 }
 
-void keypressed(Astrum::Keycode key)
+void keypressed(Astrum::Key key)
 {
-	if (key == SDLK_LSHIFT)
+	if (key == Astrum::Key::LSHIFT)
 		shape = (shape + 1) % 5;
 }
 

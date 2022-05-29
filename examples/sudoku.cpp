@@ -583,46 +583,46 @@ void undo()
 	}
 }
 
-void keypress(Astrum::Keycode key, Uint16 mod)
+void keypress(Astrum::Key key, Uint16 mod)
 {
-	if (key == SDLK_SPACE)
+	if (key == Astrum::Key::SPACE)
 		puzzleConfig.paused = !puzzleConfig.paused;
 
 	if (puzzleConfig.paused)
 		return;
 
-	if (key == SDLK_UP)
+	if (key == Astrum::Key::UP)
 		puzzle.y -= 1;
-	else if (key == SDLK_DOWN)
+	else if (key == Astrum::Key::DOWN)
 		puzzle.y += 1;
-	else if (key == SDLK_LEFT)
+	else if (key == Astrum::Key::LEFT)
 		puzzle.x -= 1;
-	else if (key == SDLK_RIGHT)
+	else if (key == Astrum::Key::RIGHT)
 		puzzle.x += 1;
 	puzzle.x = puzzle.x > 8 ? 8 : puzzle.x < 0 ? 0 : puzzle.x;
 	puzzle.y = puzzle.y > 8 ? 8 : puzzle.y < 0 ? 0 : puzzle.y;
 
-	if (key >= SDLK_1 && key <= SDLK_9) {
+	if (key >= Astrum::Key::ONE && key <= Astrum::Key::NINE) {
 		PuzzleEventType ev = (PuzzleEventType) ((puzzleConfig.notes
-			? TGL_NOTE_1 : WRITE_1) + key - SDLK_1);
+			? TGL_NOTE_1 : WRITE_1) + int(key) - int(Astrum::Key::ONE));
 		pushEvent(puzzle.x, puzzle.y, ev);
-	} if (key == SDLK_BACKSPACE) {
+	} if (key == Astrum::Key::BACKSPACE) {
 		PuzzleEventType ev = puzzleConfig.notes ? CLEAR_NOTES : DELETE;
 		pushEvent(puzzle.x, puzzle.y, ev);
 	}
 
-	if (key == SDLK_n && (mod & SHORTCUT_MOD)) {
+	if (key == Astrum::Key::N && (mod & SHORTCUT_MOD)) {
 		// CTRL+N = new puzzle
 		startup();
-	} else if (key == SDLK_n) {
+	} else if (key == Astrum::Key::N) {
 		// N = toggle notes mode
 		puzzleConfig.notes = !puzzleConfig.notes;
 	}
 
-	if (key == SDLK_z && (mod & SHORTCUT_MOD))
+	if (key == Astrum::Key::Z && (mod & SHORTCUT_MOD))
 		// CTRL+Z = undo
 		undo();
-	else if (key == SDLK_y && (mod & SHORTCUT_MOD))
+	else if (key == Astrum::Key::Y && (mod & SHORTCUT_MOD))
 		// CTRL+Y = redo
 		redo();
 }

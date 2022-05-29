@@ -13,6 +13,7 @@ extern "C" {
 
 #include "astrum/event.hpp"
 #include "astrum/constants.hpp"
+#include "astrum/log.hpp"
 
 namespace Astrum
 {
@@ -63,7 +64,7 @@ namespace event
 		Event *e = (Event *) malloc(sizeof(Event));
 		int success = SDL_PeepEvents(e, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 		if (success < 0) {
-			SDL_Log("Error peeking events: %s\n", SDL_GetError());
+			log::warn("Error peeking events: %s\n", SDL_GetError());
 			return nullptr;
 		} else if (success == 1) {
 			return e;
@@ -92,13 +93,13 @@ namespace event
 		if (filter) {
 			int success = SDL_PushEvent(e);
 			if (success < 0)
-				SDL_Log("Error pushing events: %s\n", SDL_GetError());
+				log::warn("Error pushing events: %s\n", SDL_GetError());
 		} else {
 			SDL_PumpEvents();
 			SDL_PeepEvents(e, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 			int success = SDL_PushEvent(e);
 			if (success < 0)
-				SDL_Log("Error pushing events: %s\n", SDL_GetError());
+				log::warn("Error pushing events: %s\n", SDL_GetError());
 		}
 	}
 	void push(EventType type, bool filter)
@@ -122,7 +123,7 @@ namespace event
 		if (success) {
 			return e;
 		} else {
-			SDL_Log("Error waiting for events: %s\n", SDL_GetError());
+			log::warn("Error waiting for events: %s\n", SDL_GetError());
 			return nullptr;
 		}
 	}

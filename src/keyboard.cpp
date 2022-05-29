@@ -4,10 +4,12 @@ extern "C" {
 }
 
 #include <map>
+#include <string>
 
 #include "astrum/constants.hpp"
 #include "astrum/keyboard.hpp"
 #include "astrum/astrum.hpp"
+#include "internals.hpp"
 
 namespace Astrum
 {
@@ -17,14 +19,18 @@ namespace keyboard
 
 	namespace
 	{
-		std::map<Keycode, bool> keysdown;
+		std::map<Key, bool> keysdown;
 		bool keyrepeat = false;
 	}
 
 	int InitKeyboard()
 	{
-		auto add_keydown = [](Keycode key) { keysdown[key] = true; };
-		auto remove_keydown = [](Keycode key) { keysdown[key] = false; };
+		auto add_keydown = [](Key key) {
+			keysdown[key] = true;
+		};
+		auto remove_keydown = [](Key key) {
+			keysdown[key] = false;
+		};
 
 		onkeypressed(add_keydown);
 		onkeyreleased(remove_keydown);
@@ -40,33 +46,19 @@ namespace keyboard
 	 *
 	 * @param key The keycode of the key to check for.
 	 */
-	bool isdown(Keycode key)
+	bool isdown(Key key)
 	{
 		return keysdown[key];
 	}
-	/**
-	 * @brief Tells whether or not a key is held.
-	 *
-	 * Returns whether or not the specified key
-	 * is currently held.
-	 *
-	 * @param key The scancode of the key to check for.
-	 */
-	bool isdown(Scancode key)
+	bool isdown(const char *keystr)
 	{
-		return keysdown[SDL_GetKeyFromScancode(key)];
+		SDL_Keycode code = SDL_GetKeyFromName(keystr);
+		Key key = fromKeycode(code);
+		return keysdown[key];
 	}
-	/**
-	 * @brief Tells whether or not a key is held.
-	 *
-	 * Returns whether or not the specified key
-	 * is currently held.
-	 *
-	 * @param name The name of the key to check for.
-	 */
-	bool isdown(const char *name)
+	bool isdown(std::string keystr)
 	{
-		return keysdown[SDL_GetKeyFromName(name)];
+		return isdown(keystr.c_str());
 	}
 
 	/**
@@ -134,6 +126,11 @@ namespace keyboard
 		keyrepeat = enable;
 	}
 
+}
+
+KeyMod operator|(KeyMod a, KeyMod b)
+{
+	return KeyMod(int(a) | int(b));
 }
 
 }; // namespace Astrum

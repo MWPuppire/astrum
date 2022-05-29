@@ -46,7 +46,7 @@ namespace window
 		}
 
 		if (window == nullptr) {
-			SDL_Log("Could not create window: %s\n", SDL_GetError());
+			log::warn("Could not create window: %s\n", SDL_GetError());
 			if (conf.allowNoWindow)
 				return 0;
 			else

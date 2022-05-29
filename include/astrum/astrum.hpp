@@ -8,7 +8,7 @@
 extern "C" {
 	#define SDL_MAIN_HANDLED
 	#include <SDL2/SDL.h>
-}
+};
 
 #include <filesystem>
 #include <functional>
@@ -23,6 +23,8 @@ extern "C" {
 #include "util.hpp"
 #include "image.hpp"
 #include "timer.hpp"
+#include "key.hpp"
+#include "log.hpp"
 
 namespace Astrum {
 
@@ -45,11 +47,11 @@ void ondraw(std::function<void()> cb);
 
 void onstartup(std::function<void()> cb);
 
-void onkeypressed(std::function<void(SDL_Keycode, Uint16, bool)> cb);
-void onkeypressed(std::function<void(SDL_Keycode, Uint16)> cb);
-void onkeypressed(std::function<void(SDL_Keycode)> cb);
+void onkeypressed(std::function<void(Key, Uint16, bool)> cb);
+void onkeypressed(std::function<void(Key, Uint16)> cb);
+void onkeypressed(std::function<void(Key)> cb);
 
-void onkeyreleased(std::function<void(SDL_Keycode)> cb);
+void onkeyreleased(std::function<void(Key)> cb);
 
 void onresize(std::function<void(Sint32, Sint32)> cb);
 
