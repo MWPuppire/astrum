@@ -12,14 +12,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g -Werror")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -DDEBUG -g -Werror")
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-omit-frame-pointer")
 
 string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra")
 
 if(EMSCRIPTEN)
-	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_GFX=2)
-	add_link_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_GFX=2)
+	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
+		-sUSE_SDL_GFX=2)
+	add_link_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
+		-sUSE_SDL_GFX=2)
 	set(CMAKE_EXECUTABLE_SUFFIX .html)
 else(EMSCRIPTEN)
 	find_package(SDL2 REQUIRED)

@@ -9,9 +9,9 @@ extern "C" {
 namespace Astrum {
 
 extern const char *VERSION;
-#define VERSION_MAJOR (VERSION[0] - '0')
-#define VERSION_MINOR (VERSION[2] - '0')
-#define VERSION_PATCH (VERSION[4] - '0')
+extern const int VERSION_MAJOR;
+extern const int VERSION_MINOR;
+extern const int VERSION_PATCH;
 
 extern const char *DEFAULT_TITLE;
 extern const int DEFAULT_WIDTH;

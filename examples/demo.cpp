@@ -6,8 +6,7 @@ double shapeX;
 double shapeY;
 int shape;
 
-// void update(double dt, double fps)
-void update(double dt)
+void update(double dt, double fps)
 {
 	lastColor += dt;
 	if (Astrum::keyboard::isdown("escape"))
@@ -34,7 +33,7 @@ void update(double dt)
 		shapeX += speed * dt;
 	shapeX = (shapeX < 0.0 ? 0.0 : (shapeX > width ? width : shapeX));
 	shapeY = (shapeY < 0.0 ? 0.0 : (shapeY > height ? height : shapeY));
-//	Astrum::graphics::printf(5.0, 5.0, shapeColor, "FPS: %f", fps);
+	Astrum::graphics::printf(5.0, 5.0, shapeColor, "FPS: %f", fps);
 }
 
 void draw()

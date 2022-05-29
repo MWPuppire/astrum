@@ -13,11 +13,13 @@ namespace Astrum
 Image::Image(const char *filename)
 {
 	this->image = IMG_Load(filename);
+	SDL_SetSurfaceRLE(this->image, 1);
 	this->rw = nullptr;
 }
 Image::Image(std::string filename)
 {
 	this->image = IMG_Load(filename.c_str());
+	SDL_SetSurfaceRLE(this->image, 1);
 	this->rw = nullptr;
 }
 Image::Image(SDL_RWops *rw, const char *type)
@@ -25,6 +27,7 @@ Image::Image(SDL_RWops *rw, const char *type)
 	this->image = *type == '\0'
 		? IMG_Load_RW(rw, 0)
 		: IMG_LoadTyped_RW(rw, 0, type);
+	SDL_SetSurfaceRLE(this->image, 1);
 	this->rw = rw;
 }
 Image::Image(SDL_RWops *rw, std::string type)
@@ -32,6 +35,7 @@ Image::Image(SDL_RWops *rw, std::string type)
 	this->image = type == ""
 		? IMG_Load_RW(rw, 0)
 		: IMG_LoadTyped_RW(rw, 0, type.c_str());
+	SDL_SetSurfaceRLE(this->image, 1);
 	this->rw = rw;
 }
 Image::Image(const unsigned char *buf, int bufLen, const char *type)
@@ -44,6 +48,7 @@ Image::Image(const unsigned char *buf, int bufLen, const char *type)
 		this->image = *type == '\0'
 			? IMG_Load_RW(rw, 1)
 			: IMG_LoadTyped_RW(rw, 1, type);
+		SDL_SetSurfaceRLE(this->image, 1);
 		this->rw = rw;
 	}
 }
@@ -57,12 +62,14 @@ Image::Image(const unsigned char *buf, int bufLen, std::string type)
 		this->image = type == ""
 			? IMG_Load_RW(rw, 1)
 			: IMG_LoadTyped_RW(rw, 1, type.c_str());
+		SDL_SetSurfaceRLE(this->image, 1);
 		this->rw = rw;
 	}
 }
 Image::Image(SDL_Surface *surf)
 {
 	this->image = surf;
+	SDL_SetSurfaceRLE(this->image, 1);
 	this->rw = nullptr;
 }
 

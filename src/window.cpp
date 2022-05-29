@@ -64,6 +64,10 @@ namespace window
 		};
 		onresize(resizeevent);
 
+#ifdef __EMSCRIPTEN
+		emscripten_set_window_title(conf.windowTitle);
+#endif
+
 		return 0;
 	}
 

@@ -34,6 +34,9 @@ namespace Astrum
 {
 
 const char *VERSION = "0.1.0";
+const int VERSION_MAJOR = 0;
+const int VERSION_MINOR = 1;
+const int VERSION_PATCH = 0;
 const char *DEFAULT_TITLE = "Untitled";
 const int DEFAULT_WIDTH = 640;
 const int DEFAULT_HEIGHT = 480;

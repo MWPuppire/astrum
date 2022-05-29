@@ -378,6 +378,59 @@ namespace graphics
 		defaultFont = newFont;
 	}
 
+// hackish fix
+// There is apparently a bug with rendering images in Emscripten SDL
+// https://github.com/emscripten-core/emscripten/issues/16223
+// This is a solution to display images without using SDL textures, which allows
+// the code to display properly.
+// Since this is almost certainly worse than using textures, only use the custom
+// `render` function with Emscripten; otherwise, use normal SDL code.
+#ifdef __EMSCRIPTEN__
+	void render(Image *image, int x, int y)
+	{
+		SDL_Surface *surf = image->getImage();
+		int w = surf->w, h = surf->h;
+		const SDL_PixelFormat *format = surf->format;
+		const int byteSize = format->BytesPerPixel;
+		const int yMultiplier = surf->pitch / byteSize;
+
+		Uint32 colorKey;
+		int hasKey = SDL_GetColorKey(surf, &colorKey);
+
+		SDL_LockSurface(surf);
+		const void *pixels = surf->pixels;
+		for (int surfX = 0; surfX < w; surfX++) {
+			for (int surfY = 0; surfY < h; surfY++) {
+				int idx = surfX + surfY * yMultiplier;
+				Uint32 pixel;
+				switch (byteSize) {
+				case 1:
+					pixel = ((Uint8 *) pixels)[idx];
+					break;
+				case 2:
+					pixel = ((Uint16 *) pixels)[idx];
+					break;
+				case 3: {
+					struct pixelTriplet { Uint8 a, b, c; };
+					union { pixelTriplet trip; Uint32 u32; } x;
+					x.trip = ((pixelTriplet *) pixels)[idx];
+					pixel = x.u32;
+					break;
+				}
+				case 4:
+					pixel = ((Uint32 *) pixels)[idx];
+					break;
+				}
+
+				Uint8 r, g, b, a;
+				SDL_GetRGBA(pixel, format, &r, &g, &b, &a);
+				if (hasKey != 0 || pixel != colorKey)
+					pixelRGBA(renderer, x + surfX, y + surfY, r, g, b, a);
+			}
+		}
+		SDL_UnlockSurface(surf);
+	}
+#else
 	void render(Image *image, int x, int y)
 	{
 		SDL_Surface *surf = image->getImage();
@@ -386,6 +439,7 @@ namespace graphics
 		SDL_RenderCopy(renderer, tex, NULL, &renderRect);
 		SDL_DestroyTexture(tex);
 	}
+#endif
 
 	void getVirtualCoords(int x, int y, int &virtX, int &virtY)
 	{

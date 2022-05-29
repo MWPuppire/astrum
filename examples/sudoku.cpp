@@ -457,6 +457,7 @@ std::string prettyTime(double seconds)
 		}
 		out << std::to_string(minutes) << "m";
 		seconds -= (minutes * 60.0);
+		out.precision(0);
 	}
 	out << std::fixed << seconds << "s";
 	return out.str();
