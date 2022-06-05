@@ -9,6 +9,7 @@ extern "C" {
 #include <tuple>
 
 #include "constants.hpp"
+#include "image.hpp"
 
 namespace Astrum {
 
@@ -28,7 +29,7 @@ namespace mouse {
 	void setPosition(int x, int y);
 	bool isVisible();
 	void setVisible(bool state);
-	Cursor *newCursor(SDL_Surface *surface, int hotX, int hotY);
+	Cursor *newCursor(Image *image, int hotX = 0, int hotY = 0);
 	Cursor *newCursor(SystemCursor id);
 	Cursor *getCursor();
 	void setCursor(Cursor *cursor);

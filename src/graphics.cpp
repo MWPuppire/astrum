@@ -8,6 +8,8 @@ extern "C" {
 #include <cstdio>
 #include <vector>
 #include <assert.h>
+#include <cstdint>
+#include <string>
 
 #include "astrum/constants.hpp"
 #include "astrum/window.hpp"
@@ -19,9 +21,15 @@ extern "C" {
 namespace Astrum
 {
 
-Color color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+Color::Color()
+	: r(0), g(0), b(0), a(0xFF) { }
+Color::Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a)
+	: r(r), g(g), b(b), a(a) { }
+Color::Color(std::uint32_t hex, std::uint8_t a)
+	: r((hex >> 16) & 0xFF), g((hex >> 8) & 0xFF), b(hex & 0xFF), a(a) { }
+std::uint32_t Color::toHex() const
 {
-	return (Color) { .r = r, .g = g, .b = b, .a = a };
+	return ((unsigned) r << 16) | ((unsigned) g << 8) | (unsigned) b;
 }
 
 namespace graphics
@@ -52,8 +60,8 @@ namespace graphics
 		else
 			glcontext = nullptr;
 
-		backgroundColor = color(0, 0, 0, 0xFF);
-		currentColor = color(0, 0, 0, 0xFF);
+		backgroundColor = Color(0, 0, 0, 0xFF);
+		currentColor = Color(0, 0, 0, 0xFF);
 		lineThickness = 0;
 
 #ifndef NO_DEFAULT_FONT
@@ -314,28 +322,34 @@ namespace graphics
 		SDL_RenderClear(renderer);
 	}
 
-	void print(const char *str, int x, int y)
+	void print(std::string str, int x, int y)
 	{
 		print(str, x, y, defaultFont, currentColor);
 	}
-	void print(const char *str, int x, int y, Font *font)
+	void print(std::string str, int x, int y, Font *font)
 	{
 		print(str, x, y, font, currentColor);
 	}
-	void print(const char *str, int x, int y, Color col)
+	void print(std::string str, int x, int y, Color col)
 	{
 		print(str, x, y, defaultFont, col);
 	}
-	void print(const char *str, int x, int y, Font *font, Color col)
+	void print(std::string str, int x, int y, Font *font, Color col)
 	{
 		Image *image = font->renderText(str, col);
 		if (image == nullptr)
 			return;
-		render(image, x, y);
+
+		TextAlign align = font->align();
+		int textWidth, textHeight;
+		font->textSize(str, textWidth, textHeight);
+		int offset = align * (textWidth / 2);
+
+		render(image, x - offset, y);
 		delete image;
 	}
 
-	void printf(int x, int y, const char *str, ...)
+	void printf(int x, int y, std::string str, ...)
 	{
 		va_list args;
 		va_start(args, str);
@@ -343,7 +357,7 @@ namespace graphics
 		va_end(args);
 		print(formatted.c_str(), x, y, defaultFont, currentColor);
 	}
-	void printf(int x, int y, Font *font, const char *str, ...)
+	void printf(int x, int y, Font *font, std::string str, ...)
 	{
 		va_list args;
 		va_start(args, str);
@@ -351,7 +365,7 @@ namespace graphics
 		va_end(args);
 		print(formatted.c_str(), x, y, font, currentColor);
 	}
-	void printf(int x, int y, Color col, const char *str, ...)
+	void printf(int x, int y, Color col, std::string str, ...)
 	{
 		va_list args;
 		va_start(args, str);
@@ -359,7 +373,7 @@ namespace graphics
 		va_end(args);
 		print(formatted.c_str(), x, y, defaultFont, col);
 	}
-	void printf(int x, int y, Font *font, Color col, const char *str, ...)
+	void printf(int x, int y, Font *font, Color col, std::string str, ...)
 	{
 		va_list args;
 		va_start(args, str);

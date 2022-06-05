@@ -7,6 +7,7 @@ extern "C" {
 }
 
 #include <tuple>
+#include <string>
 
 #include "constants.hpp"
 
@@ -19,9 +20,9 @@ namespace window {
 	void QuitWindow();
 	void setFullscreen(bool fullscreen);
 	void setSize(int width, int height);
-	void setTitle(const char *title);
+	void setTitle(std::string title);
 	bool getFullscreen();
-	const char *getTitle();
+	std::string getTitle();
 	int getWidth();
 	int getHeight();
 	std::tuple<int, int> getDimensions();

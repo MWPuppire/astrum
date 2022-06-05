@@ -19,6 +19,7 @@ extern "C" {
 #include <map>
 #include <vector>
 #include <filesystem>
+#include <string>
 
 #include "astrum/astrum.hpp"
 #include "astrum/constants.hpp"
@@ -30,16 +31,18 @@ extern "C" {
 #include "astrum/graphics.hpp"
 #include "astrum/event.hpp"
 #include "astrum/log.hpp"
+#include "astrum/filesystem.hpp"
 #include "internals.hpp"
 
 namespace Astrum
 {
 
-const char *VERSION = "0.1.0";
+const std::string VERSION = "0.1.0";
 const int VERSION_MAJOR = 0;
 const int VERSION_MINOR = 1;
 const int VERSION_PATCH = 0;
-const char *DEFAULT_TITLE = "Untitled";
+const std::string DEFAULT_TITLE = "Untitled";
+const std::string DEFAULT_ORG = "Example";
 const int DEFAULT_WIDTH = 640;
 const int DEFAULT_HEIGHT = 480;
 
@@ -62,18 +65,18 @@ namespace
 	std::vector<std::function<void()> > cb_startup;
 	std::vector<std::function<void()> > cb_draw;
 	std::vector<std::function<bool()> > cb_quit;
-	std::vector<std::function<void(Sint32, Sint32)> > cb_resize;
+	std::vector<std::function<void(int, int)> > cb_resize;
 	std::vector<std::function<void(bool)> > cb_visible;
 	std::vector<std::function<void(bool)> > cb_focus;
-	std::vector<std::function<void(Sint32, Sint32)> > cb_moved;
-	std::vector<std::function<void(Key, Uint16, bool)> > cb_keypressed;
+	std::vector<std::function<void(int, int)> > cb_moved;
+	std::vector<std::function<void(Key, KeyMod, bool)> > cb_keypressed;
 	std::vector<std::function<void(Key)> > cb_keyreleased;
-	std::vector<std::function<void(char *)> > cb_textinput;
-	std::vector<std::function<void(char *, Sint32, Sint32)> > cb_textedited;
-	std::vector<std::function<void(Sint32, Sint32, Sint32, Sint32)> > cb_mousemoved;
-	std::vector<std::function<void(Sint32, Sint32, Sint32, Sint32)> > cb_mousepressed;
-	std::vector<std::function<void(Sint32, Sint32, Sint32, Sint32)> > cb_mousereleased;
-	std::vector<std::function<void(Sint32, Sint32)> > cb_wheelmoved;
+	std::vector<std::function<void(std::string)> > cb_textinput;
+	std::vector<std::function<void(std::string, int, int)> > cb_textedited;
+	std::vector<std::function<void(int, int, int, int)> > cb_mousemoved;
+	std::vector<std::function<void(int, int, int, int)> > cb_mousepressed;
+	std::vector<std::function<void(int, int, int, int)> > cb_mousereleased;
+	std::vector<std::function<void(int, int)> > cb_wheelmoved;
 	std::vector<std::function<void(bool)> > cb_mousefocus;
 	std::vector<std::function<void(std::filesystem::path)> > cb_filedropped;
 	std::vector<std::function<void(std::filesystem::path)> > cb_directorydropped;
@@ -89,6 +92,8 @@ bool handle_event(SDL_Event e)
 {
 	bool term = false;
 	int virtX, virtY;
+	Key key;
+	KeyMod mod;
 	switch (e.type) {
 	case SDL_QUIT:
 		term = true;
@@ -98,13 +103,15 @@ bool handle_event(SDL_Event e)
 	case SDL_KEYDOWN:
 		if (e.key.repeat && !keyboard::hasKeyRepeat())
 			break;
+		key = fromKeycode(e.key.keysym.sym);
+		mod = fromSDLMod(e.key.keysym.mod);
 		for (size_t i = 0; i < cb_keypressed.size(); i++)
-			cb_keypressed[i](fromKeycode(e.key.keysym.sym),
-				e.key.keysym.mod, (bool) e.key.repeat);
+			cb_keypressed[i](key, mod, (bool) e.key.repeat);
 		break;
 	case SDL_KEYUP:
+		key = fromKeycode(e.key.keysym.sym);
 		for (size_t i = 0; i < cb_keyreleased.size(); i++)
-			cb_keyreleased[i](fromKeycode(e.key.keysym.sym));
+			cb_keyreleased[i](key);
 		break;
 	case SDL_TEXTEDITING:
 		for (size_t i = 0; i < cb_textedited.size(); i++)
@@ -130,7 +137,7 @@ bool handle_event(SDL_Event e)
 			cb_mousereleased[i](e.button.button, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEWHEEL: {
-		Sint32 mul = e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1;
+		int mul = e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1;
 		for (size_t i = 0; i < cb_wheelmoved.size(); i++)
 			cb_wheelmoved[i](e.wheel.x * mul, e.wheel.y * mul);
 		break;
@@ -192,6 +199,8 @@ int init(Config &conf)
 	if (hasInit)
 		return 0;
 
+	SDL_SetHint(SDL_HINT_MAC_BACKGROUND_APP,
+		(conf.windowHeadless || conf.allowNoWindow) ? "1" : "0");
 	SDL_SetMainReady();
 	int init = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO
 		| SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
@@ -247,6 +256,16 @@ int init(Config &conf)
 		return init;
 	}
 
+	init = filesystem::InitFS(conf);
+	if (init != 0) {
+		log::error("Unable to initialize filesystem submodule\n");
+		return init;
+	}
+
+#ifdef __EMSCRIPTEN__
+		emscripten_set_window_title(conf.appName);
+#endif
+
 	hasInit = 1;
 	return 0;
 }
@@ -260,6 +279,7 @@ void exit()
 	window::QuitWindow();
 	mouse::QuitMouse();
 	graphics::QuitGraphics();
+	filesystem::QuitFS();
 
 	hasInit = 0;
 }
@@ -399,18 +419,18 @@ void ondraw(std::function<void()> cb)
 	cb_draw.push_back(cb);
 }
 
-void onkeypressed(std::function<void(Key, Uint16, bool)> cb)
+void onkeypressed(std::function<void(Key, KeyMod, bool)> cb)
 {
 	cb_keypressed.push_back(cb);
 }
-void onkeypressed(std::function<void(Key, Uint16)> cb)
+void onkeypressed(std::function<void(Key, KeyMod)> cb)
 {
-	auto lambda = [cb](Key k, Uint16 m, bool UNUSED(r)) { cb(k, m); };
+	auto lambda = [cb](Key k, KeyMod m, bool UNUSED(r)) { cb(k, m); };
 	cb_keypressed.push_back(lambda);
 }
 void onkeypressed(std::function<void(Key)> cb)
 {
-	auto lambda = [cb](Key k, Uint16 UNUSED(m), bool UNUSED(r)) { cb(k); };
+	auto lambda = [cb](Key k, KeyMod UNUSED(m), bool UNUSED(r)) { cb(k); };
 	cb_keypressed.push_back(lambda);
 }
 
@@ -419,7 +439,7 @@ void onkeyreleased(std::function<void(Key)> cb)
 	cb_keyreleased.push_back(cb);
 }
 
-void onresize(std::function<void(Sint32, Sint32)> cb)
+void onresize(std::function<void(int, int)> cb)
 {
 	cb_resize.push_back(cb);
 }
@@ -434,72 +454,72 @@ void onfocus(std::function<void(bool)> cb)
 	cb_focus.push_back(cb);
 }
 
-void onmoved(std::function<void(Sint32, Sint32)> cb)
+void onmoved(std::function<void(int, int)> cb)
 {
 	cb_moved.push_back(cb);
 }
 
-void ontextinput(std::function<void(char *)> cb)
+void ontextinput(std::function<void(std::string)> cb)
 {
 	cb_textinput.push_back(cb);
 }
 
-void ontextedited(std::function<void(char *, Sint32, Sint32)> cb)
+void ontextedited(std::function<void(std::string, int, int)> cb)
 {
 	cb_textedited.push_back(cb);
 }
-void ontextedited(std::function<void(char *, Sint32)> cb)
+void ontextedited(std::function<void(std::string, int)> cb)
 {
-	auto lambda = [cb](char *text, Sint32 start, Sint32 UNUSED(length)) { cb(text, start); };
+	auto lambda = [cb](std::string text, int start, int UNUSED(length)) { cb(text, start); };
 	cb_textedited.push_back(lambda);
 }
-void ontextedited(std::function<void(char *)> cb)
+void ontextedited(std::function<void(std::string)> cb)
 {
-	auto lambda = [cb](char *text, Sint32 UNUSED(start), Sint32 UNUSED(length)) { cb(text); };
+	auto lambda = [cb](std::string text, int UNUSED(start), int UNUSED(length)) { cb(text); };
 	cb_textedited.push_back(lambda);
 }
 
-void onmousemoved(std::function<void(Sint32, Sint32, Sint32, Sint32)> cb)
+void onmousemoved(std::function<void(int, int, int, int)> cb)
 {
 	cb_mousemoved.push_back(cb);
 }
-void onmousemoved(std::function<void(Sint32, Sint32)> cb)
+void onmousemoved(std::function<void(int, int)> cb)
 {
-	auto lambda = [cb](Sint32 x, Sint32 y, Sint32 UNUSED(dx), Sint32 UNUSED(dy)) { cb(x, y); };
+	auto lambda = [cb](int x, int y, int UNUSED(dx), int UNUSED(dy)) { cb(x, y); };
 	cb_mousemoved.push_back(lambda);
 }
 
-void onmousepressed(std::function<void(Sint32, Sint32, Sint32, Sint32)> cb)
+void onmousepressed(std::function<void(int, int, int, int)> cb)
 {
 	cb_mousepressed.push_back(cb);
 }
-void onmousepressed(std::function<void(Sint32, Sint32, Sint32)> cb)
+void onmousepressed(std::function<void(int, int, int)> cb)
 {
-	auto lambda = [cb](Sint32 button, Sint32 x, Sint32 y, Sint32 UNUSED(clicks)) { cb(button, x, y); };
+	auto lambda = [cb](int button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
 	cb_mousepressed.push_back(lambda);
 }
-void onmousepressed(std::function<void(Sint32)> cb)
+void onmousepressed(std::function<void(int)> cb)
 {
-	auto lambda = [cb](Sint32 button, Sint32 UNUSED(x), Sint32 UNUSED(y), Sint32 UNUSED(clicks)) { cb(button); };
+	auto lambda = [cb](int button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
 	cb_mousepressed.push_back(lambda);
 }
 
-void onmousereleased(std::function<void(Sint32, Sint32, Sint32, Sint32)> cb)
+void onmousereleased(std::function<void(int, int, int, int)> cb)
 {
 	cb_mousereleased.push_back(cb);
 }
-void onmousereleased(std::function<void(Sint32, Sint32, Sint32)> cb)
+void onmousereleased(std::function<void(int, int, int)> cb)
 {
-	auto lambda = [cb](Sint32 button, Sint32 x, Sint32 y, Sint32 UNUSED(clicks)) { cb(button, x, y); };
+	auto lambda = [cb](int button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
 	cb_mousereleased.push_back(lambda);
 }
-void onmousereleased(std::function<void(Sint32)> cb)
+void onmousereleased(std::function<void(int)> cb)
 {
-	auto lambda = [cb](Sint32 button, Sint32 UNUSED(x), Sint32 UNUSED(y), Sint32 UNUSED(clicks)) { cb(button); };
+	auto lambda = [cb](int button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
 	cb_mousereleased.push_back(lambda);
 }
 
-void onwheelmoved(std::function<void(Sint32, Sint32)> cb)
+void onwheelmoved(std::function<void(int, int)> cb)
 {
 	cb_wheelmoved.push_back(cb);
 }
@@ -513,9 +533,9 @@ void onfiledropped(std::function<void(std::filesystem::path)> cb)
 {
 	cb_filedropped.push_back(cb);
 }
-void onfiledropped(std::function<void(const char *)> cb)
+void onfiledropped(std::function<void(std::string)> cb)
 {
-	auto lambda = [cb](std::filesystem::path p) { cb(p.string().c_str()); };
+	auto lambda = [cb](std::filesystem::path p) { cb(p.string()); };
 	cb_filedropped.push_back(lambda);
 }
 
@@ -523,9 +543,9 @@ void ondirectorydropped(std::function<void(std::filesystem::path)> cb)
 {
 	cb_directorydropped.push_back(cb);
 }
-void ondirectorydropped(std::function<void(const char *)> cb)
+void ondirectorydropped(std::function<void(std::string)> cb)
 {
-	auto lambda = [cb](std::filesystem::path p) { cb(p.string().c_str()); };
+	auto lambda = [cb](std::filesystem::path p) { cb(p.string()); };
 	cb_directorydropped.push_back(lambda);
 }
 
@@ -543,5 +563,13 @@ void onjoystickhat();
 void onjoystickpressed();
 void onjoystickreleased();
 void onjoystickremoved();
+
+std::string detectPlatform()
+{
+#ifdef __EMSCRIPTEN__
+	return "Emscripten";
+#endif
+	return std::string(SDL_GetPlatform());
+}
 
 }; // namespace Astrum

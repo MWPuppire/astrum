@@ -18,7 +18,7 @@ public:
 		this->xPos = Astrum::math::random(1, width);
 		this->yPos = Astrum::math::random(1, height);
 		this->radius = 5 * Astrum::math::random(15, 30);
-		this->color = Astrum::color(Astrum::math::random(256),
+		this->color = Astrum::Color(Astrum::math::random(256),
 			Astrum::math::random(256), Astrum::math::random(256));
 	}
 
@@ -72,7 +72,7 @@ void draw()
 int main()
 {
 	Astrum::Config conf;
-	conf.windowTitle = "Astrum Circles";
+	conf.appName = "Astrum Circles";
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
 	conf.scaleToSize = true;

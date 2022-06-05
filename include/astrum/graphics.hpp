@@ -1,22 +1,15 @@
 #ifndef INCLUDE_ASTRUM_GRAPHICS
 #define INCLUDE_ASTRUM_GRAPHICS
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
 #include <vector>
+#include <cstdint>
+#include <string>
 
 #include "constants.hpp"
 #include "font.hpp"
 #include "image.hpp"
 
 namespace Astrum {
-
-typedef SDL_Color Color;
-
-Color color (unsigned char r, unsigned char g, unsigned char b, unsigned char a = 0xFF);
 
 namespace graphics {
 
@@ -60,14 +53,14 @@ namespace graphics {
 	void arcFilled(int x, int y, int r, int a1, int a2, Color col);
 	void clear();
 	void clear(Color col);
-	void print(const char *str, int x = 0, int y = 0);
-	void print(const char *str, int x, int y, Font *font);
-	void print(const char *str, int x, int y, Color col);
-	void print(const char *str, int x, int y, Font *font, Color col);
-	void printf(int x, int y, const char *str, ...);
-	void printf(int x, int y, Font *font, const char *str, ...);
-	void printf(int x, int y, Color col, const char *str, ...);
-	void printf(int x, int y, Font *font, Color col, const char *str, ...);
+	void print(std::string str, int x = 0, int y = 0);
+	void print(std::string str, int x, int y, Font *font);
+	void print(std::string str, int x, int y, Color col);
+	void print(std::string str, int x, int y, Font *font, Color col);
+	void printf(int x, int y, std::string str, ...);
+	void printf(int x, int y, Font *font, std::string str, ...);
+	void printf(int x, int y, Color col, std::string str, ...);
+	void printf(int x, int y, Font *font, Color col, std::string str, ...);
 	Font *getFont();
 	void setFont(Font *newFont);
 	void render(Image *image, int x, int y);

@@ -19,11 +19,10 @@ namespace keyboard {
 
 	int InitKeyboard();
 	bool isdown(Key key);
-	bool isdown(const char *keystr);
 	bool isdown(std::string keystr);
 	bool hasClipboardText();
-	char *getClipboardText();
-	int setClipboardText(char *text);
+	std::string getClipboardText();
+	int setClipboardText(std::string text);
 	bool hasKeyRepeat();
 	void setKeyRepeat(bool enable);
 

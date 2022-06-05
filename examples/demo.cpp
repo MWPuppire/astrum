@@ -13,12 +13,12 @@ void update(double dt, double fps)
 		Astrum::quit();
 	if (Astrum::keyboard::isdown("space") && lastColor > 0.4) {
 		lastColor = 0.0;
-		Astrum::Color col = Astrum::color(Astrum::math::random(255), Astrum::math::random(255), Astrum::math::random(255));
+		Astrum::Color col = Astrum::Color(Astrum::math::random(255), Astrum::math::random(255), Astrum::math::random(255));
 		Astrum::graphics::setBackgroundColor(col);
 		int red    = col.r - Astrum::math::max((col.r - (~col.r & 0xFF)) & 0xFF, (int) col.r, 0xFF - col.r);
 		int green  = col.g - Astrum::math::max((col.g - (~col.g & 0xFF)) & 0xFF, (int) col.g, 0xFF - col.g);
 		int blue   = col.b - Astrum::math::max((col.b - (~col.b & 0xFF)) & 0xFF, (int) col.b, 0xFF - col.b);
-		shapeColor = Astrum::color(red & 0xFF, green & 0xFF, blue & 0xFF);
+		shapeColor = Astrum::Color(red & 0xFF, green & 0xFF, blue & 0xFF);
 	}
 	const int width = Astrum::window::getWidth();
 	const int height = Astrum::window::getHeight();
@@ -70,7 +70,7 @@ void startup()
 	shape = 0;
 	shapeX = Astrum::window::getWidth() / 2.0;
 	shapeY = Astrum::window::getHeight() / 2.0;
-	shapeColor = Astrum::color(0xFF, 0xFF, 0xFF);
+	shapeColor = Astrum::Color(0xFF, 0xFF, 0xFF);
 }
 
 int main()
@@ -78,6 +78,7 @@ int main()
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
+	conf.appName = "Astrum Demo";
 
 	Astrum::init(conf);
 	Astrum::onstartup(startup);

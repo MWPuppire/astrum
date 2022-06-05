@@ -11,6 +11,7 @@ extern "C" {
 #include "astrum/mouse.hpp"
 #include "astrum/astrum.hpp"
 #include "astrum/graphics.hpp"
+#include "astrum/image.hpp"
 
 namespace Astrum
 {
@@ -93,9 +94,10 @@ namespace mouse
 		SDL_ShowCursor(state ? SDL_ENABLE : SDL_DISABLE);
 	}
 
-	Cursor *newCursor(SDL_Surface *surface, int hotX, int hotY)
+	Cursor *newCursor(Image *image, int hotX, int hotY)
 	{
-		Cursor *cursor = SDL_CreateColorCursor(surface, hotX, hotY);
+		SDL_Surface *surf = image->getImage();
+		Cursor *cursor = SDL_CreateColorCursor(surf, hotX, hotY);
 		cursors.push_back(cursor);
 		return cursor;
 	}

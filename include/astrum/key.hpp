@@ -152,12 +152,20 @@ enum class KeyMod {
 	RGUI     = 1 << 7,
 	NUMLOCK  = 1 << 8,
 	CAPSLOCK = 1 << 9,
+	ALT_GR   = 1 << 10,
 	SHIFT    = LSHIFT | RSHIFT,
 	CTRL     = LCTRL | RCTRL,
 	ALT      = LALT | RALT,
 	GUI      = LGUI | RGUI,
 };
-KeyMod operator|(KeyMod a, KeyMod b);
+constexpr KeyMod operator|(KeyMod a, KeyMod b)
+{
+	return KeyMod(int(a) | int(b));
+}
+constexpr bool operator&(KeyMod a, KeyMod b)
+{
+	return (int(a) & int(b)) != 0;
+}
 
 };
 

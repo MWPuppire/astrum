@@ -50,15 +50,11 @@ namespace keyboard
 	{
 		return keysdown[key];
 	}
-	bool isdown(const char *keystr)
-	{
-		SDL_Keycode code = SDL_GetKeyFromName(keystr);
-		Key key = fromKeycode(code);
-		return keysdown[key];
-	}
 	bool isdown(std::string keystr)
 	{
-		return isdown(keystr.c_str());
+		SDL_Keycode code = SDL_GetKeyFromName(keystr.c_str());
+		Key key = fromKeycode(code);
+		return keysdown[key];
 	}
 
 	/**
@@ -78,7 +74,7 @@ namespace keyboard
 	 * Return any text currently in the system
 	 * clipboard.
 	 */
-	char *getClipboardText()
+	std::string getClipboardText()
 	{
 		return SDL_GetClipboardText();
 	}
@@ -94,9 +90,9 @@ namespace keyboard
 	 * @return int 0 on success and negative
 	 *   on an error.
 	 */
-	int setClipboardText(char *text)
+	int setClipboardText(std::string text)
 	{
-		return SDL_SetClipboardText(text);
+		return SDL_SetClipboardText(text.c_str());
 	}
 
 	/** @brief Test if key repeats are on.
@@ -126,11 +122,6 @@ namespace keyboard
 		keyrepeat = enable;
 	}
 
-}
-
-KeyMod operator|(KeyMod a, KeyMod b)
-{
-	return KeyMod(int(a) | int(b));
 }
 
 }; // namespace Astrum

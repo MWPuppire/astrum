@@ -4,6 +4,7 @@ extern "C" {
 }
 
 #include <tuple>
+#include <string>
 
 #include "astrum/constants.hpp"
 #include "astrum/window.hpp"
@@ -33,7 +34,7 @@ namespace window
 			window = conf.existingWindow;
 		} else {
 			window = SDL_CreateWindow(
-				conf.windowTitle,
+				conf.appName.c_str(),
 				SDL_WINDOWPOS_UNDEFINED,
 				SDL_WINDOWPOS_UNDEFINED,
 				conf.windowWidth,
@@ -64,9 +65,11 @@ namespace window
 		};
 		onresize(resizeevent);
 
-#ifdef __EMSCRIPTEN
-		emscripten_set_window_title(conf.windowTitle);
-#endif
+		if (!conf.icon.empty()) {
+			Image image(conf.icon);
+			SDL_Surface *surf = image.getImage();
+			SDL_SetWindowIcon(window, surf);
+		}
 
 		return 0;
 	}
@@ -97,12 +100,12 @@ namespace window
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 
-	void setTitle(const char *title)
+	void setTitle(std::string title)
 	{
 		if (window == nullptr)
 			return;
 
-		SDL_SetWindowTitle(window, title);
+		SDL_SetWindowTitle(window, title.c_str());
 	}
 
 	bool isFullscreen()
@@ -113,12 +116,12 @@ namespace window
 		return (bool) (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN);
 	}
 
-	const char *getTitle()
+	std::string getTitle()
 	{
 		if (window == nullptr)
 			return "";
 
-		return SDL_GetWindowTitle(window);
+		return std::string(SDL_GetWindowTitle(window));
 	}
 
 	int getWidth()

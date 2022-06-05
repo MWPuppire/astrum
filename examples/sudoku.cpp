@@ -10,17 +10,17 @@
 // on macOS, use CMD for undo/redo
 // otherwise, use CTRL
 #if defined(__APPLE__) || defined(__MACH__)
-	#define SHORTCUT_MOD KMOD_GUI
+	#define SHORTCUT_MOD Astrum::KeyMod::GUI
 #else
-	#define SHORTCUT_MOD KMOD_CTRL
+	#define SHORTCUT_MOD Astrum::KeyMod::CTRL
 #endif
 
-const Astrum::Color white = Astrum::color(255, 255, 255);
-const Astrum::Color black = Astrum::color(0, 0, 0);
-const Astrum::Color  gray = Astrum::color(128, 128, 128);
-const Astrum::Color lgray = Astrum::color(176, 176, 176);
-const Astrum::Color  blue = Astrum::color(85, 85, 255);
-const Astrum::Color   red = Astrum::color(255, 0, 0);
+const Astrum::Color white = Astrum::Color(255, 255, 255);
+const Astrum::Color black = Astrum::Color(0, 0, 0);
+const Astrum::Color  gray = Astrum::Color(128, 128, 128);
+const Astrum::Color lgray = Astrum::Color(176, 176, 176);
+const Astrum::Color  blue = Astrum::Color(85, 85, 255);
+const Astrum::Color   red = Astrum::Color(255, 0, 0);
 
 Astrum::Font *bigFont, *smallFont;
 
@@ -77,7 +77,7 @@ struct {
 
 class Button
 {
-	const char *text;
+	std::string text;
 	float x;
 	float y;
 	int textWidth;
@@ -85,7 +85,7 @@ class Button
 	std::function<void()> onclick;
 	bool mouseDown;
 public:
-	Button(const char *text, float x, float y, std::function<void()> onclick)
+	Button(std::string text, float x, float y, std::function<void()> onclick)
 		: text(text), x(x), y(y), onclick(onclick), mouseDown(false)
 	{
 		Astrum::graphics::getFont()->textSize(text, textWidth, textHeight);
@@ -364,9 +364,7 @@ void undoEvent(PuzzleEvent event)
 
 void printNumber(int x, int y, short num, Astrum::Color color, Astrum::Font *font)
 {
-	static char str[2] = { ' ', 0 };
-
-	*str = num + '0';
+	std::string str = std::to_string(num);
 	int textWidth, textHeight;
 	std::tie(textWidth, textHeight) = font->textSize(str);
 	Astrum::graphics::print(str, x - (textWidth / 2), y - (textHeight / 2), font, color);
@@ -468,10 +466,9 @@ void draw()
 	if (puzzleConfig.paused) {
 		int width = 9 * boxSize + 3 * bigLineSize;
 		Astrum::graphics::rectangle(gridOffset, gridOffset, width, width, black);
-		const char *str = "Paused";
 		int textWidth, textHeight;
-		std::tie(textWidth, textHeight) = bigFont->textSize(str);
-		Astrum::graphics::print(str, gridOffset + (width / 2) - (textWidth / 2),
+		std::tie(textWidth, textHeight) = bigFont->textSize("Paused");
+		Astrum::graphics::print("Paused", gridOffset + (width / 2) - (textWidth / 2),
 			gridOffset + (width / 2) - (textHeight / 2), bigFont, black);
 	} else {
 		printGrid(puzzle.problem, puzzle.notes, puzzle.x, puzzle.y,
@@ -583,7 +580,7 @@ void undo()
 	}
 }
 
-void keypress(Astrum::Key key, Uint16 mod)
+void keypress(Astrum::Key key, Astrum::KeyMod mod)
 {
 	if (key == Astrum::Key::SPACE)
 		puzzleConfig.paused = !puzzleConfig.paused;
@@ -660,7 +657,7 @@ int main()
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
-	conf.windowTitle = "Sudoku";
+	conf.appName = "Sudoku";
 	conf.minWindowWidth = 640;
 	conf.minWindowHeight = 480;
 	conf.scaleToSize = true;

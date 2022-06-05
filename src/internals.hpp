@@ -150,6 +150,33 @@ constexpr Key fromKeycode(SDL_Keycode code) {
 	}
 }
 
+constexpr KeyMod fromSDLMod(Uint16 mod) {
+	KeyMod out = KeyMod::NONE;
+	if (mod & KMOD_LSHIFT)
+		out = out | KeyMod::LSHIFT;
+	if (mod & KMOD_RSHIFT)
+		out = out | KeyMod::RSHIFT;
+	if (mod & KMOD_LCTRL)
+		out = out | KeyMod::LCTRL;
+	if (mod & KMOD_RCTRL)
+		out = out | KeyMod::RCTRL;
+	if (mod & KMOD_LALT)
+		out = out | KeyMod::LALT;
+	if (mod & KMOD_RALT)
+		out = out | KeyMod::RALT;
+	if (mod & KMOD_LGUI)
+		out = out | KeyMod::LGUI;
+	if (mod & KMOD_RGUI)
+		out = out | KeyMod::RGUI;
+	if (mod & KMOD_NUM)
+		out = out | KeyMod::NUMLOCK;
+	if (mod & KMOD_CAPS)
+		out = out | KeyMod::CAPSLOCK;
+	if (mod & KMOD_MODE)
+		out = out | KeyMod::ALT_GR;
+	return out;
+}
+
 }; // namespace Astrum
 
 #endif // ifndef INCLUDE_ASTRUM_INTERNALS

@@ -5,11 +5,6 @@
 	#include <emscripten.h>
 #endif
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-};
-
 #include <filesystem>
 #include <functional>
 
@@ -25,6 +20,7 @@ extern "C" {
 #include "timer.hpp"
 #include "key.hpp"
 #include "log.hpp"
+#include "filesystem.hpp"
 
 namespace Astrum {
 
@@ -47,46 +43,46 @@ void ondraw(std::function<void()> cb);
 
 void onstartup(std::function<void()> cb);
 
-void onkeypressed(std::function<void(Key, Uint16, bool)> cb);
-void onkeypressed(std::function<void(Key, Uint16)> cb);
+void onkeypressed(std::function<void(Key, KeyMod, bool)> cb);
+void onkeypressed(std::function<void(Key, KeyMod)> cb);
 void onkeypressed(std::function<void(Key)> cb);
 
 void onkeyreleased(std::function<void(Key)> cb);
 
-void onresize(std::function<void(Sint32, Sint32)> cb);
+void onresize(std::function<void(int, int)> cb);
 
 void onvisible(std::function<void(bool)> cb);
 
 void onfocus(std::function<void(bool)> cb);
 
-void onmoved(std::function<void(Sint32, Sint32)> cb);
+void onmoved(std::function<void(int, int)> cb);
 
-void ontextinput(std::function<void(char *)> cb);
+void ontextinput(std::function<void(std::string)> cb);
 
-void ontextedited(std::function<void(char *, Sint32, Sint32)> cb);
-void ontextedited(std::function<void(char *, Sint32)> cb);
-void ontextedited(std::function<void(char *)> cb);
+void ontextedited(std::function<void(std::string, int, int)> cb);
+void ontextedited(std::function<void(std::string, int)> cb);
+void ontextedited(std::function<void(std::string)> cb);
 
-void onmousemoved(std::function<void(Sint32, Sint32, Sint32, Sint32)> cb);
-void onmousemoved(std::function<void(Sint32, Sint32)> cb);
+void onmousemoved(std::function<void(int, int, int, int)> cb);
+void onmousemoved(std::function<void(int, int)> cb);
 
-void onmousepressed(std::function<void(Sint32, Sint32, Sint32, Sint32)> cb);
-void onmousepressed(std::function<void(Sint32, Sint32, Sint32)> cb);
-void onmousepressed(std::function<void(Sint32)> cb);
+void onmousepressed(std::function<void(int, int, int, int)> cb);
+void onmousepressed(std::function<void(int, int, int)> cb);
+void onmousepressed(std::function<void(int)> cb);
 
-void onmousereleased(std::function<void(Sint32, Sint32, Sint32, Sint32)> cb);
-void onmousereleased(std::function<void(Sint32, Sint32, Sint32)> cb);
-void onmousereleased(std::function<void(Sint32)> cb);
+void onmousereleased(std::function<void(int, int, int, int)> cb);
+void onmousereleased(std::function<void(int, int, int)> cb);
+void onmousereleased(std::function<void(int)> cb);
 
-void onwheelmoved(std::function<void(Sint32, Sint32)> cb);
+void onwheelmoved(std::function<void(int, int)> cb);
 
 void onmousefocus(std::function<void(bool)> cb);
 
 void onfiledropped(std::function<void(std::filesystem::path)> cb);
-void onfiledropped(std::function<void(const char *)> cb);
+void onfiledropped(std::function<void(std::string)> cb);
 
 void ondirectorydropped(std::function<void(std::filesystem::path)> cb);
-void ondirectorydropped(std::function<void(const char *)> cb);
+void ondirectorydropped(std::function<void(std::string)> cb);
 
 void ongamepadaxis();
 void ongamepadpressed();
@@ -97,6 +93,8 @@ void onjoystickhat();
 void onjoystickpressed();
 void onjoystickreleased();
 void onjoystickremoved();
+
+std::string detectPlatform();
 
 } // namespace Astrum
 

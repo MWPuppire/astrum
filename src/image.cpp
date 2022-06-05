@@ -7,93 +7,73 @@ extern "C" {
 #include "astrum/constants.hpp"
 #include "astrum/image.hpp"
 
+#include <cstddef>
+#include <memory>
+#include <string>
+
 namespace Astrum
 {
 
-Image::Image(const char *filename)
+struct ImageData {
+	SDL_Surface *image = nullptr;
+	SDL_RWops *rw = nullptr;
+	ImageData(SDL_Surface *surf, SDL_RWops *rw)
+		: image(surf), rw(rw) { }
+};
+
+std::unique_ptr<ImageData> imageDataFromRW(SDL_RWops *rw, std::string type)
 {
-	this->image = IMG_Load(filename);
-	SDL_SetSurfaceRLE(this->image, 1);
-	this->rw = nullptr;
+	if (rw == nullptr) {
+		return std::make_unique<ImageData>(nullptr, nullptr);
+	} else {
+		return std::make_unique<ImageData>(
+			type == ""
+				? IMG_Load_RW(rw, 1)
+				: IMG_LoadTyped_RW(rw, 1, type.c_str()),
+			rw);
+	}
 }
+
 Image::Image(std::string filename)
 {
-	this->image = IMG_Load(filename.c_str());
-	SDL_SetSurfaceRLE(this->image, 1);
-	this->rw = nullptr;
+	this->data = std::make_unique<ImageData>(IMG_Load(filename.c_str()), nullptr);
+	if (this->data->image != nullptr)
+		SDL_SetSurfaceRLE(this->data->image, 1);
 }
-Image::Image(SDL_RWops *rw, const char *type)
-{
-	this->image = *type == '\0'
-		? IMG_Load_RW(rw, 0)
-		: IMG_LoadTyped_RW(rw, 0, type);
-	SDL_SetSurfaceRLE(this->image, 1);
-	this->rw = rw;
-}
-Image::Image(SDL_RWops *rw, std::string type)
-{
-	this->image = type == ""
-		? IMG_Load_RW(rw, 0)
-		: IMG_LoadTyped_RW(rw, 0, type.c_str());
-	SDL_SetSurfaceRLE(this->image, 1);
-	this->rw = rw;
-}
-Image::Image(const unsigned char *buf, int bufLen, const char *type)
+Image::Image(const unsigned char *buf, std::size_t bufLen, std::string type)
 {
 	SDL_RWops *rw = SDL_RWFromConstMem(buf, bufLen);
-	if (rw == nullptr) {
-		this->image = nullptr;
-		this->rw = nullptr;
-	} else {
-		this->image = *type == '\0'
-			? IMG_Load_RW(rw, 1)
-			: IMG_LoadTyped_RW(rw, 1, type);
-		SDL_SetSurfaceRLE(this->image, 1);
-		this->rw = rw;
-	}
-}
-Image::Image(const unsigned char *buf, int bufLen, std::string type)
-{
-	SDL_RWops *rw = SDL_RWFromConstMem(buf, bufLen);
-	if (rw == nullptr) {
-		this->image = nullptr;
-		this->rw = nullptr;
-	} else {
-		this->image = type == ""
-			? IMG_Load_RW(rw, 1)
-			: IMG_LoadTyped_RW(rw, 1, type.c_str());
-		SDL_SetSurfaceRLE(this->image, 1);
-		this->rw = rw;
-	}
+	this->data = imageDataFromRW(rw, type);
+	if (this->data->image != nullptr)
+		SDL_SetSurfaceRLE(this->data->image, 1);
 }
 Image::Image(SDL_Surface *surf)
 {
-	this->image = surf;
-	SDL_SetSurfaceRLE(this->image, 1);
-	this->rw = nullptr;
+	this->data = std::make_unique<ImageData>(surf, nullptr);
+	SDL_SetSurfaceRLE(this->data->image, 1);
 }
 
 Image::~Image()
 {
-	if (this->image != nullptr)
-		SDL_FreeSurface(this->image);
-	if (this->rw != nullptr)
-		SDL_RWclose(this->rw);
+	if (this->data->image != nullptr)
+		SDL_FreeSurface(this->data->image);
+	if (this->data->rw != nullptr)
+		SDL_RWclose(this->data->rw);
 }
 
 SDL_Surface *Image::getImage()
 {
-	return this->image;
+	return this->data->image;
 }
 
 int Image::width()
 {
-	return this->image->w;
+	return this->data->image->w;
 }
 
 int Image::height()
 {
-	return this->image->h;
+	return this->data->image->h;
 }
 
 }

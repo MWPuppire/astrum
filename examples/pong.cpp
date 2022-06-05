@@ -5,8 +5,8 @@
 #include <string>
 #include <tuple>
 
-const Astrum::Color white = Astrum::color(255, 255, 255);
-const Astrum::Color black = Astrum::color(0, 0, 0);
+const Astrum::Color white = Astrum::Color(255, 255, 255);
+const Astrum::Color black = Astrum::Color(0, 0, 0);
 const double radian = 0.01745329;
 const double velocityTransfer = 0.5;
 const double ballCollisionSpeed = 1.03;
@@ -191,14 +191,13 @@ void draw()
 	Astrum::Font *font = Astrum::graphics::getFont();
 	std::string str = Astrum::util::strformat("Player: %d - Computer: %d",
 		playerScore, computerScore);
-	const char *cstr = str.c_str();
 	int textWidth, textHeight;
 	if (font == nullptr) {
-		printf("howdy! score: %s\n", cstr);
+		printf("howdy! score: %s\n", str.c_str());
 		return;
 	}
-	std::tie(textWidth, textHeight) = font->textSize(cstr);
-	Astrum::graphics::print(cstr, (width - textWidth) / 2, 5, white);
+	std::tie(textWidth, textHeight) = font->textSize(str);
+	Astrum::graphics::print(str, (width - textWidth) / 2, 5, white);
 }
 
 void startup()
@@ -216,7 +215,7 @@ int main()
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
-	conf.windowTitle = "Pong Test";
+	conf.appName = "Pong Test";
 
 	Astrum::init(conf);
 	Astrum::graphics::setBackgroundColor(black);

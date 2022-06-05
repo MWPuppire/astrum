@@ -6,14 +6,28 @@ extern "C" {
 	#include <SDL2/SDL.h>
 }
 
+#include <cstdint>
+#include <string>
+#include <filesystem>
+
 namespace Astrum {
 
-extern const char *VERSION;
+class Color {
+public:
+	std::uint8_t r, g, b, a;
+	Color();
+	Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 0xFF);
+	Color(std::uint32_t hex, std::uint8_t a = 0xFF);
+	std::uint32_t toHex() const;
+};
+
+extern const std::string VERSION;
 extern const int VERSION_MAJOR;
 extern const int VERSION_MINOR;
 extern const int VERSION_PATCH;
 
-extern const char *DEFAULT_TITLE;
+extern const std::string DEFAULT_TITLE;
+extern const std::string DEFAULT_ORG;
 extern const int DEFAULT_WIDTH;
 extern const int DEFAULT_HEIGHT;
 
@@ -26,8 +40,9 @@ extern const int DEFAULT_HEIGHT;
 class Config {
 public:
 	bool gammacorrect          = false;
-	const char *windowTitle    = DEFAULT_TITLE;
-	const char *icon           = nullptr;
+	std::string appName        = DEFAULT_TITLE;
+	std::string orgName        = DEFAULT_ORG;
+	std::filesystem::path icon = "";
 	int windowWidth            = DEFAULT_WIDTH;
 	int windowHeight           = DEFAULT_HEIGHT;
 	bool windowBorderless      = false;

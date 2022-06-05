@@ -4,26 +4,23 @@
 extern "C" {
 	#define SDL_MAIN_HANDLED
 	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_image.h>
 }
 
 #include <string>
+#include <cstddef>
+#include <memory>
 
 #include "constants.hpp"
 
 namespace Astrum {
 
 class Image {
-	SDL_Surface *image;
-	SDL_RWops *rw;
+private:
+	std::unique_ptr<struct ImageData> data;
 
 public:
-	Image(const char *filename);
 	Image(std::string filename);
-	Image(SDL_RWops *rw, const char *type = "");
-	Image(SDL_RWops *rw, std::string type = "");
-	Image(const unsigned char *buf, int bufLen, const char *type = "");
-	Image(const unsigned char *buf, int bufLen, std::string type = "");
+	Image(const unsigned char *buf, std::size_t bufLen, std::string type = "");
 	Image(SDL_Surface *surf);
 	~Image();
 
