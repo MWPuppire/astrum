@@ -33,8 +33,8 @@ endif(EMSCRIPTEN)
 
 add_library(astrum)
 target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
-	src/keyboard.cpp src/math.cpp src/mouse.cpp src/window.cpp src/event.cpp
-	src/util.cpp src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp)
+	src/keyboard.cpp src/math.cpp src/mouse.cpp src/window.cpp src/util.cpp
+	src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp)
 target_include_directories(astrum PUBLIC include)
 
 if(NOT EMSCRIPTEN)

@@ -29,7 +29,6 @@ extern "C" {
 #include "astrum/mouse.hpp"
 #include "astrum/math.hpp"
 #include "astrum/graphics.hpp"
-#include "astrum/event.hpp"
 #include "astrum/log.hpp"
 #include "astrum/filesystem.hpp"
 #include "internals.hpp"
