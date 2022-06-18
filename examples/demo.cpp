@@ -33,7 +33,8 @@ void update(double dt, double fps)
 		shapeX += speed * dt;
 	shapeX = (shapeX < 0.0 ? 0.0 : (shapeX > width ? width : shapeX));
 	shapeY = (shapeY < 0.0 ? 0.0 : (shapeY > height ? height : shapeY));
-	Astrum::graphics::printf(5.0, 5.0, shapeColor, "FPS: %f", fps);
+	std::string fpsString = Astrum::util::strformat("FPS: %f", fps);
+	Astrum::graphics::print(fpsString, 5.0, 5.0, shapeColor);
 }
 
 void draw()

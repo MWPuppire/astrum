@@ -13,6 +13,9 @@ namespace timer {
 	void sleep(std::chrono::milliseconds interval);
 
 	size_t setInterval(std::chrono::milliseconds interval, std::function<void()> cb);
+	/**
+	 * @overload
+	 */
 	template<class F, class... Args>
 	size_t setInterval(std::chrono::milliseconds interval, F func, Args&&... args)
 	{
@@ -20,6 +23,9 @@ namespace timer {
 			std::forward<Args>(args)...);
 		return setInterval(interval, cb);
 	}
+	/**
+	 * @overload
+	 */
 	template<class F, class... Args>
 	size_t setInterval(size_t ms, F func, Args&&... args)
 	{
@@ -30,6 +36,9 @@ namespace timer {
 	}
 
 	size_t setTimeout(std::chrono::milliseconds delay, std::function<void()> cb);
+	/**
+	 * @overload
+	 */
 	template<class F, class... Args>
 	size_t setTimeout(std::chrono::milliseconds delay, F func, Args&&... args)
 	{
@@ -37,6 +46,9 @@ namespace timer {
 			std::forward<Args>(args)...);
 		return setTimeout(delay, cb);
 	}
+	/**
+	 * @overload
+	 */
 	template<class F, class... Args>
 	size_t setTimeout(size_t ms, F func, Args&&... args)
 	{

@@ -9,6 +9,7 @@ extern "C" {
 #include "astrum/constants.hpp"
 #include "astrum/window.hpp"
 #include "astrum/astrum.hpp"
+#include "internals.hpp"
 
 namespace Astrum
 {
@@ -31,7 +32,7 @@ namespace window
 		}
 
 		if (conf.existingWindow != nullptr) {
-			window = conf.existingWindow;
+			window = (SDL_Window *) conf.existingWindow;
 		} else {
 			window = SDL_CreateWindow(
 				conf.appName.c_str(),
@@ -67,7 +68,8 @@ namespace window
 
 		if (!conf.icon.empty()) {
 			Image image(conf.icon);
-			SDL_Surface *surf = image.getImage();
+			ImageData *data = image.getData();
+			SDL_Surface *surf = data->image;
 			SDL_SetWindowIcon(window, surf);
 		}
 
@@ -207,7 +209,7 @@ namespace window
 			return 0;
 
 		int w;
-		SDL_GetWindowMinimumSize(window, &w, NULL);
+		SDL_GetWindowMinimumSize(window, &w, nullptr);
 		return w;
 	}
 
@@ -217,7 +219,7 @@ namespace window
 			return 0;
 
 		int h;
-		SDL_GetWindowMinimumSize(window, NULL, &h);
+		SDL_GetWindowMinimumSize(window, nullptr, &h);
 		return h;
 	}
 
@@ -249,6 +251,11 @@ namespace window
 	{
 		SDL_bool flag = toggle ? SDL_TRUE : SDL_FALSE;
 		SDL_SetWindowResizable(window, flag);
+	}
+
+	void recalculateDimensions()
+	{
+		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 };
 

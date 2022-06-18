@@ -13,6 +13,17 @@ extern "C" {
 #include "astrum/filesystem.hpp"
 #include "astrum/log.hpp"
 
+#ifdef __EMSCRIPTEN__
+extern "C"
+{
+	void log_fs_error()
+	{
+		Astrum::log::error("Could not establish persistent memory. "
+			"No data will be saved across program runs\n");
+	}
+}
+#endif
+
 namespace Astrum {
 
 namespace filesystem
@@ -32,7 +43,9 @@ namespace filesystem
 			FS.mkdir("/offline");
 			FS.mount(IDBFS, { }, "/offline");
 			FS.syncfs(true, function(err) {
-				assert(!err);
+				if (err) {
+					ccall("log_fs_error", "v");
+				}
 			});
 		);
 		return 0;
@@ -41,7 +54,7 @@ namespace filesystem
 		std::string str;
 		rawstr = SDL_GetPrefPath(conf.orgName.c_str(),
 			conf.appName.c_str());
-		if (rawstr == NULL) {
+		if (rawstr == nullptr) {
 			log::error("Could not get app directory: %s\n",
 				SDL_GetError());
 		} else {
@@ -50,7 +63,7 @@ namespace filesystem
 			SDL_free((void *) rawstr);
 		}
 		rawstr = SDL_GetBasePath();
-		if (rawstr == NULL) {
+		if (rawstr == nullptr) {
 			log::error("Could not get source directory: %s\n",
 				SDL_GetError());
 		} else {
@@ -66,8 +79,11 @@ namespace filesystem
 #ifdef __EMSCRIPTEN__
 		EM_ASM(
 			FS.syncfs(false, function(err) {
-				assert(!err);
+				if (err) {
+					ccall("log_fs_error", "v");
+				}
 			});
+			FS.unmount("/offline");
 		);
 #endif
 	}

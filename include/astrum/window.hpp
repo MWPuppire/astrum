@@ -1,11 +1,6 @@
 #ifndef INCLUDE_ASTRUM_WINDOW
 #define INCLUDE_ASTRUM_WINDOW
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
 #include <tuple>
 #include <string>
 
@@ -14,8 +9,6 @@ extern "C" {
 namespace Astrum {
 
 namespace window {
-	extern SDL_Window *window;
-
 	int InitWindow(Config &conf);
 	void QuitWindow();
 	void setFullscreen(bool fullscreen);
@@ -38,6 +31,7 @@ namespace window {
 	void getMinDimensions(int &width, int &height);
 	bool isResizable();
 	void setResizable(bool toggle);
+	void recalculateDimensions();
 };
 
 } // namespace Astrum

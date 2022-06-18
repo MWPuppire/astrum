@@ -12,41 +12,90 @@ extern "C" {
 #include "astrum/astrum.hpp"
 #include "astrum/graphics.hpp"
 #include "astrum/image.hpp"
+#include "internals.hpp"
 
 namespace Astrum
 {
+
+Cursor::Cursor(Cursor &cursor)
+{
+	CursorData otherData = *cursor.data;
+	this->data = new CursorData(otherData);
+}
+Cursor::Cursor(std::shared_ptr<Image> image, int hotX, int hotY)
+{
+	ImageData *data = image->getData();
+	SDL_Surface *surf = data->image;
+	SDL_Cursor *internalCursor = SDL_CreateColorCursor(surf, hotX, hotY);
+	this->data = new CursorData(internalCursor);
+}
+Cursor::Cursor(CursorData &data)
+{
+	this->data = new CursorData(data);
+}
+Cursor::~Cursor()
+{
+	SDL_FreeCursor(this->data->cursor);
+}
+CursorData *Cursor::getData()
+{
+	return this->data;
+}
 
 namespace mouse
 {
 
 	namespace
 	{
-		std::map<int, bool> mousedown;
-		std::vector<Cursor *> cursors;
+		std::map<MouseButton, bool> mousedown;
 	};
+
+	std::shared_ptr<Cursor> createSystemCursor(SDL_SystemCursor id) {
+		CursorData data = { SDL_CreateSystemCursor(id) };
+		Cursor *cursor = new Cursor(data);
+		return std::shared_ptr<Cursor>(cursor);
+	}
+
+	std::shared_ptr<Cursor> CURSOR_ARROW;
+	std::shared_ptr<Cursor> CURSOR_IBEAM;
+	std::shared_ptr<Cursor> CURSOR_WAIT;
+	std::shared_ptr<Cursor> CURSOR_CROSSHAIR;
+	std::shared_ptr<Cursor> CURSOR_WAITARROW;
+	std::shared_ptr<Cursor> CURSOR_SIZENWSE;
+	std::shared_ptr<Cursor> CURSOR_SIZENESW;
+	std::shared_ptr<Cursor> CURSOR_SIZEWE;
+	std::shared_ptr<Cursor> CURSOR_SIZENS;
+	std::shared_ptr<Cursor> CURSOR_SIZEALL;
+	std::shared_ptr<Cursor> CURSOR_NO;
+	std::shared_ptr<Cursor> CURSOR_HAND;
 
 	int InitMouse()
 	{
-		auto add_mousedown = [](int key) { mousedown[key] = true; };
-		auto remove_mousedown = [](int key) { mousedown[key] = false; };
+		auto add_mousedown = [](MouseButton btn) { mousedown[btn] = true; };
+		auto remove_mousedown = [](MouseButton btn) { mousedown[btn] = false; };
 
 		onmousepressed(add_mousedown);
 		onmousereleased(remove_mousedown);
 
+		CURSOR_ARROW     = createSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+		CURSOR_IBEAM     = createSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+		CURSOR_WAIT      = createSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
+		CURSOR_CROSSHAIR = createSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
+		CURSOR_WAITARROW = createSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW);
+		CURSOR_SIZENWSE  = createSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+		CURSOR_SIZENESW  = createSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+		CURSOR_SIZEWE    = createSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+		CURSOR_SIZENS    = createSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+		CURSOR_SIZEALL   = createSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+		CURSOR_NO        = createSystemCursor(SDL_SYSTEM_CURSOR_NO);
+		CURSOR_HAND      = createSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+
 		return 0;
 	}
 
-	void QuitMouse()
+	bool isdown(MouseButton button)
 	{
-		for (int i = cursors.size() - 1; i >= 0; i--) {
-			SDL_FreeCursor(cursors[i]);
-			cursors.pop_back();
-		}
-	}
-
-	bool isdown(int key)
-	{
-		return mousedown[key];
+		return mousedown[button];
 	}
 
 	int getX()
@@ -94,38 +143,18 @@ namespace mouse
 		SDL_ShowCursor(state ? SDL_ENABLE : SDL_DISABLE);
 	}
 
-	Cursor *newCursor(Image *image, int hotX, int hotY)
+	std::shared_ptr<Cursor> getCursor()
 	{
-		SDL_Surface *surf = image->getImage();
-		Cursor *cursor = SDL_CreateColorCursor(surf, hotX, hotY);
-		cursors.push_back(cursor);
-		return cursor;
-	}
-	Cursor *newCursor(SystemCursor id)
-	{
-		Cursor *cursor = SDL_CreateSystemCursor(id);
-		cursors.push_back(cursor);
-		return cursor;
+		CursorData data = { SDL_GetCursor() };
+		Cursor *cursor = new Cursor(data);
+		return std::shared_ptr<Cursor>(cursor);
 	}
 
-	Cursor *getCursor()
+	void setCursor(std::shared_ptr<Cursor> cursor)
 	{
-		return SDL_GetCursor();
+		CursorData *data = cursor->getData();
+		SDL_SetCursor(data->cursor);
 	}
-
-	void setCursor(Cursor *cursor)
-	{
-		SDL_SetCursor(cursor);
-	}
-
-	void deleteCursor(Cursor *cursor)
-	{
-		SDL_FreeCursor(cursor);
-		for (auto c = cursors.begin(); c != cursors.end(); c++)
-			if (*c == cursor)
-				cursors.erase(c);
-	}
-
 };
 
 }; // namespace Astrum

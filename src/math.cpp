@@ -44,13 +44,13 @@ namespace math
 		return distr(rng);
 	}
 
-	double randfloat()
+	double randfloat(double max)
 	{
-		return (double) rng() / (double) std::mt19937::max();
+		return (double) rng() / ((double) std::mt19937::max() / max);
 	}
-	double randfloat(double value)
+	double randfloat(double min, double max)
 	{
-		return randfloat() * value;
+		return min + randfloat(max - min);
 	}
 
 	void randomseed(unsigned s)

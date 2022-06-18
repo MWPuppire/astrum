@@ -1,26 +1,34 @@
 #ifndef INCLUDE_ASTRUM_MOUSE
 #define INCLUDE_ASTRUM_MOUSE
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
 #include <tuple>
+#include <memory>
 
 #include "constants.hpp"
 #include "image.hpp"
 
 namespace Astrum {
 
-typedef SDL_Cursor Cursor;
-typedef SDL_SystemCursor SystemCursor;
+enum class MouseButton {
+	LEFT, MIDDLE, RIGHT, X1, X2
+};
+
+class Cursor {
+private:
+	struct CursorData *data;
+
+public:
+	Cursor(Cursor &cursor);
+	Cursor(struct CursorData &data);
+	Cursor(std::shared_ptr<Image> image, int hotX = 0, int hotY = 0);
+	~Cursor();
+	struct CursorData *getData();
+};
 
 namespace mouse {
 
 	int InitMouse();
-	void QuitMouse();
-	bool isdown(int key);
+	bool isdown(MouseButton button);
 	int getX();
 	int getY();
 	std::tuple<int, int> getCoordinates();
@@ -29,24 +37,21 @@ namespace mouse {
 	void setPosition(int x, int y);
 	bool isVisible();
 	void setVisible(bool state);
-	Cursor *newCursor(Image *image, int hotX = 0, int hotY = 0);
-	Cursor *newCursor(SystemCursor id);
-	Cursor *getCursor();
-	void setCursor(Cursor *cursor);
-	void deleteCursor(Cursor *cursor);
+	std::shared_ptr<Cursor> getCursor();
+	void setCursor(std::shared_ptr<Cursor> cursor);
 
-	const static SystemCursor CURSOR_ARROW = SDL_SYSTEM_CURSOR_ARROW;
-	const static SystemCursor CURSOR_IBEAM = SDL_SYSTEM_CURSOR_IBEAM;
-	const static SystemCursor CURSOR_WAIT = SDL_SYSTEM_CURSOR_WAIT;
-	const static SystemCursor CURSOR_CROSSHAIR = SDL_SYSTEM_CURSOR_CROSSHAIR;
-	const static SystemCursor CURSOR_WAITARROW = SDL_SYSTEM_CURSOR_WAITARROW;
-	const static SystemCursor CURSOR_SIZENWSE = SDL_SYSTEM_CURSOR_SIZENWSE;
-	const static SystemCursor CURSOR_SIZENESW = SDL_SYSTEM_CURSOR_SIZENESW;
-	const static SystemCursor CURSOR_SIZWWE = SDL_SYSTEM_CURSOR_SIZEWE;
-	const static SystemCursor CURSOR_SIZENS = SDL_SYSTEM_CURSOR_SIZENS;
-	const static SystemCursor CURSOR_SIZEALL = SDL_SYSTEM_CURSOR_SIZEALL;
-	const static SystemCursor CURSOR_NO = SDL_SYSTEM_CURSOR_NO;
-	const static SystemCursor CURSOR_HAND = SDL_SYSTEM_CURSOR_HAND;
+	extern std::shared_ptr<Cursor> CURSOR_ARROW;
+	extern std::shared_ptr<Cursor> CURSOR_IBEAM;
+	extern std::shared_ptr<Cursor> CURSOR_WAIT;
+	extern std::shared_ptr<Cursor> CURSOR_CROSSHAIR;
+	extern std::shared_ptr<Cursor> CURSOR_WAITARROW;
+	extern std::shared_ptr<Cursor> CURSOR_SIZENWSE;
+	extern std::shared_ptr<Cursor> CURSOR_SIZENESW;
+	extern std::shared_ptr<Cursor> CURSOR_SIZEWE;
+	extern std::shared_ptr<Cursor> CURSOR_SIZENS;
+	extern std::shared_ptr<Cursor> CURSOR_SIZEALL;
+	extern std::shared_ptr<Cursor> CURSOR_NO;
+	extern std::shared_ptr<Cursor> CURSOR_HAND;
 };
 
 } // namespace Astrum

@@ -5,6 +5,7 @@
 #include <tuple>
 #include <cstddef>
 #include <memory>
+#include <filesystem>
 
 #include "constants.hpp"
 #include "image.hpp"
@@ -19,17 +20,27 @@ enum TextAlign {
 
 class Font {
 private:
-	std::unique_ptr<struct FontData> data;
+	struct FontData *data;
 
 public:
+	Font(Font &src);
+	Font(struct FontData &data);
 #ifndef NO_DEFAULT_FONT
 	Font(int size = 18, Color color = Color(0x000000), int style = NORMAL, TextAlign align = TextAlign::left);
 #endif
-	Font(std::string path, int size = 18, Color color = Color(0x000000), int style = NORMAL, TextAlign align = TextAlign::left);
-	Font(const unsigned char *buf, std::size_t bufLen, int size = 18, Color color = Color(0x000000), int style = NORMAL, TextAlign align = TextAlign::left);
+	Font(std::string path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
+	/**
+	 * @overload
+	 */
+	Font(std::filesystem::path path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
+	Font(const unsigned char *buf, std::size_t bufLen, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
 	~Font();
-	Image *renderText(std::string text);
-	Image *renderText(std::string text, Color color);
+	struct FontData *getData();
+	std::shared_ptr<Image> renderText(std::string text);
+	/**
+	 * @overload
+	 */
+	std::shared_ptr<Image> renderText(std::string text, Color color);
 	int textSize(std::string text, int &w, int &h);
 	std::tuple<int, int> textSize(std::string text);
 	int textSizef(int &w, int &h, std::string text, ...);

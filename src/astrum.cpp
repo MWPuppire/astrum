@@ -73,8 +73,8 @@ namespace
 	std::vector<std::function<void(std::string)> > cb_textinput;
 	std::vector<std::function<void(std::string, int, int)> > cb_textedited;
 	std::vector<std::function<void(int, int, int, int)> > cb_mousemoved;
-	std::vector<std::function<void(int, int, int, int)> > cb_mousepressed;
-	std::vector<std::function<void(int, int, int, int)> > cb_mousereleased;
+	std::vector<std::function<void(MouseButton, int, int, int)> > cb_mousepressed;
+	std::vector<std::function<void(MouseButton, int, int, int)> > cb_mousereleased;
 	std::vector<std::function<void(int, int)> > cb_wheelmoved;
 	std::vector<std::function<void(bool)> > cb_mousefocus;
 	std::vector<std::function<void(std::filesystem::path)> > cb_filedropped;
@@ -128,12 +128,12 @@ bool handle_event(SDL_Event e)
 	case SDL_MOUSEBUTTONDOWN:
 		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		for (size_t i = 0; i < cb_mousepressed.size(); i++)
-			cb_mousepressed[i](e.button.button, virtX, virtY, e.button.clicks);
+			cb_mousepressed[i](fromMouseBtn(e.button.button), virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEBUTTONUP:
 		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		for (size_t i = 0; i < cb_mousereleased.size(); i++)
-			cb_mousereleased[i](e.button.button, virtX, virtY, e.button.clicks);
+			cb_mousereleased[i](fromMouseBtn(e.button.button), virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEWHEEL: {
 		int mul = e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1;
@@ -262,7 +262,7 @@ int init(Config &conf)
 	}
 
 #ifdef __EMSCRIPTEN__
-		emscripten_set_window_title(conf.appName);
+		emscripten_set_window_title(conf.appName.c_str());
 #endif
 
 	hasInit = 1;
@@ -276,7 +276,6 @@ void exit()
 	IMG_Quit();
 
 	window::QuitWindow();
-	mouse::QuitMouse();
 	graphics::QuitGraphics();
 	filesystem::QuitFS();
 
@@ -488,33 +487,33 @@ void onmousemoved(std::function<void(int, int)> cb)
 	cb_mousemoved.push_back(lambda);
 }
 
-void onmousepressed(std::function<void(int, int, int, int)> cb)
+void onmousepressed(std::function<void(MouseButton, int, int, int)> cb)
 {
 	cb_mousepressed.push_back(cb);
 }
-void onmousepressed(std::function<void(int, int, int)> cb)
+void onmousepressed(std::function<void(MouseButton, int, int)> cb)
 {
-	auto lambda = [cb](int button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
+	auto lambda = [cb](MouseButton button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
 	cb_mousepressed.push_back(lambda);
 }
-void onmousepressed(std::function<void(int)> cb)
+void onmousepressed(std::function<void(MouseButton)> cb)
 {
-	auto lambda = [cb](int button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
+	auto lambda = [cb](MouseButton button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
 	cb_mousepressed.push_back(lambda);
 }
 
-void onmousereleased(std::function<void(int, int, int, int)> cb)
+void onmousereleased(std::function<void(MouseButton, int, int, int)> cb)
 {
 	cb_mousereleased.push_back(cb);
 }
-void onmousereleased(std::function<void(int, int, int)> cb)
+void onmousereleased(std::function<void(MouseButton, int, int)> cb)
 {
-	auto lambda = [cb](int button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
+	auto lambda = [cb](MouseButton button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
 	cb_mousereleased.push_back(lambda);
 }
-void onmousereleased(std::function<void(int)> cb)
+void onmousereleased(std::function<void(MouseButton)> cb)
 {
-	auto lambda = [cb](int button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
+	auto lambda = [cb](MouseButton button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
 	cb_mousereleased.push_back(lambda);
 }
 

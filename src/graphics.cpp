@@ -17,6 +17,7 @@ extern "C" {
 #include "astrum/font.hpp"
 #include "astrum/astrum.hpp"
 #include "astrum/util.hpp"
+#include "internals.hpp"
 
 namespace Astrum
 {
@@ -38,7 +39,7 @@ namespace graphics
 	{
 		SDL_Renderer *renderer;
 		void *glcontext;
-		Font *defaultFont;
+		std::shared_ptr<Font> defaultFont;
 
 		Color backgroundColor;
 		Color currentColor;
@@ -65,7 +66,7 @@ namespace graphics
 		lineThickness = 0;
 
 #ifndef NO_DEFAULT_FONT
-		defaultFont = new Font();
+		defaultFont = std::make_shared<Font>();
 #else
 		defaultFont = nullptr;
 #endif
@@ -75,7 +76,7 @@ namespace graphics
 		ondraw(drawevent);
 
 		if (window::window == nullptr) {
-			renderer = NULL;
+			renderer = nullptr;
 		} else {
 			if (conf.existingWindow != nullptr)
 				renderer = SDL_GetRenderer(window::window);
@@ -326,7 +327,7 @@ namespace graphics
 	{
 		print(str, x, y, defaultFont, currentColor);
 	}
-	void print(std::string str, int x, int y, Font *font)
+	void print(std::string str, int x, int y, std::shared_ptr<Font> font)
 	{
 		print(str, x, y, font, currentColor);
 	}
@@ -334,9 +335,9 @@ namespace graphics
 	{
 		print(str, x, y, defaultFont, col);
 	}
-	void print(std::string str, int x, int y, Font *font, Color col)
+	void print(std::string str, int x, int y, std::shared_ptr<Font> font, Color col)
 	{
-		Image *image = font->renderText(str, col);
+		std::shared_ptr<Image> image = font->renderText(str, col);
 		if (image == nullptr)
 			return;
 
@@ -346,114 +347,47 @@ namespace graphics
 		int offset = align * (textWidth / 2);
 
 		render(image, x - offset, y);
-		delete image;
 	}
 
-	void printf(int x, int y, std::string str, ...)
-	{
-		va_list args;
-		va_start(args, str);
-		std::string formatted = util::vstrformat(str, args);
-		va_end(args);
-		print(formatted.c_str(), x, y, defaultFont, currentColor);
-	}
-	void printf(int x, int y, Font *font, std::string str, ...)
-	{
-		va_list args;
-		va_start(args, str);
-		std::string formatted = util::vstrformat(str, args);
-		va_end(args);
-		print(formatted.c_str(), x, y, font, currentColor);
-	}
-	void printf(int x, int y, Color col, std::string str, ...)
-	{
-		va_list args;
-		va_start(args, str);
-		std::string formatted = util::vstrformat(str, args);
-		va_end(args);
-		print(formatted.c_str(), x, y, defaultFont, col);
-	}
-	void printf(int x, int y, Font *font, Color col, std::string str, ...)
-	{
-		va_list args;
-		va_start(args, str);
-		std::string formatted = util::vstrformat(str, args);
-		va_end(args);
-		print(formatted.c_str(), x, y, font, col);
-	}
-
-	Font *getFont()
+	std::shared_ptr<Font> getFont()
 	{
 		return defaultFont;
 	}
 
-	void setFont(Font *newFont)
+	void setFont(std::shared_ptr<Font> newFont)
 	{
 		defaultFont = newFont;
 	}
 
-// hackish fix
-// There is apparently a bug with rendering images in Emscripten SDL
-// https://github.com/emscripten-core/emscripten/issues/16223
-// This is a solution to display images without using SDL textures, which allows
-// the code to display properly.
-// Since this is almost certainly worse than using textures, only use the custom
-// `render` function with Emscripten; otherwise, use normal SDL code.
-#ifdef __EMSCRIPTEN__
-	void render(Image *image, int x, int y)
+	void render(std::shared_ptr<Image> image, int x, int y)
 	{
-		SDL_Surface *surf = image->getImage();
-		int w = surf->w, h = surf->h;
-		const SDL_PixelFormat *format = surf->format;
-		const int byteSize = format->BytesPerPixel;
-		const int yMultiplier = surf->pitch / byteSize;
-
-		Uint32 colorKey;
-		int hasKey = SDL_GetColorKey(surf, &colorKey);
-
-		SDL_LockSurface(surf);
-		const void *pixels = surf->pixels;
-		for (int surfX = 0; surfX < w; surfX++) {
-			for (int surfY = 0; surfY < h; surfY++) {
-				int idx = surfX + surfY * yMultiplier;
-				Uint32 pixel;
-				switch (byteSize) {
-				case 1:
-					pixel = ((Uint8 *) pixels)[idx];
-					break;
-				case 2:
-					pixel = ((Uint16 *) pixels)[idx];
-					break;
-				case 3: {
-					struct pixelTriplet { Uint8 a, b, c; };
-					union { pixelTriplet trip; Uint32 u32; } x;
-					x.trip = ((pixelTriplet *) pixels)[idx];
-					pixel = x.u32;
-					break;
-				}
-				case 4:
-					pixel = ((Uint32 *) pixels)[idx];
-					break;
-				}
-
-				Uint8 r, g, b, a;
-				SDL_GetRGBA(pixel, format, &r, &g, &b, &a);
-				if (hasKey != 0 || pixel != colorKey)
-					pixelRGBA(renderer, x + surfX, y + surfY, r, g, b, a);
-			}
-		}
-		SDL_UnlockSurface(surf);
-	}
-#else
-	void render(Image *image, int x, int y)
-	{
-		SDL_Surface *surf = image->getImage();
+		std::shared_ptr<Transforms> tran = image->getTransforms();
+		ImageData *data = image->getData();
+		SDL_Surface *surf = data->image;
 		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
-		SDL_Rect renderRect = { .x = x, .y = y, .w = surf->w, .h = surf->h };
-		SDL_RenderCopy(renderer, tex, NULL, &renderRect);
+		SDL_Rect sourceRect, renderRect;
+		SDL_RendererFlip flip;
+		double degrees;
+
+		if (tran != nullptr) {
+			sourceRect = { .x = tran->dx, .y = tran->dy,
+				.w = surf->w, .h = surf->h };
+			renderRect = { .x = x, .y = y,
+				.w = static_cast<int>(surf->w * tran->sx),
+				.h = static_cast<int>(surf->h * tran->sy) };
+			flip = static_cast<SDL_RendererFlip>(0);
+			degrees = tran->degrees;
+		} else {
+			sourceRect = { .x = 0, .y = 0, .w = surf->w, .h = surf->h };
+			renderRect = { .x = x, .y = y, .w = surf->w, .h = surf->h };
+			flip = static_cast<SDL_RendererFlip>(0);
+			degrees = 0;
+		}
+
+		SDL_RenderCopyEx(renderer, tex, &sourceRect, &renderRect,
+			degrees, nullptr, flip);
 		SDL_DestroyTexture(tex);
 	}
-#endif
 
 	void getVirtualCoords(int x, int y, int &virtX, int &virtY)
 	{
@@ -463,15 +397,16 @@ namespace graphics
 		virtY = (int) logicalY;
 	}
 
-	Image *screenshot()
+	std::shared_ptr<Image> screenshot()
 	{
 		int w, h;
 		SDL_GetRendererOutputSize(renderer, &w, &h);
 		SDL_Surface *sshot = SDL_CreateRGBSurface(0, w, h, 32,
 			0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-		SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888,
+		SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888,
 			sshot->pixels, sshot->pitch);
-		return new Image(sshot);
+		ImageData data = ImageData(sshot);
+		return std::make_shared<Image>(data);
 	}
 };
 

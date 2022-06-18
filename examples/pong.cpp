@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <tuple>
+#include <memory>
 
 const Astrum::Color white = Astrum::Color(255, 255, 255);
 const Astrum::Color black = Astrum::Color(0, 0, 0);
@@ -188,14 +189,10 @@ void draw()
 			lineHeight * (i * 2 + 1), lineWidth, lineHeight, white);
 	}
 
-	Astrum::Font *font = Astrum::graphics::getFont();
+	std::shared_ptr<Astrum::Font> font = Astrum::graphics::getFont();
 	std::string str = Astrum::util::strformat("Player: %d - Computer: %d",
 		playerScore, computerScore);
 	int textWidth, textHeight;
-	if (font == nullptr) {
-		printf("howdy! score: %s\n", str.c_str());
-		return;
-	}
 	std::tie(textWidth, textHeight) = font->textSize(str);
 	Astrum::graphics::print(str, (width - textWidth) / 2, 5, white);
 }

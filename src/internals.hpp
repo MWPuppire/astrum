@@ -4,14 +4,71 @@
 extern "C" {
 	#define SDL_MAIN_HANDLED
 	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_ttf.h>
+	#include <SDL2/SDL_image.h>
 };
 
 #include "astrum/constants.hpp"
+#include "astrum/font.hpp"
 #include "astrum/key.hpp"
+#include "astrum/image.hpp"
+#include "astrum/mouse.hpp"
 
 namespace Astrum {
 
-constexpr Key fromKeycode(SDL_Keycode code) {
+struct FontData {
+	TTF_Font *font;
+	Color defaultColor;
+	TextAlign defaultAlign;
+	FontData(TTF_Font *font, Color defaultColor, TextAlign defaultAlign)
+		: font(font), defaultColor(defaultColor),
+		defaultAlign(defaultAlign) { }
+	FontData(FontData &src) : font(src.font),
+		defaultColor(src.defaultColor), defaultAlign(src.defaultAlign)
+		{ }
+};
+
+struct ImageData {
+	SDL_Surface *image;
+	Transforms *tran;
+	ImageData(SDL_Surface *surf) : image(surf)
+	{
+		this->tran = new Transforms();
+	}
+	ImageData(ImageData &src)
+		: image(src.image), tran(new Transforms(*src.tran)) { }
+};
+
+struct CursorData
+{
+	SDL_Cursor *cursor;
+	CursorData(CursorData &data) : cursor(data.cursor) { }
+	CursorData(SDL_Cursor *cursor) : cursor(cursor) { }
+};
+
+struct SoundData {
+	Mix_Chunk *chunk;
+	int channel;
+};
+
+namespace window {
+	extern SDL_Window *window;
+};
+
+constexpr MouseButton fromMouseBtn(int button)
+{
+	switch (button) {
+		case SDL_BUTTON_LEFT: return MouseButton::LEFT;
+		case SDL_BUTTON_MIDDLE: return MouseButton::MIDDLE;
+		case SDL_BUTTON_RIGHT: return MouseButton::RIGHT;
+		case SDL_BUTTON_X1: return MouseButton::X1;
+		case SDL_BUTTON_X2: return MouseButton::X2;
+		default: return MouseButton::LEFT;
+	}
+}
+
+constexpr Key fromKeycode(SDL_Keycode code)
+{
 	switch (code) {
 		case SDLK_UNKNOWN: return Key::UNKNOWN;
 		case SDLK_SPACE: return Key::SPACE;
@@ -150,7 +207,8 @@ constexpr Key fromKeycode(SDL_Keycode code) {
 	}
 }
 
-constexpr KeyMod fromSDLMod(Uint16 mod) {
+constexpr KeyMod fromSDLMod(Uint16 mod)
+{
 	KeyMod out = KeyMod::NONE;
 	if (mod & KMOD_LSHIFT)
 		out = out | KeyMod::LSHIFT;

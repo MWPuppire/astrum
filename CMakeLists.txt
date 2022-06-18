@@ -21,7 +21,7 @@ if(EMSCRIPTEN)
 	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
 		-sUSE_SDL_GFX=2)
 	add_link_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
-		-sUSE_SDL_GFX=2 -l idbfs.js)
+		-sUSE_SDL_GFX=2 -lidbfs.js -sEXPORTED_FUNCTIONS=_log_fs_error,_main)
 	set(CMAKE_EXECUTABLE_SUFFIX .html)
 else(EMSCRIPTEN)
 	find_package(SDL2 REQUIRED)
@@ -34,7 +34,8 @@ endif(EMSCRIPTEN)
 add_library(astrum)
 target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/keyboard.cpp src/math.cpp src/mouse.cpp src/window.cpp src/util.cpp
-	src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp)
+	src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp src/audio.cpp
+	src/sound.cpp)
 target_include_directories(astrum PUBLIC include)
 
 if(NOT EMSCRIPTEN)
@@ -83,7 +84,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 #	target_link_libraries(astrumTests GTest::GTest GTest::Main)
 #	add_test(NAME astrumRunTests COMMAND astrumTests)
 
-#	find_package(Doxygen)
-#	set(DOXYGEN_EXTRACT_ALL YES)
-#	doxygen_add_docs(astrumDocs include ALL)
+	find_package(Doxygen)
+	set(DOXYGEN_EXTRACT_ALL YES)
+	doxygen_add_docs(astrumDocs include ALL)
 endif(CMAKE_BUILD_TYPE MATCHES "Debug")
