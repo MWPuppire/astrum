@@ -1,15 +1,11 @@
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
 #include <map>
 #include <string>
 
+#include "sdl.hpp"
+#include "internals.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/keyboard.hpp"
 #include "astrum/astrum.hpp"
-#include "internals.hpp"
 
 namespace Astrum
 {

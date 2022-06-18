@@ -3,11 +3,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-};
-
+#include "sdl.hpp"
 #include "astrum/log.hpp"
 #include "astrum/util.hpp"
 

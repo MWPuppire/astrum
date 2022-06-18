@@ -1,9 +1,3 @@
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_ttf.h>
-}
-
 #include <string>
 #include <cstdarg>
 #include <cstdio>
@@ -11,12 +5,13 @@ extern "C" {
 #include <memory>
 #include <cstddef>
 
+#include "sdl.hpp"
+#include "internals.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/font.hpp"
 #include "astrum/util.hpp"
 #include "astrum/image.hpp"
 #include "astrum/graphics.hpp"
-#include "internals.hpp"
 
 #ifndef NO_DEFAULT_FONT
 #include "astrum/assets/vera_font.hpp"

@@ -1,8 +1,3 @@
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
 #include <functional>
 #include <thread>
 #include <chrono>
@@ -10,6 +5,7 @@ extern "C" {
 #include <mutex>
 #include <shared_mutex>
 
+#include "sdl.hpp"
 #include "astrum/astrum.hpp"
 #include "astrum/timer.hpp"
 

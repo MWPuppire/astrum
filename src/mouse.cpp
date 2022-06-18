@@ -1,18 +1,14 @@
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-}
-
 #include <map>
 #include <vector>
 #include <tuple>
 
+#include "sdl.hpp"
+#include "internals.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/mouse.hpp"
 #include "astrum/astrum.hpp"
 #include "astrum/graphics.hpp"
 #include "astrum/image.hpp"
-#include "internals.hpp"
 
 namespace Astrum
 {
@@ -53,8 +49,7 @@ namespace mouse
 
 	std::shared_ptr<Cursor> createSystemCursor(SDL_SystemCursor id) {
 		CursorData data = { SDL_CreateSystemCursor(id) };
-		Cursor *cursor = new Cursor(data);
-		return std::shared_ptr<Cursor>(cursor);
+		return std::make_shared<Cursor>(data);
 	}
 
 	std::shared_ptr<Cursor> CURSOR_ARROW;

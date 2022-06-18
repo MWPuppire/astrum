@@ -1,23 +1,17 @@
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_image.h>
-	#include <SDL2/SDL2_gfxPrimitives.h>
-}
-
 #include <cstdio>
 #include <vector>
 #include <assert.h>
 #include <cstdint>
 #include <string>
 
+#include "sdl.hpp"
+#include "internals.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/window.hpp"
 #include "astrum/graphics.hpp"
 #include "astrum/font.hpp"
 #include "astrum/astrum.hpp"
 #include "astrum/util.hpp"
-#include "internals.hpp"
 
 namespace Astrum
 {

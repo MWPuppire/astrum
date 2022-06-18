@@ -740,5 +740,15 @@ int main()
 
 	Astrum::exit();
 
+	delete newGameButton;
+	delete easyButton;
+	delete mediumButton;
+	delete hardButton;
+	delete notesButton;
+	delete solveButton;
+	delete undoButton;
+	delete redoButton;
+	delete pauseButton;
+
 	return 0;
 }

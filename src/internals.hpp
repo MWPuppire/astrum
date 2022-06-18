@@ -1,14 +1,7 @@
 #ifndef INCLUDE_ASTRUM_INTERNALS
 #define INCLUDE_ASTRUM_INTERNALS
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_ttf.h>
-	#include <SDL2/SDL_image.h>
-	#include <SDL2/SDL_mixer.h>
-};
-
+#include "sdl.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/font.hpp"
 #include "astrum/key.hpp"

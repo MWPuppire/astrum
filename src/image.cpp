@@ -1,18 +1,13 @@
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_image.h>
-}
-
-#include "astrum/constants.hpp"
-#include "astrum/image.hpp"
-#include "internals.hpp"
-
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <filesystem>
 #include <tuple>
+
+#include "sdl.hpp"
+#include "internals.hpp"
+#include "astrum/constants.hpp"
+#include "astrum/image.hpp"
 
 namespace Astrum
 {

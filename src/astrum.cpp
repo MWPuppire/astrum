@@ -4,13 +4,6 @@
 #  define UNUSED(x) UNUSED_##x
 #endif
 
-extern "C" {
-	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_image.h>
-	#include <SDL2/SDL_ttf.h>
-}
-
 #ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
 #endif
@@ -21,6 +14,8 @@ extern "C" {
 #include <filesystem>
 #include <string>
 
+#include "sdl.hpp"
+#include "internals.hpp"
 #include "astrum/astrum.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/window.hpp"
@@ -31,7 +26,6 @@ extern "C" {
 #include "astrum/graphics.hpp"
 #include "astrum/log.hpp"
 #include "astrum/filesystem.hpp"
-#include "internals.hpp"
 
 namespace Astrum
 {
