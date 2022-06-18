@@ -36,6 +36,7 @@ Cursor::Cursor(CursorData &data)
 Cursor::~Cursor()
 {
 	SDL_FreeCursor(this->data->cursor);
+	delete this->data;
 }
 CursorData *Cursor::getData()
 {

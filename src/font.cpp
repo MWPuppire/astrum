@@ -25,8 +25,8 @@ extern "C" {
 namespace Astrum
 {
 
-FontData *fontDataFromRW(SDL_RWops *rw, int size, Color color, int style,
-	TextAlign align)
+FontData *fontDataFromRW(SDL_RWops *rw, int size, Color color,
+	int style, TextAlign align)
 {
 	if (rw == nullptr) {
 		return new FontData(nullptr, color, align);
@@ -79,8 +79,9 @@ Font::Font(const unsigned char *buf, std::size_t bufLen, int size, Color color,
 
 Font::~Font()
 {
-	if (this->data->font != nullptr)
-		TTF_CloseFont(this->data->font);
+//	if (this->data->font != nullptr)
+//		TTF_CloseFont(this->data->font);
+	delete this->data;
 }
 
 FontData *Font::getData()
@@ -94,8 +95,9 @@ std::shared_ptr<Image> Font::renderText(std::string text)
 }
 std::shared_ptr<Image> Font::renderText(std::string text, Color color)
 {
-	if (this->data->font == nullptr)
+	if (this->data->font == nullptr) {
 		return nullptr;
+	}
 	SDL_Color scol = { color.r, color.g, color.b, color.a };
 	SDL_Surface *surf = TTF_RenderUTF8_Solid(this->data->font, text.c_str(),
 		scol);
@@ -105,8 +107,9 @@ std::shared_ptr<Image> Font::renderText(std::string text, Color color)
 
 int Font::textSize(std::string text, int &w, int &h)
 {
-	if (this->data->font == nullptr)
+	if (this->data->font == nullptr) {
 		return -1;
+	}
 	int width, height;
 	int out = TTF_SizeUTF8(this->data->font, text.c_str(), &width, &height);
 	w = width;

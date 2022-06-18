@@ -24,7 +24,8 @@ struct Transforms {
 	double kx;
 	double ky;
 
-	Transforms() { };
+	Transforms()
+		: sx(1.0), sy(1.0), dx(0), dy(0), degrees(0.0), kx(0), ky(0) { }
 	Transforms(Transforms &tran)
 		: sx(tran.sx), sy(tran.sy), dx(tran.dx), dy(tran.dy),
 		degrees(tran.degrees), kx(tran.kx), ky(tran.ky) { }

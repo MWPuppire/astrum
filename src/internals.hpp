@@ -6,6 +6,7 @@ extern "C" {
 	#include <SDL2/SDL.h>
 	#include <SDL2/SDL_ttf.h>
 	#include <SDL2/SDL_image.h>
+	#include <SDL2/SDL_mixer.h>
 };
 
 #include "astrum/constants.hpp"
@@ -13,6 +14,8 @@ extern "C" {
 #include "astrum/key.hpp"
 #include "astrum/image.hpp"
 #include "astrum/mouse.hpp"
+
+#include <memory>
 
 namespace Astrum {
 
@@ -30,13 +33,15 @@ struct FontData {
 
 struct ImageData {
 	SDL_Surface *image;
-	Transforms *tran;
+	std::shared_ptr<Transforms> tran;
 	ImageData(SDL_Surface *surf) : image(surf)
 	{
-		this->tran = new Transforms();
+		this->tran = std::make_shared<Transforms>();
 	}
-	ImageData(ImageData &src)
-		: image(src.image), tran(new Transforms(*src.tran)) { }
+	ImageData(ImageData &src) : image(src.image)
+	{
+		this->tran = std::make_shared<Transforms>(*src.tran);
+	}
 };
 
 struct CursorData

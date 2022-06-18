@@ -14,6 +14,7 @@ set(CXX_STANDARD_REQUIRED ON)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -DDEBUG -g -Werror")
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-omit-frame-pointer")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address")
 
 string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra")
 

@@ -60,8 +60,7 @@ Image::~Image()
 {
 	if (this->data->image != nullptr)
 		SDL_FreeSurface(this->data->image);
-	if (this->data->tran != nullptr)
-		delete this->data->tran;
+	delete this->data;
 }
 
 ImageData *Image::getData()
@@ -71,7 +70,7 @@ ImageData *Image::getData()
 
 std::shared_ptr<Transforms> Image::getTransforms()
 {
-	return std::shared_ptr<Transforms>(this->data->tran);
+	return this->data->tran;
 }
 
 int Image::width()
