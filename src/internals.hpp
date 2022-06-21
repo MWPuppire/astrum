@@ -1,14 +1,14 @@
 #ifndef INCLUDE_ASTRUM_INTERNALS
 #define INCLUDE_ASTRUM_INTERNALS
 
+#include <memory>
+
 #include "sdl.hpp"
 #include "astrum/constants.hpp"
 #include "astrum/font.hpp"
 #include "astrum/key.hpp"
 #include "astrum/image.hpp"
 #include "astrum/mouse.hpp"
-
-#include <memory>
 
 namespace Astrum {
 
@@ -51,6 +51,18 @@ struct SoundData {
 
 namespace window {
 	extern SDL_Window *window;
+	void recalculateDimensions();
+};
+namespace mouse {
+	void addMousedown(MouseButton btn);
+	void removeMousedown(MouseButton btn);
+};
+namespace graphics {
+	void drawframe();
+};
+namespace keyboard {
+	void addKeydown(Key key);
+	void removeKeydown(Key key);
 };
 
 constexpr MouseButton fromMouseBtn(int button)

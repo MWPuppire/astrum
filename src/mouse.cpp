@@ -1,5 +1,4 @@
 #include <map>
-#include <vector>
 #include <tuple>
 
 #include "sdl.hpp"
@@ -47,6 +46,15 @@ namespace mouse
 		std::map<MouseButton, bool> mousedown;
 	};
 
+	void addMousedown(MouseButton btn)
+	{
+		mousedown[btn] = true;
+	}
+	void removeMousedown(MouseButton btn)
+	{
+		mousedown[btn] = false;
+	}
+
 	std::shared_ptr<Cursor> createSystemCursor(SDL_SystemCursor id) {
 		CursorData data = { SDL_CreateSystemCursor(id) };
 		return std::make_shared<Cursor>(data);
@@ -67,12 +75,6 @@ namespace mouse
 
 	int InitMouse()
 	{
-		auto add_mousedown = [](MouseButton btn) { mousedown[btn] = true; };
-		auto remove_mousedown = [](MouseButton btn) { mousedown[btn] = false; };
-
-		onmousepressed(add_mousedown);
-		onmousereleased(remove_mousedown);
-
 		CURSOR_ARROW     = createSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 		CURSOR_IBEAM     = createSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 		CURSOR_WAIT      = createSystemCursor(SDL_SYSTEM_CURSOR_WAIT);

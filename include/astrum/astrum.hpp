@@ -29,10 +29,6 @@ namespace Astrum {
 int init(Config &conf);
 void exit();
 
-void run(std::function<void(double, double)> update);
-/**
- * @overload
- */
 void run(std::function<void(double)> update);
 /**
  * @overload
@@ -40,7 +36,6 @@ void run(std::function<void(double)> update);
 void run(std::function<void()> update);
 
 double getDeltaTime();
-double getFramesPerSecond();
 
 void quit(bool checkonquit = false);
 

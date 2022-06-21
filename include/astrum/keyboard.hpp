@@ -17,8 +17,6 @@ namespace Astrum {
  */
 namespace keyboard {
 
-	int InitKeyboard();
-
 	/**
 	 * @brief Tells whether or not a key is held.
 	 *

@@ -65,10 +65,6 @@ namespace graphics
 		defaultFont = nullptr;
 #endif
 
-		auto drawevent = []() { drawframe(); };
-
-		ondraw(drawevent);
-
 		if (window::window == nullptr) {
 			renderer = nullptr;
 		} else {

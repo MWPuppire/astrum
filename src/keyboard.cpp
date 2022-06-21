@@ -19,19 +19,13 @@ namespace keyboard
 		bool keyrepeat = false;
 	}
 
-	int InitKeyboard()
+	void addKeydown(Key key)
 	{
-		auto add_keydown = [](Key key) {
-			keysdown[key] = true;
-		};
-		auto remove_keydown = [](Key key) {
-			keysdown[key] = false;
-		};
-
-		onkeypressed(add_keydown);
-		onkeyreleased(remove_keydown);
-
-		return 0;
+		keysdown[key] = true;
+	}
+	void removeKeydown(Key key)
+	{
+		keysdown[key] = false;
 	}
 
 	bool isdown(Key key)

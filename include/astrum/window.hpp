@@ -31,7 +31,6 @@ namespace window {
 	void getMinDimensions(int &width, int &height);
 	bool isResizable();
 	void setResizable(bool toggle);
-	void recalculateDimensions();
 };
 
 } // namespace Astrum

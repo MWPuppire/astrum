@@ -55,13 +55,6 @@ namespace window
 		if (conf.windowResizable)
 			SDL_SetWindowMinimumSize(window, conf.minWindowWidth, conf.minWindowHeight);
 
-		auto resizeevent = [](int w, int h)
-		{
-			windowWidth = w;
-			windowHeight = h;
-		};
-		onresize(resizeevent);
-
 		if (!conf.icon.empty()) {
 			Image image(conf.icon);
 			ImageData *data = image.getData();
