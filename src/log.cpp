@@ -56,6 +56,11 @@ namespace log {
 		std::string str = util::vstrformat(format, args);
 		writeFunction(cat, str);
 	}
+	void vlog(std::string format, va_list args)
+	{
+		vlog(LogCategory::info, format, args);
+	}
+
 	void log(LogCategory cat, std::string format, ...)
 	{
 		std::va_list args;

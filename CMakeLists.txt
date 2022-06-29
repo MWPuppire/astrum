@@ -73,6 +73,11 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_include_directories(astrumSudoku PRIVATE astrum)
 	target_link_libraries(astrumSudoku astrum)
 
+	add_executable(astrumGameOfLife examples/life.cpp)
+	add_dependencies(astrumGameOfLife astrum)
+	target_include_directories(astrumGameOfLife PRIVATE astrum)
+	target_link_libraries(astrumGameOfLife astrum)
+
 #	Haven't written any tests yet
 #	So testing code is irrelevant
 

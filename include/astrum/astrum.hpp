@@ -35,8 +35,6 @@ void run(std::function<void(double)> update);
  */
 void run(std::function<void()> update);
 
-double getDeltaTime();
-
 void quit(bool checkonquit = false);
 
 void onquit(std::function<bool()> cb);

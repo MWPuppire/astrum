@@ -42,7 +42,7 @@ namespace graphics
 
 	void drawframe()
 	{
-		Color col = backgroundColor;
+		const Color col = backgroundColor;
 		SDL_RenderPresent(renderer);
 		SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 		SDL_RenderClear(renderer);
@@ -94,7 +94,7 @@ namespace graphics
 		return backgroundColor;
 	}
 
-	void setBackgroundColor(Color color)
+	void setBackgroundColor(const Color &color)
 	{
 		backgroundColor = color;
 	}
@@ -114,7 +114,7 @@ namespace graphics
 		return currentColor;
 	}
 
-	void setColor(Color color)
+	void setColor(const Color &color)
 	{
 		currentColor = color;
 	}
@@ -211,11 +211,11 @@ namespace graphics
 		ellipse(x, y, rx, ry, col, true);
 	}
 
-	void polygon(std::vector<int> vertices, bool filled)
+	void polygon(const std::vector<int> &vertices, bool filled)
 	{
 		polygon(vertices, currentColor, filled);
 	}
-	void polygon(std::vector<int> vertices, Color col, bool filled)
+	void polygon(const std::vector<int> &vertices, Color col, bool filled)
 	{
 		assert((vertices.size() & 1) == 0);
 		size_t len = vertices.size() / 2;
@@ -233,11 +233,11 @@ namespace graphics
 				col.a);
 	}
 
-	void polygonFilled(std::vector<int> vertices)
+	void polygonFilled(const std::vector<int> &vertices)
 	{
 		polygon(vertices, currentColor, true);
 	}
-	void polygonFilled(std::vector<int> vertices, Color col)
+	void polygonFilled(const std::vector<int> &vertices, Color col)
 	{
 		polygon(vertices, col, true);
 	}
@@ -264,14 +264,14 @@ namespace graphics
 			lineRGBA(renderer, x1, y1, x2, y2, col.r, col.g, col.b,
 				col.a);
 	}
-	void line(std::vector<int> lines)
+	void line(const std::vector<int> &lines)
 	{
 		assert((lines.size() & 3) == 0);
 		for (size_t i = 0; i < lines.size(); i += 4)
 			line(lines[i], lines[i + 1], lines[i + 2], lines[i + 3],
 				currentColor);
 	}
-	void line(std::vector<int> lines, Color col)
+	void line(const std::vector<int> &lines, Color col)
 	{
 		assert((lines.size() & 3) == 0);
 		for (size_t i = 0; i < lines.size(); i += 4)
@@ -307,7 +307,7 @@ namespace graphics
 		SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 		SDL_RenderClear(renderer);
 	}
-	void clear(Color col)
+	void clear(const Color &col)
 	{
 		SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 		SDL_RenderClear(renderer);

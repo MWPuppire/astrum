@@ -12,6 +12,7 @@ namespace log {
 	void setLogPriority(LogCategory priority);
 	LogCategory logPriority();
 	void vlog(LogCategory cat, std::string format, va_list args);
+	void vlog(std::string format, va_list args);
 	void log(LogCategory cat, std::string format, ...);
 	void log(std::string format, ...);
 	void info(std::string format, ...);

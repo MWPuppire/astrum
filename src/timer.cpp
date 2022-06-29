@@ -14,9 +14,20 @@ namespace Astrum {
 namespace timer {
 
 	namespace {
+		Uint64 currenttime = 0;
+		Uint64 lasttime = 0;
+		double performanceFrequency;
+		double dt;
+
 		std::vector<bool> terminated;
 		std::shared_mutex termMutex;
 	};
+
+	int InitTimer()
+	{
+		performanceFrequency = (double) SDL_GetPerformanceFrequency();
+		return 0;
+	}
 
 	void sleep(std::chrono::milliseconds delay)
 	{
@@ -71,6 +82,19 @@ namespace timer {
 		if (idx < terminated.size())
 			terminated[idx] = true;
 		lock.unlock();
+	}
+
+	double step()
+	{
+		lasttime = currenttime;
+		currenttime = SDL_GetPerformanceCounter();
+		dt = (double) ((currenttime - lasttime) / performanceFrequency);
+		return dt;
+	}
+
+	double deltatime()
+	{
+		return dt;
 	}
 
 }; // namespace timer

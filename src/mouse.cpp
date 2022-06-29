@@ -1,4 +1,4 @@
-#include <map>
+#include <unordered_map>
 #include <tuple>
 
 #include "sdl.hpp"
@@ -43,7 +43,7 @@ namespace mouse
 
 	namespace
 	{
-		std::map<MouseButton, bool> mousedown;
+		std::unordered_map<MouseButton, bool> mousedown;
 	};
 
 	void addMousedown(MouseButton btn)

@@ -10,6 +10,8 @@ namespace Astrum {
 
 namespace timer {
 
+	int InitTimer();
+
 	void sleep(std::chrono::milliseconds interval);
 
 	size_t setInterval(std::chrono::milliseconds interval, std::function<void()> cb);
@@ -59,6 +61,9 @@ namespace timer {
 	}
 
 	void clearInterval(size_t idx);
+
+	double step();
+	double deltatime();
 
 }; // namespace timer
 

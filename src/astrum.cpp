@@ -1,9 +1,3 @@
-#ifdef __GNUC__
-#  define UNUSED(x) UNUSED_##x __attribute__((__unused__))
-#else
-#  define UNUSED(x) UNUSED_##x
-#endif
-
 #ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
 #endif
@@ -25,6 +19,7 @@
 #include "astrum/graphics.hpp"
 #include "astrum/log.hpp"
 #include "astrum/filesystem.hpp"
+#include "astrum/timer.hpp"
 
 namespace Astrum
 {
@@ -41,9 +36,6 @@ const int DEFAULT_HEIGHT = 480;
 namespace
 {
 	int hasInit = 0;
-
-	Uint64 currenttime = 0;
-	Uint64 lasttime = 0;
 
 	bool isrunning = false;
 	bool doquit = false;
@@ -67,13 +59,11 @@ namespace
 	std::optional<std::function<void(std::filesystem::path)> > cb_filedropped;
 	std::optional<std::function<void(std::filesystem::path)> > cb_directorydropped;
 #ifdef __EMSCRIPTEN__
-	std::function<void(double, double)> cb_update;
+	std::function<void(double)> cb_update;
 #endif
-
-	double dt;
 };
 
-bool handle_event(SDL_Event e)
+bool handle_event(const SDL_Event &e)
 {
 	bool term = false;
 	int virtX, virtY;
@@ -253,8 +243,14 @@ int init(Config &conf)
 		return init;
 	}
 
+	init = timer::InitTimer();
+	if (init != 0) {
+		log::error("Unable to initialize timer submodule\n");
+		return init;
+	}
+
 #ifdef __EMSCRIPTEN__
-		emscripten_set_window_title(conf.appName.c_str());
+	emscripten_set_window_title(conf.appName.c_str());
 #endif
 
 	hasInit = 1;
@@ -274,6 +270,27 @@ void exit()
 	hasInit = 0;
 }
 
+#ifdef __EMSCRIPTEN__
+void main_loop() {
+	SDL_Event e;
+	double dt = timer::step();
+
+	while (SDL_PollEvent(&e)) {
+		doquit = handle_event(e);
+		if (doquit) {
+			isrunning = false;
+			emscripten_cancel_main_loop();
+		}
+	}
+
+	cb_update(dt);
+
+	graphics::drawframe();
+	if (cb_draw)
+		(*cb_draw)();
+};
+#endif
+
 void run(std::function<void(double)> update)
 {
 	if (isrunning)
@@ -285,40 +302,16 @@ void run(std::function<void(double)> update)
 	if (cb_startup)
 		(*cb_startup)();
 
-	currenttime = SDL_GetPerformanceCounter();
+	// don't count time from start-up function in dt
+	timer::step();
 
 #ifdef __EMSCRIPTEN__
 	cb_update = update;
-
-	void (*main_loop)() = []() {
-		SDL_Event e;
-		lasttime = currenttime;
-		currenttime = SDL_GetPerformanceCounter();
-		double deltatime = (double) ((currenttime - lasttime) / (double) SDL_GetPerformanceFrequency());
-		dt = deltatime;
-
-		while (SDL_PollEvent(&e)) {
-			doquit = handle_event(e);
-			if (doquit) {
-				isrunning = false;
-				emscripten_cancel_main_loop();
-			}
-		}
-
-		cb_update(deltatime);
-
-		graphics::drawframe();
-		if (cb_draw)
-			(*cb_draw)();
-	};
 	emscripten_set_main_loop(main_loop, 0, 1);
 #else
 	SDL_Event e;
 	while (!doquit) {
-		lasttime = currenttime;
-		currenttime = SDL_GetPerformanceCounter();
-		double deltatime = (double) ((currenttime - lasttime) / (double) SDL_GetPerformanceFrequency());
-		dt = deltatime;
+		double dt = timer::step();
 
 		while (SDL_PollEvent(&e)) {
 			doquit = handle_event(e);
@@ -326,7 +319,7 @@ void run(std::function<void(double)> update)
 				break;
 		}
 
-		update(deltatime);
+		update(dt);
 
 		graphics::drawframe();
 		if (cb_draw)
@@ -341,11 +334,6 @@ void run(std::function<void()> update)
 {
 	auto lambda = [update](double UNUSED(dt)) { update(); };
 	run(lambda);
-}
-
-double getDeltaTime()
-{
-	return dt;
 }
 
 void quit(bool checkonquit)

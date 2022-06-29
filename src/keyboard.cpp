@@ -1,4 +1,4 @@
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "sdl.hpp"
@@ -15,7 +15,7 @@ namespace keyboard
 
 	namespace
 	{
-		std::map<Key, bool> keysdown;
+		std::unordered_map<Key, bool> keysdown;
 		bool keyrepeat = false;
 	}
 

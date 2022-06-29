@@ -1,6 +1,12 @@
 #ifndef INCLUDE_ASTRUM_INTERNALS
 #define INCLUDE_ASTRUM_INTERNALS
 
+#ifdef __GNUC__
+#  define UNUSED(x) UNUSED_##x __attribute__((__unused__))
+#else
+#  define UNUSED(x) UNUSED_##x
+#endif
+
 #include <memory>
 
 #include "sdl.hpp"
