@@ -63,18 +63,17 @@ namespace
 #endif
 };
 
-bool handle_event(const SDL_Event &e)
+void handle_event(const SDL_Event &e)
 {
-	bool term = false;
 	int virtX, virtY;
 	Key key;
 	KeyMod mod;
 	MouseButton btn;
 	switch (e.type) {
 	case SDL_QUIT:
-		term = true;
+		doquit = true;
 		if (cb_quit)
-			term = (*cb_quit)() && term;
+			doquit = (*cb_quit)() && doquit;
 		break;
 	case SDL_KEYDOWN:
 		if (e.key.repeat && !keyboard::hasKeyRepeat())
@@ -178,7 +177,6 @@ bool handle_event(const SDL_Event &e)
 		SDL_free(e.drop.file);
 		break;
 	}
-	return term;
 }
 
 int init(Config &conf)
@@ -276,7 +274,7 @@ void main_loop() {
 	double dt = timer::step();
 
 	while (SDL_PollEvent(&e)) {
-		doquit = handle_event(e);
+		handle_event(e);
 		if (doquit) {
 			isrunning = false;
 			emscripten_cancel_main_loop();
@@ -314,7 +312,7 @@ void run(std::function<void(double)> update)
 		double dt = timer::step();
 
 		while (SDL_PollEvent(&e)) {
-			doquit = handle_event(e);
+			handle_event(e);
 			if (doquit)
 				break;
 		}

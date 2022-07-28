@@ -62,6 +62,13 @@ namespace timer {
 
 	void clearInterval(size_t idx);
 
+	/**
+	 * @brief Returns the time, in seconds, since the last call.
+	 *
+	 * Returns the number of seconds since this function was last called.
+	 * Since this is used to determine `dt` in `update`, this should usually
+	 * not be called by the user.
+	 */
 	double step();
 	double deltatime();
 

@@ -38,6 +38,7 @@ target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp src/audio.cpp
 	src/sound.cpp)
 target_include_directories(astrum PUBLIC include)
+target_include_directories(astrum PRIVATE assets)
 
 if(NOT EMSCRIPTEN)
 	target_include_directories(astrum PUBLIC ${SDL2_INCLUDE_DIRS})
@@ -51,6 +52,11 @@ if(NOT EMSCRIPTEN)
 	target_link_libraries(astrum PUBLIC ${SDL2IMAGE_LIBRARY})
 	target_link_libraries(astrum PUBLIC ${SDL2GFX_LIBRARY})
 endif(NOT EMSCRIPTEN)
+
+	add_executable(astrumSudoku examples/sudoku.cpp)
+	add_dependencies(astrumSudoku astrum)
+	target_include_directories(astrumSudoku PRIVATE astrum)
+	target_link_libraries(astrumSudoku astrum)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	add_executable(astrumDemo examples/demo.cpp)
@@ -67,11 +73,6 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	add_dependencies(astrumCircles astrum)
 	target_include_directories(astrumCircles PRIVATE astrum)
 	target_link_libraries(astrumCircles astrum)
-
-	add_executable(astrumSudoku examples/sudoku.cpp)
-	add_dependencies(astrumSudoku astrum)
-	target_include_directories(astrumSudoku PRIVATE astrum)
-	target_link_libraries(astrumSudoku astrum)
 
 	add_executable(astrumGameOfLife examples/life.cpp)
 	add_dependencies(astrumGameOfLife astrum)

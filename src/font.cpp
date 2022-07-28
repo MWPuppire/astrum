@@ -14,7 +14,11 @@
 #include "astrum/graphics.hpp"
 
 #ifndef NO_DEFAULT_FONT
-#include "astrum/assets/vera_font.hpp"
+#define INCBIN_SILENCE_BITCODE_WARNING
+#define INCBIN_PREFIX binary_
+#define INCBIN_STYLE INCBIN_STYLE_SNAKE
+#include "astrum-external/incbin.h"
+INCBIN(vera, "../assets/Vera.ttf");
 #endif
 
 namespace Astrum
@@ -46,7 +50,7 @@ Font::Font(FontData &data)
 #ifndef NO_DEFAULT_FONT
 Font::Font(int size, Color color, int style, TextAlign align)
 {
-	SDL_RWops *rw = SDL_RWFromConstMem(Vera_ttf, Vera_ttf_len);
+	SDL_RWops *rw = SDL_RWFromConstMem(binary_vera_data, binary_vera_size);
 	this->data = fontDataFromRW(rw, size, color, style, align);
 }
 #endif

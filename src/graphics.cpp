@@ -32,7 +32,7 @@ namespace graphics
 	namespace
 	{
 		SDL_Renderer *renderer;
-		void *glcontext;
+//		void *glcontext;
 		std::shared_ptr<Font> defaultFont;
 
 		Color backgroundColor;
@@ -50,10 +50,10 @@ namespace graphics
 
 	int InitGraphics(Config &conf)
 	{
-		if (window::window != nullptr)
-			glcontext = SDL_GL_CreateContext(window::window);
-		else
-			glcontext = nullptr;
+//		if (window::window != nullptr)
+//			glcontext = SDL_GL_CreateContext(window::window);
+//		else
+//			glcontext = nullptr;
 
 		backgroundColor = Color(0, 0, 0, 0xFF);
 		currentColor = Color(0, 0, 0, 0xFF);
@@ -84,9 +84,8 @@ namespace graphics
 
 	void QuitGraphics()
 	{
-		SDL_GL_DeleteContext(glcontext);
+//		SDL_GL_DeleteContext(glcontext);
 		SDL_DestroyRenderer(renderer);
-		IMG_Quit();
 	}
 
 	Color getBackgroundColor()
