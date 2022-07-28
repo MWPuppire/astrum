@@ -53,32 +53,32 @@ if(NOT EMSCRIPTEN)
 	target_link_libraries(astrum PUBLIC ${SDL2GFX_LIBRARY})
 endif(NOT EMSCRIPTEN)
 
-	add_executable(astrumSudoku examples/sudoku.cpp)
-	add_dependencies(astrumSudoku astrum)
-	target_include_directories(astrumSudoku PRIVATE astrum)
-	target_link_libraries(astrumSudoku astrum)
+add_executable(astrumDemo examples/demo.cpp)
+add_dependencies(astrumDemo astrum)
+target_include_directories(astrumDemo PRIVATE astrum)
+target_link_libraries(astrumDemo astrum)
+
+add_executable(astrumPong examples/pong.cpp)
+add_dependencies(astrumPong astrum)
+target_include_directories(astrumPong PRIVATE astrum)
+target_link_libraries(astrumPong astrum)
+
+add_executable(astrumCircles examples/circles.cpp)
+add_dependencies(astrumCircles astrum)
+target_include_directories(astrumCircles PRIVATE astrum)
+target_link_libraries(astrumCircles astrum)
+
+add_executable(astrumSudoku examples/sudoku.cpp)
+add_dependencies(astrumSudoku astrum)
+target_include_directories(astrumSudoku PRIVATE astrum)
+target_link_libraries(astrumSudoku astrum)
+
+add_executable(astrumGameOfLife examples/life.cpp)
+add_dependencies(astrumGameOfLife astrum)
+target_include_directories(astrumGameOfLife PRIVATE astrum)
+target_link_libraries(astrumGameOfLife astrum)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-	add_executable(astrumDemo examples/demo.cpp)
-	add_dependencies(astrumDemo astrum)
-	target_include_directories(astrumDemo PRIVATE astrum)
-	target_link_libraries(astrumDemo astrum)
-
-	add_executable(astrumPong examples/pong.cpp)
-	add_dependencies(astrumPong astrum)
-	target_include_directories(astrumPong PRIVATE astrum)
-	target_link_libraries(astrumPong astrum)
-
-	add_executable(astrumCircles examples/circles.cpp)
-	add_dependencies(astrumCircles astrum)
-	target_include_directories(astrumCircles PRIVATE astrum)
-	target_link_libraries(astrumCircles astrum)
-
-	add_executable(astrumGameOfLife examples/life.cpp)
-	add_dependencies(astrumGameOfLife astrum)
-	target_include_directories(astrumGameOfLife PRIVATE astrum)
-	target_link_libraries(astrumGameOfLife astrum)
-
 #	Haven't written any tests yet
 #	So testing code is irrelevant
 
