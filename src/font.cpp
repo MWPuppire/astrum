@@ -14,11 +14,7 @@
 #include "astrum/graphics.hpp"
 
 #ifndef NO_DEFAULT_FONT
-#define INCBIN_SILENCE_BITCODE_WARNING
-#define INCBIN_PREFIX binary_
-#define INCBIN_STYLE INCBIN_STYLE_SNAKE
-#include "astrum-external/incbin.h"
-INCBIN(vera, "../assets/Vera.ttf");
+#include "vera_ttf.h"
 #endif
 
 namespace Astrum
@@ -50,7 +46,7 @@ Font::Font(FontData &data)
 #ifndef NO_DEFAULT_FONT
 Font::Font(int size, Color color, int style, TextAlign align)
 {
-	SDL_RWops *rw = SDL_RWFromConstMem(binary_vera_data, binary_vera_size);
+	SDL_RWops *rw = SDL_RWFromConstMem(vera_ttf, vera_ttf_len);
 	this->data = fontDataFromRW(rw, size, color, style, align);
 }
 #endif
@@ -94,7 +90,7 @@ std::shared_ptr<Image> Font::renderText(std::string text)
 }
 std::shared_ptr<Image> Font::renderText(std::string text, Color color)
 {
-	if (this->data->font == nullptr) {
+	if (this == nullptr || this->data->font == nullptr) {
 		return nullptr;
 	}
 	SDL_Color scol = { color.r, color.g, color.b, color.a };
@@ -106,7 +102,7 @@ std::shared_ptr<Image> Font::renderText(std::string text, Color color)
 
 int Font::textSize(std::string text, int &w, int &h)
 {
-	if (this->data->font == nullptr) {
+	if (this == nullptr || this->data->font == nullptr) {
 		return -1;
 	}
 	int width, height;

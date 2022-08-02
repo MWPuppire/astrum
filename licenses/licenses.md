@@ -4,9 +4,6 @@ own licenses, specified as follows:
 CMake and associated files are available under the BSD 3-Clause license,
 [reproduced here](CMake_Copyright.txt).
 
-INCBIN is available under the Unlicense,
-[reproduced here](INCBIN_UNLICENSE).
-
 SDL is available under the zlib license,
 [reproduced here](SDL2_COPYING.txt).
 

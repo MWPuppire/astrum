@@ -12,6 +12,7 @@ namespace timer {
 
 	int InitTimer();
 
+	void sleep(size_t ms);
 	void sleep(std::chrono::milliseconds interval);
 
 	size_t setInterval(std::chrono::milliseconds interval, std::function<void()> cb);

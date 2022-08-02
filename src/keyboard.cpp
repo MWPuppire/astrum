@@ -39,21 +39,6 @@ namespace keyboard
 		return keysdown[key];
 	}
 
-	bool hasClipboardText()
-	{
-		return (bool) SDL_HasClipboardText();
-	}
-
-	std::string getClipboardText()
-	{
-		return SDL_GetClipboardText();
-	}
-
-	int setClipboardText(std::string text)
-	{
-		return SDL_SetClipboardText(text.c_str());
-	}
-
 	bool hasKeyRepeat()
 	{
 		return keyrepeat;

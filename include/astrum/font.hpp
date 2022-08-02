@@ -18,6 +18,12 @@ enum TextAlign {
 //	leftWrapWord, centerWrapWord, rightWrapWord
 };
 
+struct SystemFontQuery {
+	std::string family;
+	std::string style;
+	std::string withChars;
+};
+
 class Font {
 private:
 	struct FontData *data;
@@ -56,6 +62,9 @@ public:
 	static const int UNDERLINE     =  4;
 	static const int STRIKETHROUGH =  8;
 	static const int OUTLINE       = 16;
+
+	std::string *getSystemFonts(SystemFontQuery query = { "", "", "" });
+	static Font *createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
 };
 
 } // namespace Astrum

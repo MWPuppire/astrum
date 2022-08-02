@@ -11,9 +11,8 @@ namespace Astrum {
 /**
  * @brief Contains functions for handling the keyboard
  *
- * Namespace for any keyboard interaction; stores held keys and interfaces with
- * the system's clipboard. Can toggle whether key repeats send additional events
- * or not.
+ * Namespace for any keyboard interaction. Can toggle whether key repeats send
+ * additional events or not.
  */
 namespace keyboard {
 
@@ -30,35 +29,6 @@ namespace keyboard {
 	 * @overload
 	 */
 	bool isdown(std::string keystr);
-
-	/**
-	 * @brief Check whether the clipboard has text.
-	 *
-	 * Returns whether or not there is text in the clipboard.
-	 *
-	 * @return True if the clipboard contains any text and false otherwise.
-	 */
-	bool hasClipboardText();
-
-	/**
-	 * @brief Get the clipboard's text.
-	 *
-	 * Return any text currently in the system clipboard.
-	 *
-	 * @return The current text in the clipboard.
-	 */
-	std::string getClipboardText();
-
-	/**
-	 * @brief Set the clipboard's text.
-	 *
-	 * Replace the text in the clipboard with the new specified text.
-	 *
-	 * @param text Text to set the clipboard to.
-	 *
-	 * @return 0 on success and negative on an error.
-	 */
-	int setClipboardText(std::string text);
 
 	/** @brief Test if key repeats are on.
 	 *

@@ -18,6 +18,11 @@ string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address")
 
 string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra")
 
+option(DEFAULT_FONT "include a default font in the package" ON)
+if(NOT DEFAULT_FONT)
+	add_compile_definitions(NO_DEFAULT_FONT)
+endif(NOT DEFAULT_FONT)
+
 if(EMSCRIPTEN)
 	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
 		-sUSE_SDL_GFX=2)
@@ -36,7 +41,7 @@ add_library(astrum)
 target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/keyboard.cpp src/math.cpp src/mouse.cpp src/window.cpp src/util.cpp
 	src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp src/audio.cpp
-	src/sound.cpp)
+	src/sound.cpp src/system.cpp)
 target_include_directories(astrum PUBLIC include)
 target_include_directories(astrum PRIVATE assets)
 

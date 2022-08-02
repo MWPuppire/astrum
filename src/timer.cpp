@@ -29,6 +29,10 @@ namespace timer {
 		return 0;
 	}
 
+	void sleep(size_t ms)
+	{
+		SDL_Delay(ms);
+	}
 	void sleep(std::chrono::milliseconds delay)
 	{
 		SDL_Delay(delay.count());

@@ -23,6 +23,7 @@
 #include "filesystem.hpp"
 #include "sound.hpp"
 #include "audio.hpp"
+#include "system.hpp"
 
 namespace Astrum {
 
