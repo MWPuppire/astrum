@@ -132,8 +132,6 @@ void onjoystickpressed();
 void onjoystickreleased();
 void onjoystickremoved();
 
-std::string detectPlatform();
-
 } // namespace Astrum
 
 #endif // ifndef INCLUDE_ASTRUM

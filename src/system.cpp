@@ -13,7 +13,7 @@ namespace system
 
 	std::string getPlatformName()
 	{
-		return SDL_GetPlatform();
+		return std::string(SDL_GetPlatform());
 	}
 
 	bool openURL(std::string url)

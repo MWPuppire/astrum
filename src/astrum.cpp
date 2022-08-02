@@ -507,12 +507,4 @@ void onjoystickpressed();
 void onjoystickreleased();
 void onjoystickremoved();
 
-std::string detectPlatform()
-{
-// #ifdef __EMSCRIPTEN__
-//	return "Emscripten";
-// #endif
-	return std::string(SDL_GetPlatform());
-}
-
 }; // namespace Astrum
