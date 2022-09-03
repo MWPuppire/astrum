@@ -25,7 +25,7 @@ struct FontData {
 	FontData(TTF_Font *font, Color defaultColor, TextAlign defaultAlign)
 		: font(font), defaultColor(defaultColor),
 		defaultAlign(defaultAlign) { }
-	FontData(FontData &src) : font(src.font),
+	FontData(const FontData &src) : font(src.font),
 		defaultColor(src.defaultColor), defaultAlign(src.defaultAlign)
 		{ }
 };
@@ -37,7 +37,7 @@ struct ImageData {
 	{
 		this->tran = std::make_shared<Transforms>();
 	}
-	ImageData(ImageData &src) : image(src.image)
+	ImageData(const ImageData &src) : image(src.image)
 	{
 		this->tran = std::make_shared<Transforms>(*src.tran);
 	}
@@ -46,13 +46,16 @@ struct ImageData {
 struct CursorData
 {
 	SDL_Cursor *cursor;
-	CursorData(CursorData &data) : cursor(data.cursor) { }
 	CursorData(SDL_Cursor *cursor) : cursor(cursor) { }
+	CursorData(const CursorData &data) : cursor(data.cursor) { }
 };
 
 struct SoundData {
 	Mix_Chunk *chunk;
 	int channel;
+	SoundData(const SoundData &data) : chunk(data.chunk),
+		channel(data.channel)
+		{ }
 };
 
 namespace window {

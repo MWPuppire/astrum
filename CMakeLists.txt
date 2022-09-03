@@ -83,6 +83,11 @@ add_dependencies(astrumGameOfLife astrum)
 target_include_directories(astrumGameOfLife PRIVATE astrum)
 target_link_libraries(astrumGameOfLife astrum)
 
+add_executable(astrumSnake examples/snake.cpp)
+add_dependencies(astrumSnake astrum)
+target_include_directories(astrumSnake PRIVATE astrum)
+target_link_libraries(astrumSnake astrum)
+
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
 #	Haven't written any tests yet
 #	So testing code is irrelevant

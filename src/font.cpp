@@ -90,7 +90,7 @@ std::shared_ptr<Image> Font::renderText(std::string text)
 }
 std::shared_ptr<Image> Font::renderText(std::string text, Color color)
 {
-	if (this == nullptr || this->data->font == nullptr) {
+	if (this->data->font == nullptr) {
 		return nullptr;
 	}
 	SDL_Color scol = { color.r, color.g, color.b, color.a };
@@ -102,7 +102,7 @@ std::shared_ptr<Image> Font::renderText(std::string text, Color color)
 
 int Font::textSize(std::string text, int &w, int &h)
 {
-	if (this == nullptr || this->data->font == nullptr) {
+	if (this->data->font == nullptr) {
 		return -1;
 	}
 	int width, height;

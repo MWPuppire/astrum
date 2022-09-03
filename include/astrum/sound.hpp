@@ -24,7 +24,6 @@ public:
 	~Sound();
 	struct SoundData *getData();
 	static std::unique_ptr<Sound> beep(double duration = 0.2, int hertz = 800);
-	void *getSample(int len);
 	int getDuration();
 	double volume();
 	void setVolume(double volume);
