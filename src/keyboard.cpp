@@ -7,45 +7,36 @@
 #include "astrum/keyboard.hpp"
 #include "astrum/astrum.hpp"
 
-namespace Astrum
-{
+namespace Astrum {
 
-namespace keyboard
-{
+namespace keyboard {
 
-	namespace
-	{
+	namespace {
 		std::unordered_map<Key, bool> keysdown;
 		bool keyrepeat = false;
 	}
 
-	void addKeydown(Key key)
-	{
+	void addKeydown(Key key) {
 		keysdown[key] = true;
 	}
-	void removeKeydown(Key key)
-	{
+	void removeKeydown(Key key) {
 		keysdown[key] = false;
 	}
 
-	bool isdown(Key key)
-	{
+	bool isdown(Key key) {
 		return keysdown[key];
 	}
-	bool isdown(std::string keystr)
-	{
+	bool isdown(std::string keystr) {
 		SDL_Keycode code = SDL_GetKeyFromName(keystr.c_str());
 		Key key = fromKeycode(code);
 		return keysdown[key];
 	}
 
-	bool hasKeyRepeat()
-	{
+	bool hasKeyRepeat() {
 		return keyrepeat;
 	}
 
-	void setKeyRepeat(bool enable)
-	{
+	void setKeyRepeat(bool enable) {
 		keyrepeat = enable;
 	}
 

@@ -2,9 +2,9 @@
 #define INCLUDE_ASTRUM_INTERNALS
 
 #ifdef __GNUC__
-#  define UNUSED(x) UNUSED_##x __attribute__((__unused__))
+#	define UNUSED(x) UNUSED_##x __attribute__((__unused__))
 #else
-#  define UNUSED(x) UNUSED_##x
+#	define UNUSED(x) UNUSED_##x
 #endif
 
 #include <memory>
@@ -19,43 +19,88 @@
 namespace Astrum {
 
 struct FontData {
-	TTF_Font *font;
+	TTF_Font *font = nullptr;
 	Color defaultColor;
 	TextAlign defaultAlign;
 	FontData(TTF_Font *font, Color defaultColor, TextAlign defaultAlign)
 		: font(font), defaultColor(defaultColor),
 		defaultAlign(defaultAlign) { }
-	FontData(const FontData &src) : font(src.font),
-		defaultColor(src.defaultColor), defaultAlign(src.defaultAlign)
-		{ }
+	FontData(const FontData &src) = delete;
+	FontData(FontData &&src) : font(src.font),
+		defaultColor(src.defaultColor), defaultAlign(src.defaultAlign) {
+		src.font = nullptr;
+	}
+	FontData &operator=(const FontData &src) = delete;
+	FontData &operator=(FontData &&src) {
+		this->font = src.font;
+		this->defaultColor = src.defaultColor;
+		this->defaultAlign = src.defaultAlign;
+		src.font = nullptr;
+		return *this;
+	}
+	~FontData() {
+		if (this->font != nullptr) {
+			TTF_CloseFont(this->font);
+		}
+	}
 };
 
 struct ImageData {
-	SDL_Surface *image;
-	std::shared_ptr<Transforms> tran;
-	ImageData(SDL_Surface *surf) : image(surf)
-	{
-		this->tran = std::make_shared<Transforms>();
+	SDL_Surface *image = nullptr;
+	Transforms *tran = nullptr;
+	ImageData(SDL_Surface *surf) : image(surf) {
+		this->tran = new Transforms();
 	}
-	ImageData(const ImageData &src) : image(src.image)
-	{
-		this->tran = std::make_shared<Transforms>(*src.tran);
+	ImageData(const ImageData &src) = delete;
+	ImageData(ImageData &&src) : image(src.image), tran(src.tran) {
+		src.image = nullptr;
+		src.tran = nullptr;
+	}
+	ImageData &operator=(const ImageData &src) = delete;
+	ImageData &operator=(ImageData &&src) {
+		this->image = src.image;
+		this->tran = src.tran;
+		src.image = nullptr;
+		src.tran = nullptr;
+		return *this;
+	}
+	~ImageData() {
+		if (this->image != nullptr)
+			SDL_FreeSurface(this->image);
+		if (this->tran != nullptr)
+			delete this->tran;
 	}
 };
 
-struct CursorData
-{
-	SDL_Cursor *cursor;
-	CursorData(SDL_Cursor *cursor) : cursor(cursor) { }
-	CursorData(const CursorData &data) : cursor(data.cursor) { }
+struct CursorData {
+	SDL_Cursor *cursor = nullptr;
+	bool nofree;
+	CursorData(SDL_Cursor *cursor, bool nofree = false) : cursor(cursor),
+		nofree(nofree) { }
+	CursorData(const CursorData &src) = delete;
+	CursorData(CursorData &&src) : cursor(src.cursor), nofree(src.nofree) {
+		src.cursor = nullptr;
+	}
+	CursorData &operator=(const CursorData &src) = delete;
+	CursorData &operator=(CursorData &&src) {
+		this->cursor = src.cursor;
+		this->nofree = src.nofree;
+		src.cursor = nullptr;
+		return *this;
+	}
+	~CursorData() {
+		if (this->cursor != nullptr && !this->nofree)
+			SDL_FreeCursor(this->cursor);
+	}
 };
 
 struct SoundData {
-	Mix_Chunk *chunk;
+	Mix_Chunk *chunk = nullptr;
 	int channel;
-	SoundData(const SoundData &data) : chunk(data.chunk),
-		channel(data.channel)
-		{ }
+	~SoundData() {
+		if (this->chunk != nullptr)
+			Mix_FreeChunk(this->chunk);
+	}
 };
 
 namespace window {
@@ -74,8 +119,7 @@ namespace keyboard {
 	void removeKeydown(Key key);
 };
 
-constexpr MouseButton fromMouseBtn(int button)
-{
+static constexpr MouseButton fromMouseBtn(int button) {
 	switch (button) {
 		case SDL_BUTTON_LEFT: return MouseButton::LEFT;
 		case SDL_BUTTON_MIDDLE: return MouseButton::MIDDLE;
@@ -86,8 +130,7 @@ constexpr MouseButton fromMouseBtn(int button)
 	}
 }
 
-constexpr Key fromKeycode(SDL_Keycode code)
-{
+static constexpr Key fromKeycode(SDL_Keycode code) {
 	switch (code) {
 		case SDLK_UNKNOWN: return Key::UNKNOWN;
 		case SDLK_SPACE: return Key::SPACE;
@@ -226,8 +269,7 @@ constexpr Key fromKeycode(SDL_Keycode code)
 	}
 }
 
-constexpr KeyMod fromSDLMod(Uint16 mod)
-{
+static constexpr KeyMod fromSDLMod(Uint16 mod) {
 	KeyMod out = KeyMod::NONE;
 	if (mod & KMOD_LSHIFT)
 		out = out | KeyMod::LSHIFT;

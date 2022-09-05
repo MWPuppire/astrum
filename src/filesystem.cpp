@@ -1,5 +1,5 @@
 #ifdef __EMSCRIPTEN__
-	#include <emscripten.h>
+#	include <emscripten.h>
 #endif
 
 #include <filesystem>
@@ -10,10 +10,8 @@
 #include "astrum/log.hpp"
 
 #ifdef __EMSCRIPTEN__
-extern "C"
-{
-	void log_fs_error()
-	{
+extern "C" {
+	void log_fs_error() {
 		Astrum::log::error("Could not establish persistent memory. "
 			"No data will be saved across program runs\n");
 	}
@@ -22,15 +20,12 @@ extern "C"
 
 namespace Astrum {
 
-namespace filesystem
-{
-	namespace
-	{
+namespace filesystem {
+	namespace {
 		std::filesystem::path appDirectory;
 		std::filesystem::path sourceDirectory;
 	};
-	int InitFS(Config &conf)
-	{
+	int InitFS(Config &conf) {
 #ifdef __EMSCRIPTEN__
 		(void) conf;
 		appDirectory = std::filesystem::path("/offline");
@@ -70,8 +65,7 @@ namespace filesystem
 		return 0;
 #endif
 	}
-	void QuitFS()
-	{
+	void QuitFS() {
 #ifdef __EMSCRIPTEN__
 		EM_ASM(
 			FS.syncfs(false, function(err) {
@@ -83,12 +77,10 @@ namespace filesystem
 		);
 #endif
 	}
-	std::filesystem::path getAppDirectory()
-	{
+	std::filesystem::path getAppDirectory() {
 		return appDirectory;
 	}
-	std::filesystem::path getSourceDirectory()
-	{
+	std::filesystem::path getSourceDirectory() {
 		return sourceDirectory;
 	}
 };

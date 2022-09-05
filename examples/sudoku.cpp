@@ -3,10 +3,8 @@
 #include <cmath>
 #include <sstream>
 #include <string>
-#include <tuple>
 #include <vector>
 #include <random>
-#include <memory>
 
 // on macOS, use CMD for undo/redo
 // otherwise, use CTRL
@@ -23,7 +21,7 @@ const Astrum::Color lgray = Astrum::Color(176, 176, 176);
 const Astrum::Color  blue = Astrum::Color(85, 85, 255);
 const Astrum::Color   red = Astrum::Color(255, 0, 0);
 
-std::shared_ptr<Astrum::Font> bigFont, smallFont;
+Astrum::Font bigFont, smallFont;
 
 const int boxStart[9] = { 0, 3, 6, 27, 30, 33, 54, 57, 60 };
 
@@ -76,8 +74,9 @@ struct {
 	double givingUp = 1.0;
 } puzzleConfig;
 
-class Button
-{
+void nop() { }
+
+class Button {
 	std::string text;
 	float x;
 	float y;
@@ -86,13 +85,12 @@ class Button
 	std::function<void()> onclick;
 	bool mouseDown;
 public:
+	Button() : text(""), x(0), y(0), onclick(nop), mouseDown(false) { }
 	Button(std::string text, float x, float y, std::function<void()> onclick)
-		: text(text), x(x), y(y), onclick(onclick), mouseDown(false)
-	{
-		Astrum::graphics::getFont()->textSize(text, textWidth, textHeight);
+		: text(text), x(x), y(y), onclick(onclick), mouseDown(false) {
+		Astrum::graphics::getFont().textSize(text, textWidth, textHeight);
 	}
-	void draw(bool shaded = false)
-	{
+	void draw(bool shaded = false) {
 		if (shaded || mouseDown) {
 			Astrum::graphics::rectangleFilled(x, y, textWidth + 4,
 				textHeight + 4, lgray);
@@ -100,12 +98,10 @@ public:
 		Astrum::graphics::rectangle(x, y, textWidth + 4, textHeight + 4, black);
 		Astrum::graphics::print(text, x + 2, y + 2);
 	}
-	void update(bool disabled = false)
-	{
+	void update(bool disabled = false) {
 		if (disabled == true)
 			return;
-		int mouseX, mouseY;
-		std::tie(mouseX, mouseY) = Astrum::mouse::getCoordinates();
+		auto [ mouseX, mouseY ] = Astrum::mouse::getCoordinates();
 		if (Astrum::mouse::isdown(Astrum::MouseButton::LEFT) && !mouseDown
 		&& (mouseX >= x && mouseX <= x + textWidth + 4)
 		&& (mouseY >= y && mouseY <= y + textHeight + 4)) {
@@ -117,23 +113,21 @@ public:
 	}
 };
 
-Button *newGameButton;
-Button *easyButton;
-Button *mediumButton;
-Button *hardButton;
-Button *notesButton;
-Button *solveButton;
-Button *undoButton;
-Button *redoButton;
-Button *pauseButton;
+Button newGameButton;
+Button easyButton;
+Button mediumButton;
+Button hardButton;
+Button notesButton;
+Button solveButton;
+Button undoButton;
+Button redoButton;
+Button pauseButton;
 
-int randint(int low, int high)
-{
+int randint(int low, int high) {
 	return Astrum::math::random(low, high - 1);
 }
 
-void shuffle(short arr[], int n)
-{
+void shuffle(short arr[], int n) {
 	for (int i = n - 1; i > 0; i--) {
 		int j = randint(0, i + 1);
 		short tmp = arr[j];
@@ -142,8 +136,7 @@ void shuffle(short arr[], int n)
 	}
 }
 
-bool containsDup(short row[], int n)
-{
+bool containsDup(short row[], int n) {
 	for (int i = 0; i < n - 1; i++) {
 		for (int j = i + 1; j < n; j++) {
 			if (row[i] == row[j] && row[i] != 0)
@@ -153,8 +146,7 @@ bool containsDup(short row[], int n)
 	return false;
 }
 
-bool checkCorrectness(short sudoku[81])
-{
+bool checkCorrectness(short sudoku[81]) {
 	short row[9] = { 0 };
 	short col[9] = { 0 };
 	short box[9] = { 0 };
@@ -174,8 +166,7 @@ bool checkCorrectness(short sudoku[81])
 	return true;
 }
 
-bool isSolution(short sudoku[81])
-{
+bool isSolution(short sudoku[81]) {
 	for (int i = 0; i < 81; i++) {
 		if (sudoku[i] == 0)
 			return false;
@@ -183,8 +174,7 @@ bool isSolution(short sudoku[81])
 	return checkCorrectness(sudoku);
 }
 
-bool duplicateNumber(short sudoku[81], int x, int y, short num)
-{
+bool duplicateNumber(short sudoku[81], int x, int y, short num) {
 	if (num == 0)
 		return false;
 
@@ -224,8 +214,7 @@ bool solve(short sudoku[81]) {
 	return solve(sudoku, 0, 0);
 }
 
-void generate(short sudoku[81], Difficulty difficulty)
-{
+void generate(short sudoku[81], Difficulty difficulty) {
 	short topcorner[9]    = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 	short middle[9]       = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 	short bottomcorner[9] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -260,8 +249,7 @@ void generate(short sudoku[81], Difficulty difficulty)
 	}
 }
 
-bool addNumber(int x, int y, short num)
-{
+bool addNumber(int x, int y, short num) {
 	int pos = x + y * 9;
 	if (puzzle.fixed[pos])
 		return false;
@@ -269,13 +257,11 @@ bool addNumber(int x, int y, short num)
 	return true;
 }
 
-short getNumber(int x, int y)
-{
+short getNumber(int x, int y) {
 	return puzzle.problem[x + y * 9];
 }
 
-bool tglNote(int x, int y, short note)
-{
+bool tglNote(int x, int y, short note) {
 	int pos = x + y * 9;
 	if (puzzle.fixed[pos] || puzzle.problem[pos])
 		return false;
@@ -283,8 +269,7 @@ bool tglNote(int x, int y, short note)
 	return true;
 }
 
-bool setNote(int x, int y, short note)
-{
+bool setNote(int x, int y, short note) {
 	int pos = x + y * 9;
 	if (puzzle.fixed[pos] || puzzle.problem[pos])
 		return false;
@@ -292,13 +277,11 @@ bool setNote(int x, int y, short note)
 	return true;
 }
 
-short getNote(int x, int y)
-{
+short getNote(int x, int y) {
 	return puzzle.notes[x + y * 9];
 }
 
-bool handleEvent(PuzzleEvent &event)
-{
+bool handleEvent(PuzzleEvent &event) {
 	puzzle.x = event.x;
 	puzzle.y = event.y;
 
@@ -334,8 +317,7 @@ bool handleEvent(PuzzleEvent &event)
 	}
 }
 
-void undoEvent(PuzzleEvent event)
-{
+void undoEvent(PuzzleEvent event) {
 	puzzle.x = event.x;
 	puzzle.y = event.y;
 
@@ -367,16 +349,13 @@ void undoEvent(PuzzleEvent event)
 	}
 }
 
-void printNumber(int x, int y, short num, Astrum::Color color, std::shared_ptr<Astrum::Font> font)
-{
+void printNumber(int x, int y, short num, Astrum::Color color, Astrum::Font font) {
 	std::string str = std::to_string(num);
-	int textWidth, textHeight;
-	std::tie(textWidth, textHeight) = font->textSize(str);
+	auto [ textWidth, textHeight ] = font.textSize(str);
 	Astrum::graphics::print(str, x - (textWidth / 2), y - (textHeight / 2), font, color);
 }
 
-void printGrid(short sudoku[81], short notes[81], int selectedX, int selectedY, bool showErrors)
-{
+void printGrid(short sudoku[81], short notes[81], int selectedX, int selectedY, bool showErrors) {
 	for (int i = 0; i < 81; i++) {
 		int x = gridOffset + boxSize * (i % 9) + bigLineSize * ((i % 9) / 3 + 1);
 		int y = gridOffset + boxSize * (i / 9) + bigLineSize * ((i / 27) + 1);
@@ -424,8 +403,7 @@ void printGrid(short sudoku[81], short notes[81], int selectedX, int selectedY, 
 	}
 }
 
-void startup()
-{
+void startup() {
 	puzzle.x = puzzle.y = 4;
 
 	memset(&puzzle.problem, 0, 81 * sizeof(short));
@@ -446,8 +424,7 @@ void startup()
 	memset(&puzzle.notes, 0, 81 * sizeof(short));
 }
 
-std::string prettyTime(double seconds)
-{
+std::string prettyTime(double seconds) {
 	std::ostringstream out;
 	out.precision(2);
 	if (seconds > 60) {
@@ -466,13 +443,11 @@ std::string prettyTime(double seconds)
 	return out.str();
 }
 
-void draw()
-{
+void draw() {
 	if (puzzleConfig.paused) {
 		int width = 9 * boxSize + 3 * bigLineSize;
 		Astrum::graphics::rectangle(gridOffset, gridOffset, width, width, black);
-		int textWidth, textHeight;
-		std::tie(textWidth, textHeight) = bigFont->textSize("Paused");
+		auto [ textWidth, textHeight ] = bigFont.textSize("Paused");
 		Astrum::graphics::print("Paused", gridOffset + (width / 2) - (textWidth / 2),
 			gridOffset + (width / 2) - (textHeight / 2), bigFont, black);
 	} else {
@@ -500,11 +475,11 @@ void draw()
 			gridSize + gridOffset * 2, gridOffset);
 	}
 
-	newGameButton->draw();
+	newGameButton.draw();
 
-	easyButton->draw(puzzleConfig.difficulty == EASY);
-	mediumButton->draw(puzzleConfig.difficulty == MEDIUM);
-	hardButton->draw(puzzleConfig.difficulty == HARD);
+	easyButton.draw(puzzleConfig.difficulty == EASY);
+	mediumButton.draw(puzzleConfig.difficulty == MEDIUM);
+	hardButton.draw(puzzleConfig.difficulty == HARD);
 	if (puzzleConfig.changedDifficulty) {
 		Astrum::graphics::print("You changed the difficulty. For this to take",
 			gridSize + gridOffset * 2, 70 + gridOffset * 2,
@@ -514,7 +489,7 @@ void draw()
 			smallFont);
 	}
 
-	notesButton->draw(puzzleConfig.notes);
+	notesButton.draw(puzzleConfig.notes);
 
 	Astrum::graphics::print("To give up and solve the puzzle, click",
 		gridSize + gridOffset * 2, 120 + gridOffset * 2,
@@ -525,28 +500,27 @@ void draw()
 	Astrum::graphics::print("while it's shaded will solve the puzzle.",
 		gridSize + gridOffset * 2, 140 + gridOffset * 2,
 		smallFont);
-	solveButton->draw(puzzleConfig.givingUp < 0.4);
+	solveButton.draw(puzzleConfig.givingUp < 0.4);
 
-	undoButton->draw(puzzle.eventPointer == 0);
-	redoButton->draw(puzzle.redoLength == 0);
+	undoButton.draw(puzzle.eventPointer == 0);
+	redoButton.draw(puzzle.redoLength == 0);
 
-	pauseButton->draw(puzzleConfig.paused);
+	pauseButton.draw(puzzleConfig.paused);
 }
 
-void update(double dt)
-{
+void update(double dt) {
 	if (Astrum::keyboard::isdown("escape"))
 		Astrum::quit();
 
-	newGameButton->update();
-	easyButton->update();
-	mediumButton->update();
-	hardButton->update();
-	notesButton->update();
-	solveButton->update();
-	undoButton->update(puzzle.eventPointer == 0);
-	redoButton->update(puzzle.redoLength == 0);
-	pauseButton->update();
+	newGameButton.update();
+	easyButton.update();
+	mediumButton.update();
+	hardButton.update();
+	notesButton.update();
+	solveButton.update();
+	undoButton.update(puzzle.eventPointer == 0);
+	redoButton.update(puzzle.redoLength == 0);
+	pauseButton.update();
 
 	puzzleConfig.givingUp += dt;
 
@@ -568,8 +542,7 @@ void update(double dt)
 	}
 }
 
-void pushEvent(int x, int y, PuzzleEventType kind)
-{
+void pushEvent(int x, int y, PuzzleEventType kind) {
 	PuzzleEvent event = { .x = x, .y = y, .original = 0, .type = kind };
 	if (puzzle.redoLength) {
 		puzzle.eventStack.erase(puzzle.eventStack.begin()
@@ -584,16 +557,14 @@ void pushEvent(int x, int y, PuzzleEventType kind)
 	puzzle.eventLength++;
 }
 
-void redo()
-{
+void redo() {
 	if (puzzle.redoLength) {
 		puzzle.eventLength++;
 		puzzle.redoLength--;
 	}
 }
 
-void undo()
-{
+void undo() {
 	if (puzzle.eventPointer) {
 		puzzle.eventPointer--;
 		undoEvent(puzzle.eventStack.at(puzzle.eventPointer));
@@ -602,8 +573,7 @@ void undo()
 	}
 }
 
-void keypress(Astrum::Key key, Astrum::KeyMod mod)
-{
+void keypress(Astrum::Key key, Astrum::KeyMod mod) {
 	if (key == Astrum::Key::SPACE)
 		puzzleConfig.paused = !puzzleConfig.paused;
 
@@ -646,8 +616,7 @@ void keypress(Astrum::Key key, Astrum::KeyMod mod)
 		redo();
 }
 
-void mousepress(Astrum::MouseButton button, int x, int y)
-{
+void mousepress(Astrum::MouseButton button, int x, int y) {
 	if (puzzleConfig.paused)
 		return;
 
@@ -674,8 +643,7 @@ void mousepress(Astrum::MouseButton button, int x, int y)
 	}
 }
 
-int main()
-{
+int main() {
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
@@ -686,32 +654,32 @@ int main()
 
 	Astrum::init(conf);
 	Astrum::graphics::setBackgroundColor(white);
-	bigFont = std::make_shared<Astrum::Font>(24);
-	smallFont = std::make_shared<Astrum::Font>(10);
+	bigFont = Astrum::Font(24);
+	smallFont = Astrum::Font(10);
 	Astrum::keyboard::setKeyRepeat(true);
 
-	newGameButton = new Button("New Game", gridSize + gridOffset * 2,
+	newGameButton = Button("New Game", gridSize + gridOffset * 2,
 		12 + gridOffset * 2, startup);
-	easyButton = new Button("Easy", gridSize + gridOffset * 2,
+	easyButton = Button("Easy", gridSize + gridOffset * 2,
 		42 + gridOffset * 2, [&]() {
 			puzzleConfig.difficulty = EASY;
 			puzzleConfig.changedDifficulty = true;
 		});
-	mediumButton = new Button("Medium", gridSize + gridOffset * 2 + 45,
+	mediumButton = Button("Medium", gridSize + gridOffset * 2 + 45,
 		42 + gridOffset * 2, [&]() {
 			puzzleConfig.difficulty = MEDIUM;
 			puzzleConfig.changedDifficulty = true;
 		});
-	hardButton = new Button("Hard", gridSize + gridOffset * 2 + 120,
+	hardButton = Button("Hard", gridSize + gridOffset * 2 + 120,
 		42 + gridOffset * 2, [&]() {
 			puzzleConfig.difficulty = HARD;
 			puzzleConfig.changedDifficulty = true;
 		});
-	notesButton = new Button("Edit Notes", gridSize + gridOffset * 2,
+	notesButton = Button("Edit Notes", gridSize + gridOffset * 2,
 		96 + gridOffset * 2, [&]() {
 			puzzleConfig.notes = !puzzleConfig.notes;
 		});
-	solveButton = new Button("Give Up", gridSize + gridOffset * 2,
+	solveButton = Button("Give Up", gridSize + gridOffset * 2,
 		156 + gridOffset * 2, [&]() {
 			if (puzzleConfig.givingUp < 0.4) {
 				for (int i = 0; i < 81; i++)
@@ -722,11 +690,11 @@ int main()
 			}
 			puzzleConfig.givingUp = 0;
 		});
-	undoButton = new Button("Undo", gridSize + gridOffset * 2,
+	undoButton = Button("Undo", gridSize + gridOffset * 2,
 		190 + gridOffset * 2, undo);
-	redoButton = new Button("Redo", gridSize + gridOffset * 2 + 50,
+	redoButton = Button("Redo", gridSize + gridOffset * 2 + 50,
 		190 + gridOffset * 2, redo);
-	pauseButton = new Button("Pause", gridSize + gridOffset * 2,
+	pauseButton = Button("Pause", gridSize + gridOffset * 2,
 		226 + gridOffset * 2, [&]() {
 			puzzleConfig.paused = !puzzleConfig.paused;
 		});
@@ -738,17 +706,10 @@ int main()
 
 	Astrum::run(update);
 
-	Astrum::exit();
+	Astrum::Font::close(smallFont);
+	Astrum::Font::close(bigFont);
 
-	delete newGameButton;
-	delete easyButton;
-	delete mediumButton;
-	delete hardButton;
-	delete notesButton;
-	delete solveButton;
-	delete undoButton;
-	delete redoButton;
-	delete pauseButton;
+	Astrum::exit();
 
 	return 0;
 }

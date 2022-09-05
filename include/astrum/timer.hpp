@@ -20,8 +20,7 @@ namespace timer {
 	 * @overload
 	 */
 	template<class F, class... Args>
-	size_t setInterval(std::chrono::milliseconds interval, F func, Args&&... args)
-	{
+	size_t setInterval(std::chrono::milliseconds interval, F func, Args&&... args) {
 		std::function<void()> cb = std::bind(std::forward<F>(func),
 			std::forward<Args>(args)...);
 		return setInterval(interval, cb);
@@ -30,8 +29,7 @@ namespace timer {
 	 * @overload
 	 */
 	template<class F, class... Args>
-	size_t setInterval(size_t ms, F func, Args&&... args)
-	{
+	size_t setInterval(size_t ms, F func, Args&&... args) {
 		auto interval = std::chrono::milliseconds(ms);
 		std::function<void()> cb = std::bind(std::forward<F>(func),
 			std::forward<Args>(args)...);
@@ -43,8 +41,7 @@ namespace timer {
 	 * @overload
 	 */
 	template<class F, class... Args>
-	size_t setTimeout(std::chrono::milliseconds delay, F func, Args&&... args)
-	{
+	size_t setTimeout(std::chrono::milliseconds delay, F func, Args&&... args) {
 		std::function<void()> cb = std::bind(std::forward<F>(func),
 			std::forward<Args>(args)...);
 		return setTimeout(delay, cb);
@@ -53,8 +50,7 @@ namespace timer {
 	 * @overload
 	 */
 	template<class F, class... Args>
-	size_t setTimeout(size_t ms, F func, Args&&... args)
-	{
+	size_t setTimeout(size_t ms, F func, Args&&... args) {
 		auto delay = std::chrono::milliseconds(ms);
 		std::function<void()> cb = std::bind(std::forward<F>(func),
 			std::forward<Args>(args)...);
@@ -71,6 +67,13 @@ namespace timer {
 	 * not be called by the user.
 	 */
 	double step();
+
+	/**
+	 * @brief Returns the last delta time.
+	 *
+	 * Returns the last delta time as measured by `step()` without updating
+	 * the time or calculating a new delta time.
+	 */
 	double deltatime();
 
 }; // namespace timer

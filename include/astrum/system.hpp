@@ -10,13 +10,20 @@ namespace Astrum {
 namespace system {
 
 	// vibrates the system for `seconds` seconds, if it supports that
+	// TODO
 	void vibrate(double seconds);
+
 	// returns whether the system is connected to the internet
+	// TODO
 	bool getNetworkStatus();
+
 	// returns the current user's username
+	// TODO
 	std::string getUsername();
+
 	// returns the name of the running operating system
 	std::string getPlatformName();
+
 	// opens the URL or file path with the user's default program
 	bool openURL(std::string url);
 
@@ -50,6 +57,7 @@ namespace system {
 	void setClipboardText(std::string text);
 
 	// returns the configured system language code
+	// TODO
 	std::string getLanguage();
 
 }

@@ -5,32 +5,25 @@
 #include "astrum/constants.hpp"
 #include "astrum/system.hpp"
 
-namespace Astrum
-{
+namespace Astrum {
 
-namespace system
-{
+namespace system {
 
-	std::string getPlatformName()
-	{
+	std::string getPlatformName() {
 		return std::string(SDL_GetPlatform());
 	}
 
-	bool openURL(std::string url)
-	{
+	bool openURL(std::string url) {
 		return SDL_OpenURL(url.c_str()) == 0;
 	}
 
-	bool hasClipboardText()
-	{
+	bool hasClipboardText() {
 		return SDL_HasClipboardText() == SDL_TRUE;
 	}
-	std::string getClipboardText()
-	{
+	std::string getClipboardText() {
 		return SDL_GetClipboardText();
 	}
-	void setClipboardText(std::string text)
-	{
+	void setClipboardText(std::string text) {
 		SDL_SetClipboardText(text.c_str());
 	}
 

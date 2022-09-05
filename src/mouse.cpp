@@ -1,5 +1,7 @@
 #include <unordered_map>
 #include <tuple>
+#include <optional>
+#include <memory>
 
 #include "sdl.hpp"
 #include "internals.hpp"
@@ -9,72 +11,57 @@
 #include "astrum/graphics.hpp"
 #include "astrum/image.hpp"
 
-namespace Astrum
-{
+namespace Astrum {
 
-Cursor::Cursor(Cursor &cursor)
-{
-	CursorData otherData = *cursor.data;
-	this->data = new CursorData(otherData);
+Cursor::Cursor(std::shared_ptr<CursorData> data) {
+	this->data = data;
 }
-Cursor::Cursor(std::shared_ptr<Image> image, int hotX, int hotY)
-{
-	ImageData *data = image->getData();
+Cursor::Cursor(Image image, int hotX, int hotY) {
+	std::shared_ptr<ImageData> data = image.getData();
 	SDL_Surface *surf = data->image;
 	SDL_Cursor *internalCursor = SDL_CreateColorCursor(surf, hotX, hotY);
-	this->data = new CursorData(internalCursor);
+	this->data = std::make_shared<CursorData>(internalCursor);
 }
-Cursor::Cursor(CursorData &data)
-{
-	this->data = new CursorData(data);
-}
-Cursor::~Cursor()
-{
-	SDL_FreeCursor(this->data->cursor);
-	delete this->data;
-}
-CursorData *Cursor::getData()
-{
+std::shared_ptr<CursorData> Cursor::getData() {
 	return this->data;
 }
 
-namespace mouse
-{
+namespace mouse {
 
-	namespace
-	{
+	namespace {
 		std::unordered_map<MouseButton, bool> mousedown;
 	};
 
-	void addMousedown(MouseButton btn)
-	{
+	void addMousedown(MouseButton btn) {
 		mousedown[btn] = true;
 	}
-	void removeMousedown(MouseButton btn)
-	{
+	void removeMousedown(MouseButton btn) {
 		mousedown[btn] = false;
 	}
 
-	std::shared_ptr<Cursor> createSystemCursor(SDL_SystemCursor id) {
-		CursorData data = { SDL_CreateSystemCursor(id) };
-		return std::make_shared<Cursor>(data);
+	std::optional<Cursor> createSystemCursor(SDL_SystemCursor id) {
+		SDL_Cursor *cursor = SDL_CreateSystemCursor(id);
+		if (cursor == nullptr) {
+			return std::nullopt;
+		}
+		auto data = std::make_shared<CursorData>(cursor);
+		return std::optional(Cursor(data));
 	}
 
-	std::shared_ptr<Cursor> CURSOR_ARROW;
-	std::shared_ptr<Cursor> CURSOR_IBEAM;
-	std::shared_ptr<Cursor> CURSOR_WAIT;
-	std::shared_ptr<Cursor> CURSOR_CROSSHAIR;
-	std::shared_ptr<Cursor> CURSOR_WAITARROW;
-	std::shared_ptr<Cursor> CURSOR_SIZENWSE;
-	std::shared_ptr<Cursor> CURSOR_SIZENESW;
-	std::shared_ptr<Cursor> CURSOR_SIZEWE;
-	std::shared_ptr<Cursor> CURSOR_SIZENS;
-	std::shared_ptr<Cursor> CURSOR_SIZEALL;
-	std::shared_ptr<Cursor> CURSOR_NO;
-	std::shared_ptr<Cursor> CURSOR_HAND;
+	std::optional<Cursor> CURSOR_ARROW = std::nullopt;
+	std::optional<Cursor> CURSOR_IBEAM = std::nullopt;
+	std::optional<Cursor> CURSOR_WAIT = std::nullopt;
+	std::optional<Cursor> CURSOR_CROSSHAIR = std::nullopt;
+	std::optional<Cursor> CURSOR_WAITARROW = std::nullopt;
+	std::optional<Cursor> CURSOR_SIZENWSE = std::nullopt;
+	std::optional<Cursor> CURSOR_SIZENESW = std::nullopt;
+	std::optional<Cursor> CURSOR_SIZEWE = std::nullopt;
+	std::optional<Cursor> CURSOR_SIZENS = std::nullopt;
+	std::optional<Cursor> CURSOR_SIZEALL = std::nullopt;
+	std::optional<Cursor> CURSOR_NO = std::nullopt;
+	std::optional<Cursor> CURSOR_HAND = std::nullopt;
 
-	int InitMouse()
-	{
+	int InitMouse() {
 		CURSOR_ARROW     = createSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 		CURSOR_IBEAM     = createSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 		CURSOR_WAIT      = createSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
@@ -91,23 +78,19 @@ namespace mouse
 		return 0;
 	}
 
-	bool isdown(MouseButton button)
-	{
+	bool isdown(MouseButton button) {
 		return mousedown[button];
 	}
 
-	int getX()
-	{
+	int getX() {
 		return std::get<0>(getCoordinates());
 	}
 
-	int getY()
-	{
+	int getY() {
 		return std::get<1>(getCoordinates());
 	}
 
-	std::tuple<int, int> getCoordinates()
-	{
+	std::tuple<int, int> getCoordinates() {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		int virtX, virtY;
@@ -115,42 +98,34 @@ namespace mouse
 		return std::make_tuple(virtX, virtY);
 	}
 
-	void setX(int x)
-	{
+	void setX(int x) {
 		SDL_WarpMouseInWindow(nullptr, x, getY());
 	}
 
-	void setY(int y)
-	{
+	void setY(int y) {
 		SDL_WarpMouseInWindow(nullptr, getX(), y);
 	}
 
-	void setPosition(int x, int y)
-	{
+	void setPosition(int x, int y) {
 		SDL_WarpMouseInWindow(nullptr, x, y);
 	}
 
-	bool isVisible()
-	{
+	bool isVisible() {
 		int out = SDL_ShowCursor(SDL_QUERY);
 		return out == SDL_ENABLE;
 	}
 
-	void setVisible(bool state)
-	{
+	void setVisible(bool state) {
 		SDL_ShowCursor(state ? SDL_ENABLE : SDL_DISABLE);
 	}
 
-	std::shared_ptr<Cursor> getCursor()
-	{
-		CursorData data = { SDL_GetCursor() };
-		Cursor *cursor = new Cursor(data);
-		return std::shared_ptr<Cursor>(cursor);
+	Cursor getCursor() {
+		auto data = std::make_shared<CursorData>(SDL_GetCursor(), true);
+		return Cursor(data);
 	}
 
-	void setCursor(std::shared_ptr<Cursor> cursor)
-	{
-		CursorData *data = cursor->getData();
+	void setCursor(Cursor cursor) {
+		std::shared_ptr<CursorData> data = cursor.getData();
 		SDL_SetCursor(data->cursor);
 	}
 };

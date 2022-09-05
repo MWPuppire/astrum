@@ -6,8 +6,7 @@ double shapeX;
 double shapeY;
 int shape;
 
-void update(double dt)
-{
+void update(double dt) {
 	lastColor += dt;
 	if (Astrum::keyboard::isdown("escape"))
 		Astrum::quit();
@@ -35,8 +34,7 @@ void update(double dt)
 	shapeY = (shapeY < 0.0 ? 0.0 : (shapeY > height ? height : shapeY));
 }
 
-void draw()
-{
+void draw() {
 	float size = (float) Astrum::window::getWidth() / 8.0;
 	switch (shape) {
 	case 0:
@@ -57,14 +55,12 @@ void draw()
 	}
 }
 
-void keypressed(Astrum::Key key)
-{
+void keypressed(Astrum::Key key) {
 	if (key == Astrum::Key::LSHIFT)
 		shape = (shape + 1) % 5;
 }
 
-void startup()
-{
+void startup() {
 	lastColor = 0.0;
 	shape = 0;
 	shapeX = Astrum::window::getWidth() / 2.0;
@@ -72,8 +68,7 @@ void startup()
 	shapeColor = Astrum::Color(0xFF, 0xFF, 0xFF);
 }
 
-int main()
-{
+int main() {
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;

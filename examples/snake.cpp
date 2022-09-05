@@ -72,8 +72,23 @@ void tick(GameState &game) {
 	if (newHead == game.food) {
 		game.score += 1;
 		snake.push_back(tail);
-		game.food = Position(Astrum::math::random(GAME_SIZE - 1),
-			Astrum::math::random(GAME_SIZE - 1));
+		Position newFood;
+		while (1) {
+			newFood = Position(
+				Astrum::math::random(GAME_SIZE - 1),
+				Astrum::math::random(GAME_SIZE - 1));
+			bool inSnake = false;
+			for (auto &pos : snake) {
+				if (newFood == pos) {
+					inSnake = true;
+					break;
+				}
+			}
+			if (!inSnake) {
+				break;
+			}
+		}
+		game.food = newFood;
 	}
 }
 

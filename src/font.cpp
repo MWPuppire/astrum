@@ -4,6 +4,7 @@
 #include <tuple>
 #include <memory>
 #include <cstddef>
+#include <stdexcept>
 
 #include "sdl.hpp"
 #include "internals.hpp"
@@ -14,94 +15,73 @@
 #include "astrum/graphics.hpp"
 
 #ifndef NO_DEFAULT_FONT
-#include "vera_ttf.h"
+#	include "vera_ttf.h"
 #endif
 
-namespace Astrum
-{
+namespace Astrum {
 
-FontData *fontDataFromRW(SDL_RWops *rw, int size, Color color,
-	int style, TextAlign align)
-{
+std::shared_ptr<FontData> fontDataFromRW(SDL_RWops *rw, int size, Color color,
+	int style, TextAlign align) {
 	if (rw == nullptr) {
-		return new FontData(nullptr, color, align);
+		return std::make_shared<FontData>(nullptr, color, align);
 	} else {
 		TTF_Font *font = TTF_OpenFontRW(rw, 1, size);
 		TTF_SetFontStyle(font, style & ~Font::OUTLINE);
 		if (style & Font::OUTLINE)
 			TTF_SetFontOutline(font, 1);
-		return new FontData(font, color, align);
+		return std::make_shared<FontData>(font, color, align);
 	}
 }
 
-Font::Font(Font &src)
-{
-	this->data = new FontData(*(src.data));
-}
-Font::Font(FontData &data)
-{
-	this->data = new FontData(data);
+Font::Font(std::shared_ptr<FontData> data) {
+	this->data = data;
 }
 
 #ifndef NO_DEFAULT_FONT
-Font::Font(int size, Color color, int style, TextAlign align)
-{
+Font::Font(int size, Color color, int style, TextAlign align) {
 	SDL_RWops *rw = SDL_RWFromConstMem(vera_ttf, vera_ttf_len);
 	this->data = fontDataFromRW(rw, size, color, style, align);
 }
 #endif
 
-Font::Font(std::string path, int size, Color color, int style, TextAlign align)
-{
+Font::Font(std::string path, int size, Color color, int style, TextAlign align) {
 	TTF_Font *font = TTF_OpenFont(path.c_str(), size);
 	if (font == nullptr) {
-		this->data = new FontData(nullptr, color, align);
+		this->data = std::make_shared<FontData>(nullptr, color, align);
 		return;
 	}
 	TTF_SetFontStyle(font, style & ~OUTLINE);
 	if (style & OUTLINE)
 		TTF_SetFontOutline(font, 1);
-	this->data = new FontData(font, color, align);
+	this->data = std::make_shared<FontData>(font, color, align);
 }
 Font::Font(std::filesystem::path path, int size, Color color, int style,
 	TextAlign align) : Font(path.string(), size, color, style, align) { };
 Font::Font(const unsigned char *buf, std::size_t bufLen, int size, Color color,
-	int style, TextAlign align)
-{
+	int style, TextAlign align) {
 	SDL_RWops *rw = SDL_RWFromConstMem(buf, bufLen);
 	this->data = fontDataFromRW(rw, size, color, style, align);
 }
 
-Font::~Font()
-{
-//	if (this->data->font != nullptr)
-//		TTF_CloseFont(this->data->font);
-	delete this->data;
-}
-
-FontData *Font::getData()
-{
+std::shared_ptr<FontData> Font::getData() {
 	return this->data;
 }
 
-std::shared_ptr<Image> Font::renderText(std::string text)
-{
+Image Font::renderText(std::string text) {
 	return this->renderText(text, this->data->defaultColor);
 }
-std::shared_ptr<Image> Font::renderText(std::string text, Color color)
-{
+Image Font::renderText(std::string text, Color color) {
 	if (this->data->font == nullptr) {
-		return nullptr;
+		throw std::runtime_error("invalid font");
 	}
 	SDL_Color scol = { color.r, color.g, color.b, color.a };
 	SDL_Surface *surf = TTF_RenderUTF8_Solid(this->data->font, text.c_str(),
 		scol);
-	ImageData data = { surf };
-	return std::make_shared<Image>(data);
+	auto data = std::make_shared<ImageData>(surf);
+	return Image(data);
 }
 
-int Font::textSize(std::string text, int &w, int &h)
-{
+int Font::textSize(std::string text, int &w, int &h) {
 	if (this->data->font == nullptr) {
 		return -1;
 	}
@@ -111,8 +91,7 @@ int Font::textSize(std::string text, int &w, int &h)
 	h = height;
 	return out;
 }
-std::tuple<int, int> Font::textSize(std::string text)
-{
+std::tuple<int, int> Font::textSize(std::string text) {
 	int w, h;
 	int out = this->textSize(text, w, h);
 	if (out != 0)
@@ -120,16 +99,14 @@ std::tuple<int, int> Font::textSize(std::string text)
 	return std::make_tuple(w, h);
 }
 
-int Font::textSizef(int &w, int &h, std::string text, ...)
-{
+int Font::textSizef(int &w, int &h, std::string text, ...) {
 	std::va_list args;
 	va_start(args, text);
 	std::string str = util::vstrformat(text, args);
 	va_end(args);
 	return this->textSize(str, w, h);
 }
-std::tuple<int, int> Font::textSizef(std::string text, ...)
-{
+std::tuple<int, int> Font::textSizef(std::string text, ...) {
 	std::va_list args;
 	va_start(args, text);
 	std::string str = util::vstrformat(text, args);
@@ -137,24 +114,25 @@ std::tuple<int, int> Font::textSizef(std::string text, ...)
 	return this->textSize(str);
 }
 
-Color Font::color()
-{
+Color Font::color() {
 	return this->data->defaultColor;
 }
 
-void Font::setColor(Color col)
-{
+void Font::setColor(Color col) {
 	this->data->defaultColor = col;
 }
 
-TextAlign Font::align()
-{
+TextAlign Font::align() {
 	return this->data->defaultAlign;
 }
 
-void Font::setAlign(TextAlign align)
-{
+void Font::setAlign(TextAlign align) {
 	this->data->defaultAlign = align;
+}
+
+void Font::close(Font &font) {
+	// release resources associated with `font`
+	font.data = std::shared_ptr<FontData>();
 }
 
 }; // namespace Astrum

@@ -14,18 +14,25 @@ enum class AudioFileType {
 
 class Sound {
 private:
-	struct SoundData *data;
+	std::shared_ptr<struct SoundData> data;
 public:
-	Sound(Sound &src);
-	Sound(struct SoundData &data);
+	// TODO
+	Sound(std::shared_ptr<struct SoundData> data);
+	// TODO
 	Sound(std::filesystem::path filename);
+	// TODO
 	Sound(std::filesystem::path filename, AudioFileType type);
+	// TODO
 	Sound(const unsigned char *buf, AudioFileType type);
-	~Sound();
-	struct SoundData *getData();
-	static std::unique_ptr<Sound> beep(double duration = 0.2, int hertz = 800);
+	// TODO
+	std::shared_ptr<struct SoundData> getData();
+	// TODO
+	static Sound beep(double duration = 0.2, int hertz = 800);
+	// TODO
 	int getDuration();
+	// TODO
 	double volume();
+	// TODO
 	void setVolume(double volume);
 };
 

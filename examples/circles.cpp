@@ -11,8 +11,7 @@ class Circle {
 	Astrum::Color color;
 
 public:
-	Circle()
-	{
+	Circle() {
 		int width = Astrum::window::getWidth(), height =
 			Astrum::window::getHeight();
 		this->xPos = Astrum::math::random(1, width);
@@ -22,34 +21,29 @@ public:
 			Astrum::math::random(256), Astrum::math::random(256));
 	}
 
-	void update(double dt)
-	{
+	void update(double dt) {
 		this->radius = radius - 50 * dt;
 	}
 
-	void draw()
-	{
+	void draw() {
 		Astrum::graphics::circle(this->xPos, this->yPos, this->radius,
 			this->color, true);
 	}
 
-	bool isDead()
-	{
+	bool isDead() {
 		return this->radius <= 1;
 	}
 };
 
 std::vector<std::unique_ptr<Circle>> circles;
 
-void load()
-{
+void load() {
 	int numCircles = Astrum::math::random(17, 24);
 	for (int i = 0; i < numCircles; i++)
 		circles.push_back(std::make_unique<Circle>());
 }
 
-void update(double dt)
-{
+void update(double dt) {
 	if (Astrum::keyboard::isdown("escape"))
 		Astrum::quit();
 
@@ -63,14 +57,12 @@ void update(double dt)
 		circles.push_back(std::make_unique<Circle>());
 }
 
-void draw()
-{
+void draw() {
 	for (const auto &circle : circles)
 		circle->draw();
 }
 
-int main()
-{
+int main() {
 	Astrum::Config conf;
 	conf.appName = "Astrum Circles";
 	conf.windowFullscreen = false;

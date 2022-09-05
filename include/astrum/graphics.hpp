@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <string>
-#include <memory>
+#include <tuple>
 
 #include "constants.hpp"
 #include "font.hpp"
@@ -55,14 +55,15 @@ namespace graphics {
 	void clear();
 	void clear(const Color &col);
 	void print(std::string str, int x = 0, int y = 0);
-	void print(std::string str, int x, int y, std::shared_ptr<Font> font);
+	void print(std::string str, int x, int y, Font font);
 	void print(std::string str, int x, int y, Color col);
-	void print(std::string str, int x, int y, std::shared_ptr<Font> font, Color col);
-	std::shared_ptr<Font> getFont();
-	void setFont(std::shared_ptr<Font> newFont);
-	void render(std::shared_ptr<Image> image, int x, int y);
+	void print(std::string str, int x, int y, Font font, Color col);
+	Font getFont();
+	void setFont(Font newFont);
+	void render(Image image, int x, int y);
+	std::tuple<int, int> getVirtualCoords(int x, int y);
 	void getVirtualCoords(int x, int y, int &virtX, int &virtY);
-	std::shared_ptr<Image> screenshot();
+	Image screenshot();
 
 };
 

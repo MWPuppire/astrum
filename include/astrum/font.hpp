@@ -4,8 +4,8 @@
 #include <string>
 #include <tuple>
 #include <cstddef>
-#include <memory>
 #include <filesystem>
+#include <memory>
 
 #include "constants.hpp"
 #include "image.hpp"
@@ -26,11 +26,10 @@ struct SystemFontQuery {
 
 class Font {
 private:
-	struct FontData *data;
+	std::shared_ptr<struct FontData> data;
 
 public:
-	Font(Font &src);
-	Font(struct FontData &data);
+	Font(std::shared_ptr<struct FontData> data);
 #ifndef NO_DEFAULT_FONT
 	Font(int size = 18, Color color = Color(0x000000), int style = NORMAL, TextAlign align = TextAlign::left);
 #endif
@@ -40,13 +39,12 @@ public:
 	 */
 	Font(std::filesystem::path path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
 	Font(const unsigned char *buf, std::size_t bufLen, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
-	~Font();
-	struct FontData *getData();
-	std::shared_ptr<Image> renderText(std::string text);
+	std::shared_ptr<struct FontData> getData();
+	Image renderText(std::string text);
 	/**
 	 * @overload
 	 */
-	std::shared_ptr<Image> renderText(std::string text, Color color);
+	Image renderText(std::string text, Color color);
 	int textSize(std::string text, int &w, int &h);
 	std::tuple<int, int> textSize(std::string text);
 	int textSizef(int &w, int &h, std::string text, ...);
@@ -63,8 +61,12 @@ public:
 	static const int STRIKETHROUGH =  8;
 	static const int OUTLINE       = 16;
 
+	static void close(Font &font);
+
+	// TODO
 	std::string *getSystemFonts(SystemFontQuery query = { "", "", "" });
-	static Font *createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
+	// TODO
+	static Font createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
 };
 
 } // namespace Astrum

@@ -11,8 +11,7 @@ namespace Astrum {
 
 namespace util {
 
-	std::string strformat(std::string format, ...)
-	{
+	std::string strformat(std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		std::string out = vstrformat(format, args);
@@ -20,8 +19,7 @@ namespace util {
 		return out;
 	}
 
-	std::string vstrformat(std::string format, std::va_list args)
-	{
+	std::string vstrformat(std::string format, std::va_list args) {
 		std::va_list tmpArgs;
 		va_copy(tmpArgs, args);
 		// extra space for NULL terminator

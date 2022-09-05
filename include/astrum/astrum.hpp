@@ -2,7 +2,7 @@
 #define INCLUDE_ASTRUM
 
 #ifdef __EMSCRIPTEN__
-	#include <emscripten.h>
+#	include <emscripten.h>
 #endif
 
 #include <filesystem>
@@ -122,14 +122,23 @@ void ondirectorydropped(std::function<void(std::filesystem::path)> cb);
  */
 void ondirectorydropped(std::function<void(std::string)> cb);
 
+// TODO
 void ongamepadaxis();
+// TODO
 void ongamepadpressed();
+// TODO
 void ongamepadreleased();
+// TODO
 void onjoystickadded();
+// TODO
 void onjoystickaxis();
+// TODO
 void onjoystickhat();
+// TODO
 void onjoystickpressed();
+// TODO
 void onjoystickreleased();
+// TODO
 void onjoystickremoved();
 
 } // namespace Astrum

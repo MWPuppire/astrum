@@ -37,11 +37,10 @@ struct Transforms {
 
 class Image {
 private:
-	struct ImageData *data;
+	std::shared_ptr<struct ImageData> data;
 
 public:
-	Image(Image &src);
-	Image(struct ImageData &data);
+	Image(std::shared_ptr<struct ImageData> data);
 	Image(std::string filename);
 	/**
 	 * @overload
@@ -49,11 +48,10 @@ public:
 	Image(std::filesystem::path filename);
 	Image(const unsigned char *buf, std::size_t bufLen, std::string type = "");
 	Image(void *pixels, int height, int width);
-	~Image();
 
-	struct ImageData *getData();
+	std::shared_ptr<struct ImageData> getData();
 
-	std::shared_ptr<Transforms> getTransforms();
+	Transforms *getTransforms();
 	int width();
 	int height();
 	void scale(double factor);

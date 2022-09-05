@@ -12,11 +12,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -DDEBUG -g ")
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-omit-frame-pointer")
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address")
 
-string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra")
+string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O2")
+
+string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra -Werror")
 
 option(DEFAULT_FONT "include a default font in the package" ON)
 if(NOT DEFAULT_FONT)

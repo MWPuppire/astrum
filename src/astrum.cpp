@@ -1,5 +1,5 @@
 #ifdef __EMSCRIPTEN__
-	#include <emscripten.h>
+#	include <emscripten.h>
 #endif
 
 #include <functional>
@@ -21,8 +21,7 @@
 #include "astrum/filesystem.hpp"
 #include "astrum/timer.hpp"
 
-namespace Astrum
-{
+namespace Astrum {
 
 const std::string VERSION = "0.1.0";
 const int VERSION_MAJOR = 0;
@@ -33,8 +32,7 @@ const std::string DEFAULT_ORG = "Example";
 const int DEFAULT_WIDTH = 640;
 const int DEFAULT_HEIGHT = 480;
 
-namespace
-{
+namespace {
 	int hasInit = 0;
 
 	bool isrunning = false;
@@ -63,8 +61,7 @@ namespace
 #endif
 };
 
-void handle_event(const SDL_Event &e)
-{
+void handle_event(const SDL_Event &e) {
 	int virtX, virtY;
 	Key key;
 	KeyMod mod;
@@ -179,8 +176,7 @@ void handle_event(const SDL_Event &e)
 	}
 }
 
-int init(Config &conf)
-{
+int init(Config &conf) {
 	if (hasInit)
 		return 0;
 
@@ -255,15 +251,14 @@ int init(Config &conf)
 	return 0;
 }
 
-void exit()
-{
-	SDL_Quit();
-	TTF_Quit();
-	IMG_Quit();
-
+void exit() {
 	window::QuitWindow();
 	graphics::QuitGraphics();
 	filesystem::QuitFS();
+
+	SDL_Quit();
+	TTF_Quit();
+	IMG_Quit();
 
 	hasInit = 0;
 }
@@ -289,8 +284,7 @@ void main_loop() {
 };
 #endif
 
-void run(std::function<void(double)> update)
-{
+void run(std::function<void(double)> update) {
 	if (isrunning)
 		return;
 
@@ -328,14 +322,12 @@ void run(std::function<void(double)> update)
 	isrunning = false;
 #endif
 }
-void run(std::function<void()> update)
-{
+void run(std::function<void()> update) {
 	auto lambda = [update](double UNUSED(dt)) { update(); };
 	run(lambda);
 }
 
-void quit(bool checkonquit)
-{
+void quit(bool checkonquit) {
 	if (!isrunning)
 		return;
 	if (checkonquit) {
@@ -347,153 +339,123 @@ void quit(bool checkonquit)
 	}
 }
 
-void onquit(std::function<bool()> cb)
-{
+void onquit(std::function<bool()> cb) {
 	cb_quit = cb;
 }
-void onquit(std::function<void()> cb)
-{
+void onquit(std::function<void()> cb) {
 	auto lambda = [cb]() { cb(); return true; };
 	cb_quit = lambda;
 }
 
-void ondraw(std::function<void()> cb)
-{
+void ondraw(std::function<void()> cb) {
 	cb_draw = cb;
 }
 
-void onkeypressed(std::function<void(Key, KeyMod, bool)> cb)
-{
+void onkeypressed(std::function<void(Key, KeyMod, bool)> cb) {
 	cb_keypressed = cb;
 }
-void onkeypressed(std::function<void(Key, KeyMod)> cb)
-{
+void onkeypressed(std::function<void(Key, KeyMod)> cb) {
 	auto lambda = [cb](Key k, KeyMod m, bool UNUSED(r)) { cb(k, m); };
 	cb_keypressed = lambda;
 }
-void onkeypressed(std::function<void(Key)> cb)
-{
+void onkeypressed(std::function<void(Key)> cb) {
 	auto lambda = [cb](Key k, KeyMod UNUSED(m), bool UNUSED(r)) { cb(k); };
 	cb_keypressed = lambda;
 }
 
-void onkeyreleased(std::function<void(Key)> cb)
-{
+void onkeyreleased(std::function<void(Key)> cb) {
 	cb_keyreleased = cb;
 }
 
-void onresize(std::function<void(int, int)> cb)
-{
+void onresize(std::function<void(int, int)> cb) {
 	cb_resize = cb;
 }
 
-void onvisible(std::function<void(bool)> cb)
-{
+void onvisible(std::function<void(bool)> cb) {
 	cb_visible = cb;
 }
 
-void onfocus(std::function<void(bool)> cb)
-{
+void onfocus(std::function<void(bool)> cb) {
 	cb_focus = cb;
 }
 
-void onmoved(std::function<void(int, int)> cb)
-{
+void onmoved(std::function<void(int, int)> cb) {
 	cb_moved = cb;
 }
 
-void ontextinput(std::function<void(std::string)> cb)
-{
+void ontextinput(std::function<void(std::string)> cb) {
 	cb_textinput = cb;
 }
 
-void ontextedited(std::function<void(std::string, int, int)> cb)
-{
+void ontextedited(std::function<void(std::string, int, int)> cb) {
 	cb_textedited = cb;
 }
-void ontextedited(std::function<void(std::string, int)> cb)
-{
+void ontextedited(std::function<void(std::string, int)> cb) {
 	auto lambda = [cb](std::string text, int start, int UNUSED(length)) { cb(text, start); };
 	cb_textedited = lambda;
 }
-void ontextedited(std::function<void(std::string)> cb)
-{
+void ontextedited(std::function<void(std::string)> cb) {
 	auto lambda = [cb](std::string text, int UNUSED(start), int UNUSED(length)) { cb(text); };
 	cb_textedited = lambda;
 }
 
-void onmousemoved(std::function<void(int, int, int, int)> cb)
-{
+void onmousemoved(std::function<void(int, int, int, int)> cb) {
 	cb_mousemoved = cb;
 }
-void onmousemoved(std::function<void(int, int)> cb)
-{
+void onmousemoved(std::function<void(int, int)> cb) {
 	auto lambda = [cb](int x, int y, int UNUSED(dx), int UNUSED(dy)) { cb(x, y); };
 	cb_mousemoved = lambda;
 }
 
-void onmousepressed(std::function<void(MouseButton, int, int, int)> cb)
-{
+void onmousepressed(std::function<void(MouseButton, int, int, int)> cb) {
 	cb_mousepressed = cb;
 }
-void onmousepressed(std::function<void(MouseButton, int, int)> cb)
-{
+void onmousepressed(std::function<void(MouseButton, int, int)> cb) {
 	auto lambda = [cb](MouseButton button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
 	cb_mousepressed = lambda;
 }
-void onmousepressed(std::function<void(MouseButton)> cb)
-{
+void onmousepressed(std::function<void(MouseButton)> cb) {
 	auto lambda = [cb](MouseButton button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
 	cb_mousepressed = lambda;
 }
 
-void onmousereleased(std::function<void(MouseButton, int, int, int)> cb)
-{
+void onmousereleased(std::function<void(MouseButton, int, int, int)> cb) {
 	cb_mousereleased = cb;
 }
-void onmousereleased(std::function<void(MouseButton, int, int)> cb)
-{
+void onmousereleased(std::function<void(MouseButton, int, int)> cb) {
 	auto lambda = [cb](MouseButton button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
 	cb_mousereleased = lambda;
 }
-void onmousereleased(std::function<void(MouseButton)> cb)
-{
+void onmousereleased(std::function<void(MouseButton)> cb) {
 	auto lambda = [cb](MouseButton button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
 	cb_mousereleased = lambda;
 }
 
-void onwheelmoved(std::function<void(int, int)> cb)
-{
+void onwheelmoved(std::function<void(int, int)> cb) {
 	cb_wheelmoved = cb;
 }
 
-void onmousefocus(std::function<void(bool)> cb)
-{
+void onmousefocus(std::function<void(bool)> cb) {
 	cb_mousefocus = cb;
 }
 
-void onfiledropped(std::function<void(std::filesystem::path)> cb)
-{
+void onfiledropped(std::function<void(std::filesystem::path)> cb) {
 	cb_filedropped = cb;
 }
-void onfiledropped(std::function<void(std::string)> cb)
-{
+void onfiledropped(std::function<void(std::string)> cb) {
 	auto lambda = [cb](std::filesystem::path p) { cb(p.string()); };
 	cb_filedropped = lambda;
 }
 
-void ondirectorydropped(std::function<void(std::filesystem::path)> cb)
-{
+void ondirectorydropped(std::function<void(std::filesystem::path)> cb) {
 	cb_directorydropped = cb;
 }
-void ondirectorydropped(std::function<void(std::string)> cb)
-{
+void ondirectorydropped(std::function<void(std::string)> cb) {
 	auto lambda = [cb](std::filesystem::path p) { cb(p.string()); };
 	cb_directorydropped = lambda;
 }
 
-void onstartup(std::function<void()> cb)
-{
+void onstartup(std::function<void()> cb) {
 	cb_startup = cb;
 }
 

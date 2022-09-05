@@ -2,6 +2,7 @@
 #define INCLUDE_ASTRUM_MOUSE
 
 #include <tuple>
+#include <optional>
 #include <memory>
 
 #include "constants.hpp"
@@ -15,14 +16,12 @@ enum class MouseButton {
 
 class Cursor {
 private:
-	struct CursorData *data;
+	std::shared_ptr<struct CursorData> data;
 
 public:
-	Cursor(Cursor &cursor);
-	Cursor(struct CursorData &data);
-	Cursor(std::shared_ptr<Image> image, int hotX = 0, int hotY = 0);
-	~Cursor();
-	struct CursorData *getData();
+	Cursor(std::shared_ptr<struct CursorData> data);
+	Cursor(Image image, int hotX = 0, int hotY = 0);
+	std::shared_ptr<struct CursorData> getData();
 };
 
 namespace mouse {
@@ -37,21 +36,21 @@ namespace mouse {
 	void setPosition(int x, int y);
 	bool isVisible();
 	void setVisible(bool state);
-	std::shared_ptr<Cursor> getCursor();
-	void setCursor(std::shared_ptr<Cursor> cursor);
+	Cursor getCursor();
+	void setCursor(Cursor cursor);
 
-	extern std::shared_ptr<Cursor> CURSOR_ARROW;
-	extern std::shared_ptr<Cursor> CURSOR_IBEAM;
-	extern std::shared_ptr<Cursor> CURSOR_WAIT;
-	extern std::shared_ptr<Cursor> CURSOR_CROSSHAIR;
-	extern std::shared_ptr<Cursor> CURSOR_WAITARROW;
-	extern std::shared_ptr<Cursor> CURSOR_SIZENWSE;
-	extern std::shared_ptr<Cursor> CURSOR_SIZENESW;
-	extern std::shared_ptr<Cursor> CURSOR_SIZEWE;
-	extern std::shared_ptr<Cursor> CURSOR_SIZENS;
-	extern std::shared_ptr<Cursor> CURSOR_SIZEALL;
-	extern std::shared_ptr<Cursor> CURSOR_NO;
-	extern std::shared_ptr<Cursor> CURSOR_HAND;
+	extern std::optional<Cursor> CURSOR_ARROW;
+	extern std::optional<Cursor> CURSOR_IBEAM;
+	extern std::optional<Cursor> CURSOR_WAIT;
+	extern std::optional<Cursor> CURSOR_CROSSHAIR;
+	extern std::optional<Cursor> CURSOR_WAITARROW;
+	extern std::optional<Cursor> CURSOR_SIZENWSE;
+	extern std::optional<Cursor> CURSOR_SIZENESW;
+	extern std::optional<Cursor> CURSOR_SIZEWE;
+	extern std::optional<Cursor> CURSOR_SIZENS;
+	extern std::optional<Cursor> CURSOR_SIZEALL;
+	extern std::optional<Cursor> CURSOR_NO;
+	extern std::optional<Cursor> CURSOR_HAND;
 };
 
 } // namespace Astrum

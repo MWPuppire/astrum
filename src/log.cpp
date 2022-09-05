@@ -10,8 +10,7 @@
 namespace Astrum {
 
 namespace log {
-	void defaultWriteFunction(LogCategory cat, std::string str)
-	{
+	void defaultWriteFunction(LogCategory cat, std::string str) {
 		SDL_LogPriority priority;
 		switch (cat) {
 		case LogCategory::debug:
@@ -48,57 +47,49 @@ namespace log {
 		return outputLevel;
 	}
 
-	void vlog(LogCategory cat, std::string format, va_list args)
-	{
+	void vlog(LogCategory cat, std::string format, va_list args) {
 		// if the message is below the output level, it is ignored
 		if (cat < outputLevel)
 			return;
 		std::string str = util::vstrformat(format, args);
 		writeFunction(cat, str);
 	}
-	void vlog(std::string format, va_list args)
-	{
+	void vlog(std::string format, va_list args) {
 		vlog(LogCategory::info, format, args);
 	}
 
-	void log(LogCategory cat, std::string format, ...)
-	{
+	void log(LogCategory cat, std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		vlog(cat, format, args);
 		va_end(args);
 	}
-	void log(std::string format, ...)
-	{
+	void log(std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		vlog(LogCategory::info, format, args);
 		va_end(args);
 	}
 
-	void info(std::string format, ...)
-	{
+	void info(std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		vlog(LogCategory::info, format, args);
 		va_end(args);
 	}
-	void debug(std::string format, ...)
-	{
+	void debug(std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		vlog(LogCategory::debug, format, args);
 		va_end(args);
 	}
-	void warn(std::string format, ...)
-	{
+	void warn(std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		vlog(LogCategory::warn, format, args);
 		va_end(args);
 	}
-	void error(std::string format, ...)
-	{
+	void error(std::string format, ...) {
 		std::va_list args;
 		va_start(args, format);
 		vlog(LogCategory::error, format, args);

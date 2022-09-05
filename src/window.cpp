@@ -1,4 +1,3 @@
-#include <tuple>
 #include <string>
 
 #include "sdl.hpp"
@@ -7,21 +6,17 @@
 #include "astrum/window.hpp"
 #include "astrum/astrum.hpp"
 
-namespace Astrum
-{
+namespace Astrum {
 
-namespace window
-{
+namespace window {
 	SDL_Window *window;
 
-	namespace
-	{
+	namespace {
 		int windowHeight;
 		int windowWidth;
 	};
 
-	int InitWindow(Config &conf)
-	{
+	int InitWindow(Config &conf) {
 		if (conf.windowHeadless) {
 			window = nullptr;
 			return 0;
@@ -57,7 +52,7 @@ namespace window
 
 		if (!conf.icon.empty()) {
 			Image image(conf.icon);
-			ImageData *data = image.getData();
+			std::shared_ptr<ImageData> data = image.getData();
 			SDL_Surface *surf = data->image;
 			SDL_SetWindowIcon(window, surf);
 		}
@@ -65,16 +60,14 @@ namespace window
 		return 0;
 	}
 
-	void QuitWindow()
-	{
+	void QuitWindow() {
 		if (window == nullptr)
 			return;
 
 		SDL_DestroyWindow(window);
 	}
 
-	void setFullscreen(bool fullscreen)
-	{
+	void setFullscreen(bool fullscreen) {
 		if (window == nullptr)
 			return;
 
@@ -82,8 +75,7 @@ namespace window
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 
-	void setSize(int width, int height)
-	{
+	void setSize(int width, int height) {
 		if (window == nullptr)
 			return;
 
@@ -91,63 +83,54 @@ namespace window
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 
-	void setTitle(std::string title)
-	{
+	void setTitle(std::string title) {
 		if (window == nullptr)
 			return;
 
 		SDL_SetWindowTitle(window, title.c_str());
 	}
 
-	bool isFullscreen()
-	{
+	bool isFullscreen() {
 		if (window == nullptr)
 			return false;
 
 		return (bool) (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN);
 	}
 
-	std::string getTitle()
-	{
+	std::string getTitle() {
 		if (window == nullptr)
 			return "";
 
 		return std::string(SDL_GetWindowTitle(window));
 	}
 
-	int getWidth()
-	{
+	int getWidth() {
 		if (window == nullptr)
 			return 0;
 
 		return windowWidth;
 	}
 
-	int getHeight()
-	{
+	int getHeight() {
 		if (window == nullptr)
 			return 0;
 
 		return windowHeight;
 	}
 
-	std::tuple<int, int> getDimensions()
-	{
+	std::tuple<int, int> getDimensions() {
 		if (window == nullptr)
 			return std::make_tuple(0, 0);
 
 		return std::make_tuple(windowWidth, windowHeight);
 	}
-	void getDimensions(int &width, int &height)
-	{
-		int w, h;
-		std::tie(w, h) = getDimensions();
+	void getDimensions(int &width, int &height) {
+		auto [ w, h ] = getDimensions();
 		width  = w;
 		height = h;
 	}
 
-	std::tuple<int, int> getDesktopDimensions()
-	{
+	std::tuple<int, int> getDesktopDimensions() {
 		if (window == nullptr) {
 			SDL_DisplayMode mode;
 			SDL_GetDesktopDisplayMode(0, &mode);
@@ -159,24 +142,20 @@ namespace window
 		SDL_GetDesktopDisplayMode(displayIdx, &mode);
 		return std::make_tuple(mode.w, mode.h);
 	}
-	void getDesktopDimensions(int &width, int &height)
-	{
-		int w, h;
-		std::tie(w, h) = getDesktopDimensions();
+	void getDesktopDimensions(int &width, int &height) {
+		auto [ w, h ] = getDesktopDimensions();
 		width  = w;
 		height = h;
 	}
 
-	void setPosition(int x, int y)
-	{
+	void setPosition(int x, int y) {
 		if (window == nullptr)
 			return;
 
 		SDL_SetWindowPosition(window, x, y);
 	}
 
-	std::tuple<int, int> getPosition()
-	{
+	std::tuple<int, int> getPosition() {
 		if (window == nullptr)
 			return std::make_tuple(0, 0);
 
@@ -184,16 +163,13 @@ namespace window
 		SDL_GetWindowPosition(window, &x, &y);
 		return std::make_tuple(x, y);
 	}
-	void getPosition(int &x, int &y)
-	{
-		int tX, tY;
-		std::tie(tX, tY) = getPosition();
+	void getPosition(int &x, int &y) {
+		auto [ tX, tY ] = getPosition();
 		x = tX;
 		y = tY;
 	}
 
-	int getMinWidth()
-	{
+	int getMinWidth() {
 		if (window == nullptr)
 			return 0;
 
@@ -202,8 +178,7 @@ namespace window
 		return w;
 	}
 
-	int getMinHeight()
-	{
+	int getMinHeight() {
 		if (window == nullptr)
 			return 0;
 
@@ -212,8 +187,7 @@ namespace window
 		return h;
 	}
 
-	std::tuple<int, int> getMinDimensions()
-	{
+	std::tuple<int, int> getMinDimensions() {
 		if (window == nullptr)
 			return std::make_tuple(0, 0);
 
@@ -222,28 +196,23 @@ namespace window
 		return std::make_tuple(w, h);
 	}
 
-	void getMinDimensions(int &width, int &height)
-	{
-		int w, h;
-		std::tie(w, h) = getMinDimensions();
+	void getMinDimensions(int &width, int &height) {
+		auto [ w, h ] = getMinDimensions();
 		width  = w;
 		height = h;
 	}
 
-	bool isResizable()
-	{
+	bool isResizable() {
 		return SDL_GetWindowFlags(window) & SDL_WINDOW_RESIZABLE
 			? true : false;
 	}
 
-	void setResizable(bool toggle)
-	{
+	void setResizable(bool toggle) {
 		SDL_bool flag = toggle ? SDL_TRUE : SDL_FALSE;
 		SDL_SetWindowResizable(window, flag);
 	}
 
-	void recalculateDimensions()
-	{
+	void recalculateDimensions() {
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 };

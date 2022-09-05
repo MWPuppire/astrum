@@ -3,8 +3,6 @@
 #include <cmath>
 #include <sstream>
 #include <string>
-#include <tuple>
-#include <memory>
 
 const Astrum::Color white = Astrum::Color(255, 255, 255);
 const Astrum::Color black = Astrum::Color(0, 0, 0);
@@ -17,8 +15,7 @@ double ballX, ballY;
 double ballAngle, ballMove, ballSpeed, ballPow;
 int playerScore, computerScore;
 
-void initBall(int lastScore)
-{
+void initBall(int lastScore) {
 	const int width  = Astrum::window::getWidth();
 	const int height = Astrum::window::getHeight();
 	ballAngle = ((lastScore ? 195 : 15) + Astrum::math::random(4) * 15.0) * radian;
@@ -29,8 +26,7 @@ void initBall(int lastScore)
 	ballPow = 1.0;
 }
 
-void deflectBall(double xMod, double yMod, double xAdd, double yAdd)
-{
+void deflectBall(double xMod, double yMod, double xAdd, double yAdd) {
 	double ballVx = std::cos(ballAngle) * ballSpeed * xMod + xAdd;
 	double ballVy = std::sin(ballAngle) * ballSpeed * yMod + yAdd;
 	ballAngle = std::atan2(ballVy, ballVx);
@@ -38,8 +34,7 @@ void deflectBall(double xMod, double yMod, double xAdd, double yAdd)
 	ballSpeed = Astrum::window::getWidth() * ballPow;
 }
 
-double updatePlayer(double dt)
-{
+double updatePlayer(double dt) {
 	const int height = Astrum::window::getHeight();
 	const double shapeHeight = (double) height / 4.0;
 	const double speed = (double) height;
@@ -62,8 +57,7 @@ double updatePlayer(double dt)
 	return speed * std::cos(playerDir);
 }
 
-double updateComputer(double dt)
-{
+double updateComputer(double dt) {
 	const int height = Astrum::window::getHeight();
 	const double shapeHeight = (double) height / 4.0;
 	const double speed = (double) height;
@@ -85,8 +79,7 @@ double updateComputer(double dt)
 	return speed * std::cos(compDir);
 }
 
-bool ballCollision(double charY, bool end)
-{
+bool ballCollision(double charY, bool end) {
 	const int width  = Astrum::window::getWidth();
 	const int height = Astrum::window::getHeight();
 	const double circleSize  = (double) width / 32.0;
@@ -119,8 +112,7 @@ bool ballCollision(double charY, bool end)
 	return distance2 <= halfSize * halfSize;
 }
 
-void updateBall(double dt, double playerVel, double computerVel)
-{
+void updateBall(double dt, double playerVel, double computerVel) {
 	const int width  = Astrum::window::getWidth();
 	const int height = Astrum::window::getHeight();
 	const double circleSize  = (double) width / 32.0;
@@ -157,8 +149,7 @@ void updateBall(double dt, double playerVel, double computerVel)
 	}
 }
 
-void update(double dt)
-{
+void update(double dt) {
 	if (Astrum::keyboard::isdown("escape"))
 		Astrum::quit();
 
@@ -168,8 +159,7 @@ void update(double dt)
 	updateBall(dt, playerVel, computerVel);
 }
 
-void draw()
-{
+void draw() {
 	const int width  = Astrum::window::getWidth();
 	const int height = Astrum::window::getHeight();
 	const double shapeHeight = (double) height / 4.0;
@@ -189,16 +179,14 @@ void draw()
 			lineHeight * (i * 2 + 1), lineWidth, lineHeight, white);
 	}
 
-	std::shared_ptr<Astrum::Font> font = Astrum::graphics::getFont();
+	auto font = Astrum::graphics::getFont();
 	std::string str = Astrum::util::strformat("Player: %d - Computer: %d",
 		playerScore, computerScore);
-	int textWidth, textHeight;
-	std::tie(textWidth, textHeight) = font->textSize(str);
+	auto [ textWidth, textHeight ] = font.textSize(str);
 	Astrum::graphics::print(str, (width - textWidth) / 2, 5, white);
 }
 
-void startup()
-{
+void startup() {
 	const int height = Astrum::window::getHeight();
 	const double shapeHeight = (double) height / 4.0;
 	const double center = (double) (height - shapeHeight) / 2.0 + shapeHeight;
@@ -207,8 +195,7 @@ void startup()
 	initBall(0);
 }
 
-int main()
-{
+int main() {
 	Astrum::Config conf;
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;

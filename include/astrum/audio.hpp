@@ -1,28 +1,41 @@
 #ifndef INCLUDE_ASTRUM_AUDIO
 #define INCLUDE_ASTRUM_AUDIO
 
-#include <memory>
-
 #include "constants.hpp"
 #include "sound.hpp"
 
 namespace Astrum {
 
 namespace audio {
+	// TODO
 	void InitAudio(Config &conf);
+	// TODO
 	void QuitAudio();
-	void play(std::shared_ptr<Sound> source);
-	void loop(std::shared_ptr<Sound> source, bool loop = true);
-	void pause(std::shared_ptr<Sound> source);
-	void stop(std::shared_ptr<Sound> source);
+	// TODO
+	void play(Sound &source);
+	// TODO
+	void loop(Sound &source, bool loop = true);
+	// TODO
+	void pause(Sound &source);
+	// TODO
+	void stop(Sound &source);
+	// TODO
 	void pauseAll();
+	// TODO
 	void resumeAll();
+	// TODO
 	void stopAll();
-	bool isPlaying(const std::shared_ptr<Sound> source);
-	bool isLooping(const std::shared_ptr<Sound> source);
-	void seek(std::shared_ptr<Sound> source, int position);
-	int currentPosition(const std::shared_ptr<Sound> source);
+	// TODO
+	bool isPlaying(const Sound source);
+	// TODO
+	bool isLooping(const Sound source);
+	// TODO
+	void seek(Sound &source, int position);
+	// TODO
+	int currentPosition(const Sound source);
+	// TODO
 	double masterVolume();
+	// TODO
 	void setMasterVolume(double volume);
 };
 

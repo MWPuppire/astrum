@@ -158,12 +158,10 @@ enum class KeyMod {
 	ALT      = LALT | RALT,
 	GUI      = LGUI | RGUI,
 };
-constexpr KeyMod operator|(KeyMod a, KeyMod b)
-{
+static inline constexpr KeyMod operator|(KeyMod a, KeyMod b) {
 	return KeyMod(int(a) | int(b));
 }
-constexpr bool operator&(KeyMod a, KeyMod b)
-{
+static inline constexpr bool operator&(KeyMod a, KeyMod b) {
 	return (int(a) & int(b)) != 0;
 }
 

@@ -39,6 +39,7 @@ extern const int DEFAULT_HEIGHT;
  */
 class Config {
 public:
+	// TODO
 	bool gammacorrect          = false;
 	std::string appName        = DEFAULT_TITLE;
 	std::string orgName        = DEFAULT_ORG;
@@ -52,6 +53,7 @@ public:
 	bool windowFullscreen      = true;
 	bool windowHeadless        = false;
 	bool allowNoWindow         = false;
+	// TODO
 	bool saveDimensions        = true;
 	bool scaleToSize           = false;
 	// You can supply an existing SDL window through this parameter.
