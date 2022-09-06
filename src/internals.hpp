@@ -8,6 +8,9 @@
 #endif
 
 #include <memory>
+#include <vector>
+#include <utility>
+#include <functional>
 
 #include "sdl.hpp"
 #include "astrum/constants.hpp"
@@ -17,6 +20,9 @@
 #include "astrum/mouse.hpp"
 
 namespace Astrum {
+
+extern bool hasInit;
+extern std::vector<std::pair<void *, std::function<void(void *)>>> dropQueue;
 
 struct FontData {
 	TTF_Font *font = nullptr;
@@ -39,8 +45,13 @@ struct FontData {
 		return *this;
 	}
 	~FontData() {
-		if (this->font != nullptr) {
+		if (this->font == nullptr) {
+			return;
+		} else if (hasInit) {
 			TTF_CloseFont(this->font);
+		} else {
+			auto pair = std::make_pair((void *) this->font, (void (*)(void *)) TTF_CloseFont);
+			dropQueue.push_back(pair);
 		}
 	}
 };
@@ -65,10 +76,16 @@ struct ImageData {
 		return *this;
 	}
 	~ImageData() {
-		if (this->image != nullptr)
-			SDL_FreeSurface(this->image);
 		if (this->tran != nullptr)
 			delete this->tran;
+		if (this->image == nullptr) {
+			return;
+		} else if (hasInit) {
+			SDL_FreeSurface(this->image);
+		} else {
+			auto pair = std::make_pair((void *) this->image, (void (*)(void *)) SDL_FreeSurface);
+			dropQueue.push_back(pair);
+		}
 	}
 };
 
@@ -89,8 +106,14 @@ struct CursorData {
 		return *this;
 	}
 	~CursorData() {
-		if (this->cursor != nullptr && !this->nofree)
+		if (this->cursor == nullptr || this->nofree) {
+			return;
+		} else if (hasInit) {
 			SDL_FreeCursor(this->cursor);
+		} else {
+			auto pair = std::make_pair((void *) this->cursor, (void (*)(void *)) SDL_FreeCursor);
+			dropQueue.push_back(pair);
+		}
 	}
 };
 
@@ -98,8 +121,14 @@ struct SoundData {
 	Mix_Chunk *chunk = nullptr;
 	int channel;
 	~SoundData() {
-		if (this->chunk != nullptr)
+		if (this->chunk == nullptr) {
+			return;
+		} else if (hasInit) {
 			Mix_FreeChunk(this->chunk);
+		} else {
+			auto pair = std::make_pair((void *) this->chunk, (void (*)(void *)) Mix_FreeChunk);
+			dropQueue.push_back(pair);
+		}
 	}
 };
 

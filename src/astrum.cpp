@@ -6,6 +6,8 @@
 #include <optional>
 #include <filesystem>
 #include <string>
+#include <vector>
+#include <utility>
 
 #include "sdl.hpp"
 #include "internals.hpp"
@@ -32,9 +34,10 @@ const std::string DEFAULT_ORG = "Example";
 const int DEFAULT_WIDTH = 640;
 const int DEFAULT_HEIGHT = 480;
 
-namespace {
-	int hasInit = 0;
+bool hasInit = false;
+std::vector<std::pair<void *, std::function<void(void *)>>> dropQueue;
 
+namespace {
 	bool isrunning = false;
 	bool doquit = false;
 
@@ -243,11 +246,16 @@ int init(Config &conf) {
 		return init;
 	}
 
+	for (auto [ ptr, dropFunc ] : dropQueue) {
+		dropFunc(ptr);
+	}
+	dropQueue.clear();
+
 #ifdef __EMSCRIPTEN__
 	emscripten_set_window_title(conf.appName.c_str());
 #endif
 
-	hasInit = 1;
+	hasInit = true;
 	return 0;
 }
 
@@ -260,7 +268,7 @@ void exit() {
 	TTF_Quit();
 	IMG_Quit();
 
-	hasInit = 0;
+	hasInit = false;
 }
 
 #ifdef __EMSCRIPTEN__
