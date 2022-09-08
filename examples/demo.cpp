@@ -53,6 +53,8 @@ void draw() {
 		Astrum::graphics::arc(shapeX, shapeY, size, 45, 315, shapeColor, true);
 		break;
 	}
+	std::string str = Astrum::util::strformat("FPS: %f", 1 / Astrum::timer::deltatime());
+	Astrum::graphics::print(str, 0, 0, shapeColor);
 }
 
 void keypressed(Astrum::Key key) {

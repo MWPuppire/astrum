@@ -11,7 +11,7 @@
 
 #ifdef __EMSCRIPTEN__
 extern "C" {
-	void log_fs_error() {
+	void logFsError() {
 		Astrum::log::error("Could not establish persistent memory. "
 			"No data will be saved across program runs\n");
 	}
@@ -35,7 +35,7 @@ namespace filesystem {
 			FS.mount(IDBFS, { }, "/offline");
 			FS.syncfs(true, function(err) {
 				if (err) {
-					ccall("log_fs_error", "v");
+					ccall("logFsError", "v");
 				}
 			});
 		);
@@ -70,7 +70,7 @@ namespace filesystem {
 		EM_ASM(
 			FS.syncfs(false, function(err) {
 				if (err) {
-					ccall("log_fs_error", "v");
+					ccall("logFsError", "v");
 				}
 			});
 			FS.unmount("/offline");

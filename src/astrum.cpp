@@ -41,30 +41,30 @@ namespace {
 	bool isrunning = false;
 	bool doquit = false;
 
-	std::optional<std::function<void()> > cb_startup;
-	std::optional<std::function<void()> > cb_draw;
-	std::optional<std::function<bool()> > cb_quit;
-	std::optional<std::function<void(int, int)> > cb_resize;
-	std::optional<std::function<void(bool)> > cb_visible;
-	std::optional<std::function<void(bool)> > cb_focus;
-	std::optional<std::function<void(int, int)> > cb_moved;
-	std::optional<std::function<void(Key, KeyMod, bool)> > cb_keypressed;
-	std::optional<std::function<void(Key)> > cb_keyreleased;
-	std::optional<std::function<void(std::string)> > cb_textinput;
-	std::optional<std::function<void(std::string, int, int)> > cb_textedited;
-	std::optional<std::function<void(int, int, int, int)> > cb_mousemoved;
-	std::optional<std::function<void(MouseButton, int, int, int)> > cb_mousepressed;
-	std::optional<std::function<void(MouseButton, int, int, int)> > cb_mousereleased;
-	std::optional<std::function<void(int, int)> > cb_wheelmoved;
-	std::optional<std::function<void(bool)> > cb_mousefocus;
-	std::optional<std::function<void(std::filesystem::path)> > cb_filedropped;
-	std::optional<std::function<void(std::filesystem::path)> > cb_directorydropped;
+	std::optional<std::function<void()> > startupCb;
+	std::optional<std::function<void()> > drawCb;
+	std::optional<std::function<bool()> > quitCb;
+	std::optional<std::function<void(int, int)> > resizeCb;
+	std::optional<std::function<void(bool)> > visibleCb;
+	std::optional<std::function<void(bool)> > focusCb;
+	std::optional<std::function<void(int, int)> > movedCb;
+	std::optional<std::function<void(Key, KeyMod, bool)> > keypressedCb;
+	std::optional<std::function<void(Key)> > keyreleasedCb;
+	std::optional<std::function<void(std::string)> > textinputCb;
+	std::optional<std::function<void(std::string, int, int)> > texteditedCb;
+	std::optional<std::function<void(int, int, int, int)> > mousemovedCb;
+	std::optional<std::function<void(MouseButton, int, int, int)> > mousepressedCb;
+	std::optional<std::function<void(MouseButton, int, int, int)> > mousereleasedCb;
+	std::optional<std::function<void(int, int)> > wheelmovedCb;
+	std::optional<std::function<void(bool)> > mousefocusCb;
+	std::optional<std::function<void(std::filesystem::path)> > filedroppedCb;
+	std::optional<std::function<void(std::filesystem::path)> > directorydroppedCb;
 #ifdef __EMSCRIPTEN__
-	std::function<void(double)> cb_update;
+	std::function<void(double)> updateCb;
 #endif
 };
 
-void handle_event(const SDL_Event &e) {
+void handleEvent(const SDL_Event &e) {
 	int virtX, virtY;
 	Key key;
 	KeyMod mod;
@@ -72,8 +72,8 @@ void handle_event(const SDL_Event &e) {
 	switch (e.type) {
 	case SDL_QUIT:
 		doquit = true;
-		if (cb_quit)
-			doquit = (*cb_quit)() && doquit;
+		if (quitCb)
+			doquit = (*quitCb)() && doquit;
 		break;
 	case SDL_KEYDOWN:
 		if (e.key.repeat && !keyboard::hasKeyRepeat())
@@ -81,81 +81,81 @@ void handle_event(const SDL_Event &e) {
 		key = fromKeycode(e.key.keysym.sym);
 		mod = fromSDLMod(e.key.keysym.mod);
 		keyboard::addKeydown(key);
-		if (cb_keypressed)
-			(*cb_keypressed)(key, mod, (bool) e.key.repeat);
+		if (keypressedCb)
+			(*keypressedCb)(key, mod, (bool) e.key.repeat);
 		break;
 	case SDL_KEYUP:
 		key = fromKeycode(e.key.keysym.sym);
 		keyboard::removeKeydown(key);
-		if (cb_keyreleased)
-			(*cb_keyreleased)(key);
+		if (keyreleasedCb)
+			(*keyreleasedCb)(key);
 		break;
 	case SDL_TEXTEDITING:
-		if (cb_textedited)
-			(*cb_textedited)(e.edit.text, e.edit.start, e.edit.length);
+		if (texteditedCb)
+			(*texteditedCb)(e.edit.text, e.edit.start, e.edit.length);
 		break;
 	case SDL_TEXTINPUT:
-		if (cb_textinput)
-			(*cb_textinput)(e.edit.text);
+		if (textinputCb)
+			(*textinputCb)(e.edit.text);
 		break;
 	case SDL_MOUSEMOTION:
 		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
-		if (cb_mousemoved)
-			(*cb_mousemoved)(virtX, virtY, e.motion.xrel, e.motion.yrel);
+		if (mousemovedCb)
+			(*mousemovedCb)(virtX, virtY, e.motion.xrel, e.motion.yrel);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		btn = fromMouseBtn(e.button.button);
 		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		mouse::addMousedown(btn);
-		if (cb_mousepressed)
-			(*cb_mousepressed)(btn, virtX, virtY, e.button.clicks);
+		if (mousepressedCb)
+			(*mousepressedCb)(btn, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEBUTTONUP:
 		btn = fromMouseBtn(e.button.button);
 		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
 		mouse::removeMousedown(btn);
-		if (cb_mousereleased)
-			(*cb_mousereleased)(btn, virtX, virtY, e.button.clicks);
+		if (mousereleasedCb)
+			(*mousereleasedCb)(btn, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEWHEEL: {
 		int mul = e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1;
-		if (cb_wheelmoved)
-			(*cb_wheelmoved)(e.wheel.x * mul, e.wheel.y * mul);
+		if (wheelmovedCb)
+			(*wheelmovedCb)(e.wheel.x * mul, e.wheel.y * mul);
 		break;
 	}
 	case SDL_WINDOWEVENT:
 		switch (e.window.event) {
 		case SDL_WINDOWEVENT_SHOWN:
-			if (cb_visible)
-				(*cb_visible)(true);
+			if (visibleCb)
+				(*visibleCb)(true);
 			break;
 		case SDL_WINDOWEVENT_HIDDEN:
-			if (cb_visible)
-				(*cb_visible)(false);
+			if (visibleCb)
+				(*visibleCb)(false);
 			break;
 		case SDL_WINDOWEVENT_MOVED:
-			if (cb_moved)
-				(*cb_moved)(e.window.data1, e.window.data2);
+			if (movedCb)
+				(*movedCb)(e.window.data1, e.window.data2);
 			break;
 		case SDL_WINDOWEVENT_RESIZED:
-			if (cb_resize)
-				(*cb_resize)(e.window.data1, e.window.data2);
+			if (resizeCb)
+				(*resizeCb)(e.window.data1, e.window.data2);
 			break;
 		case SDL_WINDOWEVENT_FOCUS_GAINED:
-			if (cb_focus)
-				(*cb_focus)(true);
+			if (focusCb)
+				(*focusCb)(true);
 			break;
 		case SDL_WINDOWEVENT_FOCUS_LOST:
-			if (cb_focus)
-				(*cb_focus)(false);
+			if (focusCb)
+				(*focusCb)(false);
 			break;
 		case SDL_WINDOWEVENT_ENTER:
-			if (cb_mousefocus)
-				(*cb_mousefocus)(true);
+			if (mousefocusCb)
+				(*mousefocusCb)(true);
 			break;
 		case SDL_WINDOWEVENT_LEAVE:
-			if (cb_mousefocus)
-				(*cb_mousefocus)(false);
+			if (mousefocusCb)
+				(*mousefocusCb)(false);
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
 		case SDL_WINDOWEVENT_RESTORED:
@@ -168,11 +168,11 @@ void handle_event(const SDL_Event &e) {
 		std::filesystem::path p(e.drop.file);
 		bool isdir = std::filesystem::is_directory(p);
 		if (isdir) {
-			if (cb_directorydropped)
-				(*cb_directorydropped)(p);
+			if (directorydroppedCb)
+				(*directorydroppedCb)(p);
 		} else {
-			if (cb_filedropped)
-				(*cb_filedropped)(p);
+			if (filedroppedCb)
+				(*filedroppedCb)(p);
 		}
 		SDL_free(e.drop.file);
 		break;
@@ -272,23 +272,23 @@ void exit() {
 }
 
 #ifdef __EMSCRIPTEN__
-void main_loop() {
+void mainLoop() {
 	SDL_Event e;
 	double dt = timer::step();
 
 	while (SDL_PollEvent(&e)) {
-		handle_event(e);
+		handleEvent(e);
 		if (doquit) {
 			isrunning = false;
 			emscripten_cancel_main_loop();
 		}
 	}
 
-	cb_update(dt);
+	updateCb(dt);
 
 	graphics::drawframe();
-	if (cb_draw)
-		(*cb_draw)();
+	if (drawCb)
+		(*drawCb)();
 };
 #endif
 
@@ -299,22 +299,22 @@ void run(std::function<void(double)> update) {
 	isrunning = true;
 	doquit = false;
 
-	if (cb_startup)
-		(*cb_startup)();
+	if (startupCb)
+		(*startupCb)();
 
 	// don't count time from start-up function in dt
 	timer::step();
 
 #ifdef __EMSCRIPTEN__
-	cb_update = update;
-	emscripten_set_main_loop(main_loop, 0, 1);
+	updateCb = update;
+	emscripten_set_main_loop(mainLoop, 0, 1);
 #else
 	SDL_Event e;
 	while (!doquit) {
 		double dt = timer::step();
 
 		while (SDL_PollEvent(&e)) {
-			handle_event(e);
+			handleEvent(e);
 			if (doquit)
 				break;
 		}
@@ -322,8 +322,8 @@ void run(std::function<void(double)> update) {
 		update(dt);
 
 		graphics::drawframe();
-		if (cb_draw)
-			(*cb_draw)();
+		if (drawCb)
+			(*drawCb)();
 
 		SDL_Delay(1);
 	}
@@ -340,131 +340,131 @@ void quit(bool checkonquit) {
 		return;
 	if (checkonquit) {
 		doquit = true;
-		if (cb_quit)
-			doquit = (*cb_quit)() && doquit;
+		if (quitCb)
+			doquit = (*quitCb)() && doquit;
 	} else {
 		doquit = true;
 	}
 }
 
 void onquit(std::function<bool()> cb) {
-	cb_quit = cb;
+	quitCb = cb;
 }
 void onquit(std::function<void()> cb) {
 	auto lambda = [cb]() { cb(); return true; };
-	cb_quit = lambda;
+	quitCb = lambda;
 }
 
 void ondraw(std::function<void()> cb) {
-	cb_draw = cb;
+	drawCb = cb;
 }
 
 void onkeypressed(std::function<void(Key, KeyMod, bool)> cb) {
-	cb_keypressed = cb;
+	keypressedCb = cb;
 }
 void onkeypressed(std::function<void(Key, KeyMod)> cb) {
 	auto lambda = [cb](Key k, KeyMod m, bool UNUSED(r)) { cb(k, m); };
-	cb_keypressed = lambda;
+	keypressedCb = lambda;
 }
 void onkeypressed(std::function<void(Key)> cb) {
 	auto lambda = [cb](Key k, KeyMod UNUSED(m), bool UNUSED(r)) { cb(k); };
-	cb_keypressed = lambda;
+	keypressedCb = lambda;
 }
 
 void onkeyreleased(std::function<void(Key)> cb) {
-	cb_keyreleased = cb;
+	keyreleasedCb = cb;
 }
 
 void onresize(std::function<void(int, int)> cb) {
-	cb_resize = cb;
+	resizeCb = cb;
 }
 
 void onvisible(std::function<void(bool)> cb) {
-	cb_visible = cb;
+	visibleCb = cb;
 }
 
 void onfocus(std::function<void(bool)> cb) {
-	cb_focus = cb;
+	focusCb = cb;
 }
 
 void onmoved(std::function<void(int, int)> cb) {
-	cb_moved = cb;
+	movedCb = cb;
 }
 
 void ontextinput(std::function<void(std::string)> cb) {
-	cb_textinput = cb;
+	textinputCb = cb;
 }
 
 void ontextedited(std::function<void(std::string, int, int)> cb) {
-	cb_textedited = cb;
+	texteditedCb = cb;
 }
 void ontextedited(std::function<void(std::string, int)> cb) {
 	auto lambda = [cb](std::string text, int start, int UNUSED(length)) { cb(text, start); };
-	cb_textedited = lambda;
+	texteditedCb = lambda;
 }
 void ontextedited(std::function<void(std::string)> cb) {
 	auto lambda = [cb](std::string text, int UNUSED(start), int UNUSED(length)) { cb(text); };
-	cb_textedited = lambda;
+	texteditedCb = lambda;
 }
 
 void onmousemoved(std::function<void(int, int, int, int)> cb) {
-	cb_mousemoved = cb;
+	mousemovedCb = cb;
 }
 void onmousemoved(std::function<void(int, int)> cb) {
 	auto lambda = [cb](int x, int y, int UNUSED(dx), int UNUSED(dy)) { cb(x, y); };
-	cb_mousemoved = lambda;
+	mousemovedCb = lambda;
 }
 
 void onmousepressed(std::function<void(MouseButton, int, int, int)> cb) {
-	cb_mousepressed = cb;
+	mousepressedCb = cb;
 }
 void onmousepressed(std::function<void(MouseButton, int, int)> cb) {
 	auto lambda = [cb](MouseButton button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
-	cb_mousepressed = lambda;
+	mousepressedCb = lambda;
 }
 void onmousepressed(std::function<void(MouseButton)> cb) {
 	auto lambda = [cb](MouseButton button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
-	cb_mousepressed = lambda;
+	mousepressedCb = lambda;
 }
 
 void onmousereleased(std::function<void(MouseButton, int, int, int)> cb) {
-	cb_mousereleased = cb;
+	mousereleasedCb = cb;
 }
 void onmousereleased(std::function<void(MouseButton, int, int)> cb) {
 	auto lambda = [cb](MouseButton button, int x, int y, int UNUSED(clicks)) { cb(button, x, y); };
-	cb_mousereleased = lambda;
+	mousereleasedCb = lambda;
 }
 void onmousereleased(std::function<void(MouseButton)> cb) {
 	auto lambda = [cb](MouseButton button, int UNUSED(x), int UNUSED(y), int UNUSED(clicks)) { cb(button); };
-	cb_mousereleased = lambda;
+	mousereleasedCb = lambda;
 }
 
 void onwheelmoved(std::function<void(int, int)> cb) {
-	cb_wheelmoved = cb;
+	wheelmovedCb = cb;
 }
 
 void onmousefocus(std::function<void(bool)> cb) {
-	cb_mousefocus = cb;
+	mousefocusCb = cb;
 }
 
 void onfiledropped(std::function<void(std::filesystem::path)> cb) {
-	cb_filedropped = cb;
+	filedroppedCb = cb;
 }
 void onfiledropped(std::function<void(std::string)> cb) {
 	auto lambda = [cb](std::filesystem::path p) { cb(p.string()); };
-	cb_filedropped = lambda;
+	filedroppedCb = lambda;
 }
 
 void ondirectorydropped(std::function<void(std::filesystem::path)> cb) {
-	cb_directorydropped = cb;
+	directorydroppedCb = cb;
 }
 void ondirectorydropped(std::function<void(std::string)> cb) {
 	auto lambda = [cb](std::filesystem::path p) { cb(p.string()); };
-	cb_directorydropped = lambda;
+	directorydroppedCb = lambda;
 }
 
 void onstartup(std::function<void()> cb) {
-	cb_startup = cb;
+	startupCb = cb;
 }
 
 void ongamepadaxis();

@@ -67,7 +67,7 @@ namespace graphics {
 			if (conf.existingWindow != nullptr)
 				renderer = SDL_GetRenderer(window::window);
 			if (renderer == nullptr)
-				renderer = SDL_CreateRenderer(window::window, -1, 0);
+				renderer = SDL_CreateRenderer(window::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 		}
 
 		if (conf.scaleToSize) {
