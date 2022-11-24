@@ -10,8 +10,6 @@ namespace Astrum {
 
 namespace timer {
 
-	int InitTimer();
-
 	void sleep(size_t ms);
 	void sleep(std::chrono::milliseconds interval);
 

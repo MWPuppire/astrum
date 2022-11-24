@@ -4,6 +4,7 @@
 
 const double TICK_RATE = 0.2; // 5 ticks per second
 const int GAME_SIZE = 12;
+const int SQUARE_SIZE = 30;
 const Astrum::Color GREEN = Astrum::Color(0x00FF00);
 const Astrum::Color RED   = Astrum::Color(0xFF0000);
 const Astrum::Color BLACK = Astrum::Color(0x000000);
@@ -37,6 +38,7 @@ struct GameState {
 	bool paused;
 	int score;
 	bool dead;
+	bool can_move;
 };
 GameState game;
 
@@ -49,9 +51,11 @@ void reset(GameState &game) {
 	game.dead = false;
 	game.food = Position(Astrum::math::random(GAME_SIZE - 1),
 		Astrum::math::random(GAME_SIZE - 1));
+	game.can_move = true;
 }
 
 void tick(GameState &game) {
+	game.can_move = true;
 	auto &snake = game.snake;
 	Position head = snake.front();
 	Position tail = snake.back();
@@ -117,29 +121,28 @@ void keypress(Astrum::Key key) {
 			game.paused = !game.paused;
 		return;
 	}
-	bool moved = false;
-	if (key == Astrum::Key::LEFT && !moved) {
+	if (key == Astrum::Key::LEFT && game.can_move) {
 		if (game.facing == UP || game.facing == DOWN) {
 			game.facing = LEFT;
-			moved = true;
+			game.can_move = false;
 		}
 	}
-	if (key == Astrum::Key::RIGHT && !moved) {
+	if (key == Astrum::Key::RIGHT && game.can_move) {
 		if (game.facing == UP || game.facing == DOWN) {
 			game.facing = RIGHT;
-			moved = true;
+			game.can_move = false;
 		}
 	}
-	if (key == Astrum::Key::UP && !moved) {
+	if (key == Astrum::Key::UP && game.can_move) {
 		if (game.facing == LEFT || game.facing == RIGHT) {
 			game.facing = UP;
-			moved = true;
+			game.can_move = false;
 		}
 	}
-	if (key == Astrum::Key::DOWN && !moved) {
+	if (key == Astrum::Key::DOWN && game.can_move) {
 		if (game.facing == LEFT || game.facing == RIGHT) {
 			game.facing = DOWN;
-			moved = true;
+			game.can_move = false;
 		}
 	}
 }
@@ -152,11 +155,12 @@ void draw() {
 		Astrum::graphics::print(formatted, 10, 40, WHITE);
 	} else {
 		for (auto &pos : game.snake) {
-			Astrum::graphics::rectangle(30 * pos.x + 1, 30 * pos.y + 1,
-				28, 28, GREEN, true);
+			Astrum::graphics::rectangle(SQUARE_SIZE * pos.x + 1,
+				SQUARE_SIZE * pos.y + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2, GREEN, true);
 		}
-		Astrum::graphics::rectangle(30 * game.food.x + 1, 30 * game.food.y + 1,
-			28, 28, RED, true);
+		Astrum::graphics::rectangle(SQUARE_SIZE * game.food.x + 1,
+			SQUARE_SIZE * game.food.y + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2, RED,
+			true);
 	}
 }
 
@@ -165,8 +169,8 @@ int main() {
 	conf.windowFullscreen = false;
 	conf.windowResizable = true;
 	conf.appName = "Snake";
-	conf.windowWidth = conf.minWindowWidth = 360;
-	conf.windowHeight = conf.minWindowHeight = 360;
+	conf.windowWidth = conf.minWindowWidth = SQUARE_SIZE * GAME_SIZE;
+	conf.windowHeight = conf.minWindowHeight = SQUARE_SIZE * GAME_SIZE;
 	conf.scaleToSize = true;
 
 	Astrum::init(conf);

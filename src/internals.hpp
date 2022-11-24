@@ -134,18 +134,30 @@ struct SoundData {
 
 namespace window {
 	extern SDL_Window *window;
+	int InitWindow(Config &conf);
+	void QuitWindow();
 	void recalculateDimensions();
 };
 namespace mouse {
+	int InitMouse();
 	void addMousedown(MouseButton btn);
 	void removeMousedown(MouseButton btn);
 };
 namespace graphics {
+	int InitGraphics(Config &conf);
+	void QuitGraphics();
 	void drawframe();
 };
 namespace keyboard {
 	void addKeydown(Key key);
 	void removeKeydown(Key key);
+};
+namespace filesystem {
+	int InitFS(Config &conf);
+	void QuitFS();
+};
+namespace timer {
+	int InitTimer();
 };
 
 static constexpr MouseButton fromMouseBtn(int button) {

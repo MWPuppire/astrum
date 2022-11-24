@@ -315,12 +315,12 @@ namespace graphics {
 			renderRect = { .x = x, .y = y,
 				.w = static_cast<int>(surf->w * tran->sx),
 				.h = static_cast<int>(surf->h * tran->sy) };
-			flip = static_cast<SDL_RendererFlip>(0);
+			flip = SDL_FLIP_NONE;
 			degrees = tran->degrees;
 		} else {
 			sourceRect = { .x = 0, .y = 0, .w = surf->w, .h = surf->h };
 			renderRect = { .x = x, .y = y, .w = surf->w, .h = surf->h };
-			flip = static_cast<SDL_RendererFlip>(0);
+			flip = SDL_FLIP_NONE;
 			degrees = 0;
 		}
 

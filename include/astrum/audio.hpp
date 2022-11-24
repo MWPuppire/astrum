@@ -7,10 +7,7 @@
 namespace Astrum {
 
 namespace audio {
-	// TODO
-	void InitAudio(Config &conf);
-	// TODO
-	void QuitAudio();
+
 	// TODO
 	void play(Sound &source);
 	// TODO

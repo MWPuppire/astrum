@@ -26,7 +26,6 @@ public:
 
 namespace mouse {
 
-	int InitMouse();
 	bool isdown(MouseButton button);
 	int getX();
 	int getY();

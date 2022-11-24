@@ -14,8 +14,6 @@ namespace Astrum {
 
 namespace graphics {
 
-	int InitGraphics(Config &conf);
-	void QuitGraphics();
 	Color getBackgroundColor();
 	void setBackgroundColor(const Color &color);
 	void setLineThickness(int thickness);

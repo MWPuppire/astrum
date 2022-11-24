@@ -13,10 +13,6 @@ namespace system {
 	// TODO
 	void vibrate(double seconds);
 
-	// returns whether the system is connected to the internet
-	// TODO
-	bool getNetworkStatus();
-
 	// returns the current user's username
 	// TODO
 	std::string getUsername();

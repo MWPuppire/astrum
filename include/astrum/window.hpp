@@ -9,8 +9,7 @@
 namespace Astrum {
 
 namespace window {
-	int InitWindow(Config &conf);
-	void QuitWindow();
+
 	void setFullscreen(bool fullscreen);
 	void setSize(int width, int height);
 	void setTitle(std::string title);
