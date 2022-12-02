@@ -9,7 +9,7 @@ endif(WIN64)
 project(astrum VERSION 0.1.0)
 
 include(CheckIPOSupported)
-check_ipo_supported(RESULT supported)
+check_ipo_supported(RESULT ipo_supported)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
@@ -52,9 +52,11 @@ target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 target_include_directories(astrum PUBLIC include)
 target_include_directories(astrum PRIVATE assets)
 
-if(supported AND CMAKE_BUILD_TYPE EQUAL "Release")
+if(ipo_supported AND CMAKE_BUILD_TYPE STREQUAL "Release")
 	set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif(supported AND CMAKE_BUILD_TYPE EQUAL "Release")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+	message(STATUS "Interprocedural optimization not supported")
+endif(ipo_supported AND CMAKE_BUILD_TYPE STREQUAL "Release")
 
 if(NOT EMSCRIPTEN)
 	target_include_directories(astrum PUBLIC ${SDL2_INCLUDE_DIRS})
