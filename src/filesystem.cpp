@@ -35,7 +35,7 @@ namespace filesystem {
 			FS.mount(IDBFS, { }, "/offline");
 			FS.syncfs(true, function(err) {
 				if (err) {
-					ccall("log_fs_error", "v");
+					Module.ccall('log_fs_error', 'void', [], []);
 				}
 			});
 		);
@@ -70,7 +70,7 @@ namespace filesystem {
 		EM_ASM(
 			FS.syncfs(false, function(err) {
 				if (err) {
-					ccall("log_fs_error", "v");
+					Module.ccall('log_fs_error', 'void', [], []);
 				}
 			});
 			FS.unmount("/offline");

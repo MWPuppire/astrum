@@ -30,7 +30,8 @@ if(EMSCRIPTEN)
 	add_compile_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
 		-sUSE_SDL_GFX=2)
 	add_link_options(-sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_IMAGE=2
-		-sUSE_SDL_GFX=2 -lidbfs.js -sEXPORTED_FUNCTIONS=_log_fs_error,_main)
+		-sUSE_SDL_GFX=2 -lidbfs.js -sEXPORTED_FUNCTIONS=_log_fs_error,_main
+		-sEXPORTED_RUNTIME_METHODS=ccall)
 	set(CMAKE_EXECUTABLE_SUFFIX .html)
 else(EMSCRIPTEN)
 	find_package(SDL2 REQUIRED)
