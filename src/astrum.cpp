@@ -39,11 +39,10 @@ std::vector<std::pair<void *, std::function<void(void *)>>> dropQueue;
 
 namespace {
 	bool isrunning = false;
-	bool doquit = false;
 
 	std::optional<std::function<void()> > startupCb;
 	std::optional<std::function<void()> > drawCb;
-	std::optional<std::function<bool()> > quitCb;
+	std::optional<std::function<void()> > quitCb;
 	std::optional<std::function<void(int, int)> > resizeCb;
 	std::optional<std::function<void(bool)> > visibleCb;
 	std::optional<std::function<void(bool)> > focusCb;
@@ -59,21 +58,20 @@ namespace {
 	std::optional<std::function<void(bool)> > mousefocusCb;
 	std::optional<std::function<void(std::filesystem::path)> > filedroppedCb;
 	std::optional<std::function<void(std::filesystem::path)> > directorydroppedCb;
-#ifdef __EMSCRIPTEN__
 	std::function<void(double)> updateCb;
-#endif
 };
 
-void handleEvent(const SDL_Event &e) {
+bool handleEvent(const SDL_Event &e) {
 	int virtX, virtY;
 	Key key;
 	KeyMod mod;
 	MouseButton btn;
+	bool doquit = false;
 	switch (e.type) {
 	case SDL_QUIT:
 		doquit = true;
 		if (quitCb)
-			doquit = (*quitCb)() && doquit;
+			(*quitCb)();
 		break;
 	case SDL_KEYDOWN:
 		if (e.key.repeat && !keyboard::hasKeyRepeat())
@@ -177,14 +175,13 @@ void handleEvent(const SDL_Event &e) {
 		SDL_free(e.drop.file);
 		break;
 	}
+	return doquit;
 }
 
 int init(const Config &conf) {
 	if (hasInit)
 		return 0;
 
-	SDL_SetHint(SDL_HINT_MAC_BACKGROUND_APP,
-		(conf.windowHeadless || conf.allowNoWindow) ? "1" : "0");
 	SDL_SetMainReady();
 	int init = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO
 		| SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
@@ -260,6 +257,9 @@ int init(const Config &conf) {
 }
 
 void exit() {
+	if (!hasInit)
+		return;
+
 	window::QuitWindow();
 	graphics::QuitGraphics();
 	filesystem::QuitFS();
@@ -271,16 +271,18 @@ void exit() {
 	hasInit = false;
 }
 
-#ifdef __EMSCRIPTEN__
 void mainLoop() {
 	SDL_Event e;
 	double dt = timer::step();
 
+	bool doquit = false;
 	while (SDL_PollEvent(&e)) {
-		handleEvent(e);
+		doquit |= handleEvent(e);
 		if (doquit) {
 			isrunning = false;
+#ifdef __EMSCRIPTEN__
 			emscripten_cancel_main_loop();
+#endif
 		}
 	}
 
@@ -290,14 +292,12 @@ void mainLoop() {
 	if (drawCb)
 		(*drawCb)();
 };
-#endif
 
 void run(std::function<void(double)> update) {
 	if (isrunning)
 		return;
 
 	isrunning = true;
-	doquit = false;
 
 	if (startupCb)
 		(*startupCb)();
@@ -305,29 +305,14 @@ void run(std::function<void(double)> update) {
 	// don't count time from start-up function in dt
 	timer::step();
 
-#ifdef __EMSCRIPTEN__
 	updateCb = update;
+#ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(mainLoop, 0, 1);
 #else
-	SDL_Event e;
-	while (!doquit) {
-		double dt = timer::step();
-
-		while (SDL_PollEvent(&e)) {
-			handleEvent(e);
-			if (doquit)
-				break;
-		}
-
-		update(dt);
-
-		graphics::drawframe();
-		if (drawCb)
-			(*drawCb)();
-
+	while (isrunning) {
 		SDL_Delay(1);
+		mainLoop();
 	}
-	isrunning = false;
 #endif
 }
 void run(std::function<void()> update) {
@@ -335,24 +320,17 @@ void run(std::function<void()> update) {
 	run(lambda);
 }
 
-void quit(bool checkonquit) {
+void quit() {
 	if (!isrunning)
 		return;
-	if (checkonquit) {
-		doquit = true;
-		if (quitCb)
-			doquit = (*quitCb)() && doquit;
-	} else {
-		doquit = true;
-	}
+	SDL_Event e = {
+		.type = SDL_QUIT,
+	};
+	SDL_PushEvent(&e);
 }
 
-void onquit(std::function<bool()> cb) {
-	quitCb = cb;
-}
 void onquit(std::function<void()> cb) {
-	auto lambda = [cb]() { cb(); return true; };
-	quitCb = lambda;
+	quitCb = cb;
 }
 
 void ondraw(std::function<void()> cb) {

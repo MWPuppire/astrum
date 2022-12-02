@@ -15,46 +15,55 @@ Image::Image(std::shared_ptr<ImageData> data) {
 	this->data = data;
 }
 Image::Image(std::string filename) {
-	this->data = std::make_shared<ImageData>(IMG_Load(filename.c_str()));
-	if (this->data->image != nullptr)
-		SDL_SetSurfaceRLE(this->data->image, 1);
+	SDL_Surface *surf = IMG_Load(filename.c_str());
+	if (surf == nullptr)
+		throw std::runtime_error("Failed to create image");
+	SDL_SetSurfaceRLE(surf, 1);
+	this->data = std::make_shared<ImageData>(surf);
 }
 Image::Image(std::filesystem::path filename)
 	: Image(filename.string()) { };
 Image::Image(const unsigned char *buf, std::size_t bufLen, std::string type) {
 	SDL_RWops *rw = SDL_RWFromConstMem(buf, bufLen);
-	if (rw == nullptr) {
-		this->data = std::make_shared<ImageData>(nullptr);
-	} else {
-		this->data = std::make_shared<ImageData>(type == ""
-			? IMG_Load_RW(rw, 1)
-			: IMG_LoadTyped_RW(rw, 1, type.c_str()));
-		if (this->data->image != nullptr)
-			SDL_SetSurfaceRLE(this->data->image, 1);
-	}
+	if (rw == nullptr)
+		throw std::runtime_error("Failed to create image");
+	SDL_Surface *surf = type == ""
+		? IMG_Load_RW(rw, 1)
+		: IMG_LoadTyped_RW(rw, 1, type.c_str());
+	if (surf == nullptr)
+		throw std::runtime_error("Failed to create image");
+	SDL_SetSurfaceRLE(surf, 1);
+	this->data = std::make_shared<ImageData>(surf);
 }
 Image::Image(void *pixels, int width, int height) {
 	SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32,
 		SDL_PIXELFORMAT_RGBA32);
+	if (surf == nullptr)
+		throw std::runtime_error("Failed to create image");
 	memcpy(surf->pixels, pixels, surf->pitch * height);
+	SDL_SetSurfaceRLE(surf, 1);
 	this->data = std::make_shared<ImageData>(surf);
-	if (surf != nullptr)
-		SDL_SetSurfaceRLE(this->data->image, 1);
 }
 
+const std::shared_ptr<ImageData> Image::getData() const {
+	return this->data;
+}
 std::shared_ptr<ImageData> Image::getData() {
 	return this->data;
 }
 
+const Transforms &Image::getTransforms() const {
+	return this->data->tran;
+}
 Transforms &Image::getTransforms() {
 	return this->data->tran;
 }
 
-int Image::getWidth() {
+int Image::getWidth() const {
 	return this->data->image->w;
 }
 
-int Image::getHeight() {
+int Image::getHeight() const {
 	return this->data->image->h;
 }
 

@@ -36,12 +36,8 @@ void run(std::function<void(double)> update);
  */
 void run(std::function<void()> update);
 
-void quit(bool checkonquit = false);
+void quit();
 
-void onquit(std::function<bool()> cb);
-/**
- * @overload
- */
 void onquit(std::function<void()> cb);
 
 void ondraw(std::function<void()> cb);

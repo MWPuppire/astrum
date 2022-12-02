@@ -21,6 +21,8 @@ private:
 public:
 	Cursor(std::shared_ptr<struct CursorData> data);
 	Cursor(Image image, int hotX = 0, int hotY = 0);
+
+	const std::shared_ptr<struct CursorData> getData() const;
 	std::shared_ptr<struct CursorData> getData();
 };
 
@@ -35,7 +37,7 @@ namespace mouse {
 	void setPosition(int x, int y);
 	bool isVisible();
 	void setVisible(bool state);
-	Cursor getCursor();
+	std::optional<Cursor> getCursor();
 	void setCursor(Cursor cursor);
 
 	extern std::optional<Cursor> CURSOR_ARROW;

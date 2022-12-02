@@ -39,16 +39,21 @@ public:
 	 */
 	Font(std::filesystem::path path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
 	Font(const unsigned char *buf, std::size_t bufLen, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
-	std::shared_ptr<struct FontData> getData();
-	Image renderText(std::string text);
+
+	const std::shared_ptr<struct FontData> getData() const;
 	/**
 	 * @overload
 	 */
-	Image renderText(std::string text, Color color);
-	std::tuple<int, int> textSize(std::string text);
-	Color getColor();
+	std::shared_ptr<struct FontData> getData();
+	Image renderText(std::string text) const;
+	/**
+	 * @overload
+	 */
+	Image renderText(std::string text, Color color) const;
+	std::tuple<int, int> textSize(std::string text) const;
+	Color getColor() const;
 	void setColor(Color col);
-	TextAlign getAlign();
+	TextAlign getAlign() const;
 	void setAlign(TextAlign align);
 
 	static const int NORMAL        =  0;

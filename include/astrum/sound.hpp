@@ -25,6 +25,11 @@ public:
 	// TODO
 	Sound(const unsigned char *buf, AudioFileType type);
 	// TODO
+	const std::shared_ptr<struct SoundData> getData() const;
+	// TODO
+	/**
+	 * @overload
+	 */
 	std::shared_ptr<struct SoundData> getData();
 	// TODO
 	static Sound beep(double duration = 0.2, int hertz = 800);

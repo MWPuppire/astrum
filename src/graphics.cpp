@@ -61,13 +61,14 @@ namespace graphics {
 		defaultFont = Font{ std::shared_ptr<FontData>() };
 #endif
 
-		if (window::window == nullptr) {
-			renderer = nullptr;
-		} else {
-			if (conf.existingWindow != nullptr)
-				renderer = SDL_GetRenderer(window::window);
-			if (renderer == nullptr)
-				renderer = SDL_CreateRenderer(window::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+		if (conf.existingWindow != nullptr)
+			renderer = SDL_GetRenderer(window::window);
+		if (renderer == nullptr)
+			renderer = SDL_CreateRenderer(window::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+		// if renderer is still null, there's something wrong
+		if (renderer == nullptr) {
+			return -1;
 		}
 
 		if (conf.scaleToSize) {
@@ -88,7 +89,7 @@ namespace graphics {
 		return backgroundColor;
 	}
 
-	void setBackgroundColor(const Color &color) {
+	void setBackgroundColor(Color color) {
 		backgroundColor = color;
 	}
 
@@ -104,7 +105,7 @@ namespace graphics {
 		return currentColor;
 	}
 
-	void setColor(const Color &color) {
+	void setColor(Color color) {
 		currentColor = color;
 	}
 
@@ -184,10 +185,10 @@ namespace graphics {
 		ellipse(x, y, rx, ry, col, true);
 	}
 
-	void polygon(const std::vector<int> &vertices, bool filled) {
+	void polygon(const std::vector<int> vertices, bool filled) {
 		polygon(vertices, currentColor, filled);
 	}
-	void polygon(const std::vector<int> &vertices, Color col, bool filled) {
+	void polygon(const std::vector<int> vertices, Color col, bool filled) {
 		assert((vertices.size() & 1) == 0);
 		size_t len = vertices.size() / 2;
 		short x[len];
@@ -204,10 +205,10 @@ namespace graphics {
 				col.a);
 	}
 
-	void polygonFilled(const std::vector<int> &vertices) {
+	void polygonFilled(const std::vector<int> vertices) {
 		polygon(vertices, currentColor, true);
 	}
-	void polygonFilled(const std::vector<int> &vertices, Color col) {
+	void polygonFilled(const std::vector<int> vertices, Color col) {
 		polygon(vertices, col, true);
 	}
 
@@ -229,13 +230,13 @@ namespace graphics {
 			lineRGBA(renderer, x1, y1, x2, y2, col.r, col.g, col.b,
 				col.a);
 	}
-	void line(const std::vector<int> &lines) {
+	void line(const std::vector<int> lines) {
 		assert((lines.size() & 3) == 0);
 		for (size_t i = 0; i < lines.size(); i += 4)
 			line(lines[i], lines[i + 1], lines[i + 2], lines[i + 3],
 				currentColor);
 	}
-	void line(const std::vector<int> &lines, Color col) {
+	void line(const std::vector<int> lines, Color col) {
 		assert((lines.size() & 3) == 0);
 		for (size_t i = 0; i < lines.size(); i += 4)
 			line(lines[i], lines[i + 1], lines[i + 2], lines[i + 3],
@@ -266,7 +267,7 @@ namespace graphics {
 		SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 		SDL_RenderClear(renderer);
 	}
-	void clear(const Color &col) {
+	void clear(Color col) {
 		SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 		SDL_RenderClear(renderer);
 	}
@@ -334,6 +335,8 @@ namespace graphics {
 		SDL_GetRendererOutputSize(renderer, &w, &h);
 		SDL_Surface *sshot = SDL_CreateRGBSurface(0, w, h, 32,
 			0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		if (sshot == nullptr)
+			throw std::runtime_error("Screenshot failed");
 		SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888,
 			sshot->pixels, sshot->pitch);
 		auto data = std::make_shared<ImageData>(sshot);

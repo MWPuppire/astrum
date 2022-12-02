@@ -17,11 +17,6 @@ namespace window {
 	};
 
 	int InitWindow(const Config &conf) {
-		if (conf.windowHeadless) {
-			window = nullptr;
-			return 0;
-		}
-
 		if (conf.existingWindow != nullptr) {
 			window = (SDL_Window *) conf.existingWindow;
 		} else {
@@ -39,11 +34,8 @@ namespace window {
 		}
 
 		if (window == nullptr) {
-			log::warn("Could not create window: %s\n", SDL_GetError());
-			if (conf.allowNoWindow)
-				return 0;
-			else
-				return -1;
+			log::error("Could not create window: %s\n", SDL_GetError());
+			return -1;
 		}
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 
@@ -61,77 +53,44 @@ namespace window {
 	}
 
 	void QuitWindow() {
-		if (window == nullptr)
-			return;
-
 		SDL_DestroyWindow(window);
 	}
 
 	void setFullscreen(bool fullscreen) {
-		if (window == nullptr)
-			return;
-
 		SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 
 	void setSize(int width, int height) {
-		if (window == nullptr)
-			return;
-
 		SDL_SetWindowSize(window, width, height);
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	}
 
 	void setTitle(std::string title) {
-		if (window == nullptr)
-			return;
-
 		SDL_SetWindowTitle(window, title.c_str());
 	}
 
 	bool isFullscreen() {
-		if (window == nullptr)
-			return false;
-
 		return (bool) (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN);
 	}
 
 	std::string getTitle() {
-		if (window == nullptr)
-			return "";
-
 		return std::string(SDL_GetWindowTitle(window));
 	}
 
 	int getWidth() {
-		if (window == nullptr)
-			return 0;
-
 		return windowWidth;
 	}
 
 	int getHeight() {
-		if (window == nullptr)
-			return 0;
-
 		return windowHeight;
 	}
 
 	std::tuple<int, int> getDimensions() {
-		if (window == nullptr)
-			return std::make_tuple(0, 0);
-
 		return std::make_tuple(windowWidth, windowHeight);
 	}
 
 	std::tuple<int, int> getDesktopDimensions() {
-		if (window == nullptr) {
-			SDL_DisplayMode mode;
-			SDL_GetDesktopDisplayMode(0, &mode);
-			return std::make_tuple(mode.w, mode.h);
-		}
-
 		SDL_DisplayMode mode;
 		int displayIdx = SDL_GetWindowDisplayIndex(window);
 		SDL_GetDesktopDisplayMode(displayIdx, &mode);
@@ -139,43 +98,29 @@ namespace window {
 	}
 
 	void setPosition(int x, int y) {
-		if (window == nullptr)
-			return;
 
 		SDL_SetWindowPosition(window, x, y);
 	}
 
 	std::tuple<int, int> getPosition() {
-		if (window == nullptr)
-			return std::make_tuple(0, 0);
-
 		int x, y;
 		SDL_GetWindowPosition(window, &x, &y);
 		return std::make_tuple(x, y);
 	}
 
 	int getMinWidth() {
-		if (window == nullptr)
-			return 0;
-
 		int w;
 		SDL_GetWindowMinimumSize(window, &w, nullptr);
 		return w;
 	}
 
 	int getMinHeight() {
-		if (window == nullptr)
-			return 0;
-
 		int h;
 		SDL_GetWindowMinimumSize(window, nullptr, &h);
 		return h;
 	}
 
 	std::tuple<int, int> getMinDimensions() {
-		if (window == nullptr)
-			return std::make_tuple(0, 0);
-
 		int w, h;
 		SDL_GetWindowMinimumSize(window, &w, &h);
 		return std::make_tuple(w, h);

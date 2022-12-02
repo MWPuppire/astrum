@@ -85,6 +85,7 @@ struct ImageData {
 
 struct CursorData {
 	SDL_Cursor *cursor = nullptr;
+	// used for system cursors, which don't have manual memory management
 	bool nofree;
 	CursorData(SDL_Cursor *cursor, bool nofree = false) : cursor(cursor),
 		nofree(nofree) { }
@@ -113,8 +114,18 @@ struct CursorData {
 
 struct SoundData {
 	Mix_Chunk *chunk = nullptr;
-	int channel;
+	std::vector<int> channels;
+	SoundData(Mix_Chunk *chunk) : chunk(chunk) { }
+	SoundData(const SoundData &src) = delete;
+	SoundData(SoundData &&src) : chunk(src.chunk), channels(src.channels) {
+		src.chunk = nullptr;
+		src.channels.clear();
+	}
 	~SoundData() {
+		// TODO should error when still playing?
+		// it's unlikely the user ever intends to end a sound playing
+		//	by releasing the sound resource instead of ending
+		//	playback normally
 		if (this->chunk == nullptr) {
 			return;
 		} else if (hasInit) {

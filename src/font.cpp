@@ -63,16 +63,19 @@ Font::Font(const unsigned char *buf, std::size_t bufLen, int size, Color color,
 	this->data = fontDataFromRW(rw, size, color, style, align);
 }
 
+const std::shared_ptr<FontData> Font::getData() const {
+	return this->data;
+}
 std::shared_ptr<FontData> Font::getData() {
 	return this->data;
 }
 
-Image Font::renderText(std::string text) {
+Image Font::renderText(std::string text) const {
 	return this->renderText(text, this->data->defaultColor);
 }
-Image Font::renderText(std::string text, Color color) {
-	if (this->data->font == nullptr) {
-		throw std::runtime_error("invalid font");
+Image Font::renderText(std::string text, Color color) const {
+	if (this->data == nullptr) {
+		throw std::runtime_error("Method called on closed font");
 	}
 	SDL_Color scol = { color.r, color.g, color.b, color.a };
 	SDL_Surface *surf = TTF_RenderUTF8_Solid(this->data->font, text.c_str(),
@@ -81,37 +84,49 @@ Image Font::renderText(std::string text, Color color) {
 	return Image(data);
 }
 
-std::tuple<int, int> Font::textSize(std::string text) {
-	if (this->data->font == nullptr) {
-		return std::make_tuple(0, 0);
+std::tuple<int, int> Font::textSize(std::string text) const {
+	if (this->data == nullptr) {
+		throw std::runtime_error("Method called on closed font");
 	}
 	int width, height;
 	int out = TTF_SizeUTF8(this->data->font, text.c_str(), &width, &height);
 	if (out != 0) {
-		return std::make_tuple(0, 0);
+		throw std::runtime_error("Failed to get text size");
 	}
 	return std::make_tuple(width, height);
 }
 
-Color Font::getColor() {
+Color Font::getColor() const {
+	if (this->data == nullptr) {
+		throw std::runtime_error("Method called on closed font");
+	}
 	return this->data->defaultColor;
 }
 
 void Font::setColor(Color col) {
+	if (this->data == nullptr) {
+		throw std::runtime_error("Method called on closed font");
+	}
 	this->data->defaultColor = col;
 }
 
-TextAlign Font::getAlign() {
+TextAlign Font::getAlign() const {
+	if (this->data == nullptr) {
+		throw std::runtime_error("Method called on closed font");
+	}
 	return this->data->defaultAlign;
 }
 
 void Font::setAlign(TextAlign align) {
+	if (this->data == nullptr) {
+		throw std::runtime_error("Method called on closed font");
+	}
 	this->data->defaultAlign = align;
 }
 
 void Font::close(Font &font) {
 	// release resources associated with `font`
-	font.data = std::shared_ptr<FontData>();
+	font.data.reset();
 }
 
 }; // namespace Astrum

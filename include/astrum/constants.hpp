@@ -51,8 +51,6 @@ public:
 	int minWindowWidth         = 1;
 	int minWindowHeight        = 1;
 	bool windowFullscreen      = true;
-	bool windowHeadless        = false;
-	bool allowNoWindow         = false;
 	// TODO
 	bool saveDimensions        = true;
 	bool scaleToSize           = false;

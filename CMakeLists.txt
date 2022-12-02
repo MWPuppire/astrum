@@ -8,16 +8,19 @@ endif(WIN64)
 
 project(astrum VERSION 0.1.0)
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT supported)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -DDEBUG -g ")
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-omit-frame-pointer")
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-omit-frame-pointer ")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address ")
 
-string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O2")
+string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O2 ")
 
 string(APPEND CMAKE_CXX_FLAGS " -fsigned-char -Wall -Wextra -Werror")
 
@@ -48,6 +51,10 @@ target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/sound.cpp src/system.cpp)
 target_include_directories(astrum PUBLIC include)
 target_include_directories(astrum PRIVATE assets)
+
+if(supported AND CMAKE_BUILD_TYPE EQUAL "Release")
+	set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif(supported AND CMAKE_BUILD_TYPE EQUAL "Release")
 
 if(NOT EMSCRIPTEN)
 	target_include_directories(astrum PUBLIC ${SDL2_INCLUDE_DIRS})

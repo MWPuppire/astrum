@@ -46,11 +46,16 @@ public:
 	Image(const unsigned char *buf, std::size_t bufLen, std::string type = "");
 	Image(void *pixels, int height, int width);
 
+	const std::shared_ptr<struct ImageData> getData() const;
+	/**
+	 * @overload
+	 */
 	std::shared_ptr<struct ImageData> getData();
 
+	const Transforms &getTransforms() const;
 	Transforms &getTransforms();
-	int getWidth();
-	int getHeight();
+	int getWidth() const;
+	int getHeight() const;
 	void scale(double factor);
 	void scale(double sx, double sy);
 	void translate(int dx, int dy);

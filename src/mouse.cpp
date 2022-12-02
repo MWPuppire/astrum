@@ -22,6 +22,10 @@ Cursor::Cursor(Image image, int hotX, int hotY) {
 	SDL_Cursor *internalCursor = SDL_CreateColorCursor(surf, hotX, hotY);
 	this->data = std::make_shared<CursorData>(internalCursor);
 }
+
+const std::shared_ptr<CursorData> Cursor::getData() const {
+	return this->data;
+}
 std::shared_ptr<CursorData> Cursor::getData() {
 	return this->data;
 }
@@ -121,9 +125,12 @@ namespace mouse {
 		SDL_ShowCursor(state ? SDL_ENABLE : SDL_DISABLE);
 	}
 
-	Cursor getCursor() {
-		auto data = std::make_shared<CursorData>(SDL_GetCursor(), true);
-		return Cursor(data);
+	std::optional<Cursor> getCursor() {
+		SDL_Cursor *cursor = SDL_GetCursor();
+		if (cursor == nullptr)
+			return std::nullopt;
+		auto data = std::make_shared<CursorData>(cursor, true);
+		return std::optional(Cursor(data));
 	}
 
 	void setCursor(Cursor cursor) {
