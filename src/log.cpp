@@ -40,11 +40,11 @@ namespace log {
 			= defaultWriteFunction;
 	};
 
+	LogCategory getLogPriority() {
+		return outputLevel;
+	}
 	void setLogPriority(LogCategory priority) {
 		outputLevel = priority;
-	}
-	LogCategory logPriority() {
-		return outputLevel;
 	}
 
 	void vlog(LogCategory cat, std::string format, va_list args) {

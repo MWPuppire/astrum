@@ -29,7 +29,7 @@ namespace mouse {
 	bool isdown(MouseButton button);
 	int getX();
 	int getY();
-	std::tuple<int, int> getCoordinates();
+	std::tuple<int, int> getPosition();
 	void setX(int x);
 	void setY(int y);
 	void setPosition(int x, int y);

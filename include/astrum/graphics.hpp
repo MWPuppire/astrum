@@ -16,8 +16,8 @@ namespace graphics {
 
 	Color getBackgroundColor();
 	void setBackgroundColor(const Color &color);
-	void setLineThickness(int thickness);
 	int getLineThickness();
+	void setLineThickness(int thickness);
 	Color getColor();
 	void setColor(const Color &color);
 	void rectangle(int x, int y, int width, int height, bool filled = false);
@@ -60,7 +60,6 @@ namespace graphics {
 	void setFont(Font newFont);
 	void render(Image image, int x, int y);
 	std::tuple<int, int> getVirtualCoords(int x, int y);
-	void getVirtualCoords(int x, int y, int &virtX, int &virtY);
 	Image screenshot();
 
 };

@@ -18,16 +18,12 @@ namespace window {
 	int getWidth();
 	int getHeight();
 	std::tuple<int, int> getDimensions();
-	void getDimensions(int &width, int &height);
 	std::tuple<int, int> getDesktopDimensions();
-	void getDesktopDimensions(int &width, int &height);
 	void setPosition(int x, int y);
 	std::tuple<int, int> getPosition();
-	void getPosition(int &x, int &y);
 	int getMinWidth();
 	int getMinHeight();
 	std::tuple<int, int> getMinDimensions();
-	void getMinDimensions(int &width, int &height);
 	bool isResizable();
 	void setResizable(bool toggle);
 };

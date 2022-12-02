@@ -22,25 +22,25 @@ namespace log {
 	enum class LogCategory { debug, info, warn, error };
 
 	/**
-	 * @brief Set the current logging priority
-	 *
-	 * Stop appending messages to the log with priority less than `priority`. The
-	 * logging priority defaults to `LogCategory::debug` on debug builds and
-	 * `LogCategory::info` otherwise.
-	 * 
-	 * @param priority The new priority for ignoring messages.
-	 */
-	void setLogPriority(LogCategory priority);
-	/**
 	 * @brief Get the current logging priority.
 	 *
 	 * Returns the current set logging priority; messages logged with priority
 	 * under this will be ignored. Defaults to `LogCategory::debug` on debug
 	 * builds and `LogCategory::info` otherwise.
-	 * 
+	 *
 	 * @return LogCategory The priority for ignoring messages.
 	 */
-	LogCategory logPriority();
+	LogCategory getLogPriority();
+	/**
+	 * @brief Set the current logging priority
+	 *
+	 * Stop appending messages to the log with priority less than `priority`. The
+	 * logging priority defaults to `LogCategory::debug` on debug builds and
+	 * `LogCategory::info` otherwise.
+	 *
+	 * @param priority The new priority for ignoring messages.
+	 */
+	void setLogPriority(LogCategory priority);
 	/**
 	 * @brief Logs with `va_list` instead of variadic arguments
 	 *

@@ -88,7 +88,8 @@ public:
 	Button() : text(""), x(0), y(0), onclick(nop), mouseDown(false) { }
 	Button(std::string text, float x, float y, std::function<void()> onclick)
 		: text(text), x(x), y(y), onclick(onclick), mouseDown(false) {
-		Astrum::graphics::getFont().textSize(text, textWidth, textHeight);
+		auto font = Astrum::graphics::getFont();
+		std::tie(textWidth, textHeight) = font.textSize(text);
 	}
 	void draw(bool shaded = false) {
 		if (shaded || mouseDown) {
@@ -101,7 +102,7 @@ public:
 	void update(bool disabled = false) {
 		if (disabled == true)
 			return;
-		auto [ mouseX, mouseY ] = Astrum::mouse::getCoordinates();
+		auto [mouseX, mouseY] = Astrum::mouse::getPosition();
 		if (Astrum::mouse::isdown(Astrum::MouseButton::LEFT) && !mouseDown
 		&& (mouseX >= x && mouseX <= x + textWidth + 4)
 		&& (mouseY >= y && mouseY <= y + textHeight + 4)) {
@@ -351,7 +352,7 @@ void undoEvent(PuzzleEvent event) {
 
 void printNumber(int x, int y, short num, Astrum::Color color, Astrum::Font font) {
 	std::string str = std::to_string(num);
-	auto [ textWidth, textHeight ] = font.textSize(str);
+	auto [textWidth, textHeight] = font.textSize(str);
 	Astrum::graphics::print(str, x - (textWidth / 2), y - (textHeight / 2), font, color);
 }
 
@@ -447,7 +448,7 @@ void draw() {
 	if (puzzleConfig.paused) {
 		int width = 9 * boxSize + 3 * bigLineSize;
 		Astrum::graphics::rectangle(gridOffset, gridOffset, width, width, black);
-		auto [ textWidth, textHeight ] = bigFont.textSize("Paused");
+		auto [textWidth, textHeight] = bigFont.textSize("Paused");
 		Astrum::graphics::print("Paused", gridOffset + (width / 2) - (textWidth / 2),
 			gridOffset + (width / 2) - (textHeight / 2), bigFont, black);
 	} else {

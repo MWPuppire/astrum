@@ -45,7 +45,7 @@ namespace graphics {
 		SDL_RenderClear(renderer);
 	}
 
-	int InitGraphics(Config &conf) {
+	int InitGraphics(const Config &conf) {
 //		if (window::window != nullptr)
 //			glcontext = SDL_GL_CreateContext(window::window);
 //		else
@@ -92,12 +92,12 @@ namespace graphics {
 		backgroundColor = color;
 	}
 
-	void setLineThickness(int thickness) {
-		lineThickness = thickness;
-	}
-
 	int getLineThickness() {
 		return lineThickness;
+	}
+
+	void setLineThickness(int thickness) {
+		lineThickness = thickness;
 	}
 
 	Color getColor() {
@@ -283,10 +283,14 @@ namespace graphics {
 	void print(std::string str, int x, int y, Font font, Color col) {
 		Image image = font.renderText(str, col);
 
-		TextAlign align = font.align();
-		int textWidth, textHeight;
-		font.textSize(str, textWidth, textHeight);
-		int offset = align * (textWidth / 2);
+		TextAlign align = font.getAlign();
+		int offset;
+		if (align != TextAlign::Left) {
+			auto [textWidth, textHeight] = font.textSize(str);
+			offset = textWidth / (align == TextAlign::Center ? 2 : 1);
+		} else {
+			offset = 0;
+		}
 
 		render(image, x - offset, y);
 	}
@@ -300,29 +304,19 @@ namespace graphics {
 	}
 
 	void render(Image image, int x, int y) {
-		Transforms *tran = image.getTransforms();
+		Transforms tran = image.getTransforms();
 		std::shared_ptr<ImageData> data = image.getData();
 		SDL_Surface *surf = data->image;
 		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
-		SDL_Rect sourceRect, renderRect;
-		SDL_RendererFlip flip;
-		double degrees;
 
 		// TODO apply shear `kx, ky`
-		if (tran != nullptr) {
-			sourceRect = { .x = tran->dx, .y = tran->dy,
-				.w = surf->w, .h = surf->h };
-			renderRect = { .x = x, .y = y,
-				.w = static_cast<int>(surf->w * tran->sx),
-				.h = static_cast<int>(surf->h * tran->sy) };
-			flip = SDL_FLIP_NONE;
-			degrees = tran->degrees;
-		} else {
-			sourceRect = { .x = 0, .y = 0, .w = surf->w, .h = surf->h };
-			renderRect = { .x = x, .y = y, .w = surf->w, .h = surf->h };
-			flip = SDL_FLIP_NONE;
-			degrees = 0;
-		}
+		SDL_Rect sourceRect = { .x = tran.dx, .y = tran.dy,
+			.w = surf->w, .h = surf->h };
+		SDL_Rect renderRect = { .x = x, .y = y,
+			.w = static_cast<int>(surf->w * tran.sx),
+			.h = static_cast<int>(surf->h * tran.sy) };
+		SDL_RendererFlip flip = SDL_FLIP_NONE;
+		double degrees = tran.degrees;
 
 		SDL_RenderCopyEx(renderer, tex, &sourceRect, &renderRect,
 			degrees, nullptr, flip);
@@ -333,11 +327,6 @@ namespace graphics {
 		float logicalX, logicalY;
 		SDL_RenderWindowToLogical(renderer, x, y, &logicalX, &logicalY);
 		return std::make_tuple((int) x, (int) y);
-	}
-	void getVirtualCoords(int x, int y, int &virtX, int &virtY) {
-		auto [ logicalX, logicalY ] = getVirtualCoords(x, y);
-		virtX = logicalX;
-		virtY = logicalY;
 	}
 
 	Image screenshot() {

@@ -83,31 +83,33 @@ namespace mouse {
 	}
 
 	int getX() {
-		return std::get<0>(getCoordinates());
+		return std::get<0>(getPosition());
 	}
 
 	int getY() {
-		return std::get<1>(getCoordinates());
+		return std::get<1>(getPosition());
 	}
 
-	std::tuple<int, int> getCoordinates() {
+	std::tuple<int, int> getPosition() {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
-		int virtX, virtY;
-		graphics::getVirtualCoords(x, y, virtX, virtY);
+		auto [virtX, virtY] = graphics::getVirtualCoords(x, y);
 		return std::make_tuple(virtX, virtY);
 	}
 
 	void setX(int x) {
-		SDL_WarpMouseInWindow(nullptr, x, getY());
+		auto [virtX, virtY] = graphics::getVirtualCoords(x, getY());
+		SDL_WarpMouseInWindow(nullptr, virtX, virtY);
 	}
 
 	void setY(int y) {
-		SDL_WarpMouseInWindow(nullptr, getX(), y);
+		auto [virtX, virtY] = graphics::getVirtualCoords(getX(), y);
+		SDL_WarpMouseInWindow(nullptr, virtX, virtY);
 	}
 
 	void setPosition(int x, int y) {
-		SDL_WarpMouseInWindow(nullptr, x, y);
+		auto [virtX, virtY] = graphics::getVirtualCoords(x, y);
+		SDL_WarpMouseInWindow(nullptr, virtX, virtY);
 	}
 
 	bool isVisible() {

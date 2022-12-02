@@ -12,8 +12,8 @@
 
 namespace Astrum {
 
-enum TextAlign {
-	left, center, right,
+enum class TextAlign {
+	Left, Center, Right,
 //	leftWrap, centerWrap, rightWrap,
 //	leftWrapWord, centerWrapWord, rightWrapWord
 };
@@ -31,27 +31,24 @@ private:
 public:
 	Font(std::shared_ptr<struct FontData> data);
 #ifndef NO_DEFAULT_FONT
-	Font(int size = 18, Color color = Color(0x000000), int style = NORMAL, TextAlign align = TextAlign::left);
+	Font(int size = 18, Color color = Color(0x000000), int style = NORMAL, TextAlign align = TextAlign::Left);
 #endif
-	Font(std::string path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
+	Font(std::string path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
 	/**
 	 * @overload
 	 */
-	Font(std::filesystem::path path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
-	Font(const unsigned char *buf, std::size_t bufLen, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
+	Font(std::filesystem::path path, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
+	Font(const unsigned char *buf, std::size_t bufLen, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
 	std::shared_ptr<struct FontData> getData();
 	Image renderText(std::string text);
 	/**
 	 * @overload
 	 */
 	Image renderText(std::string text, Color color);
-	int textSize(std::string text, int &w, int &h);
 	std::tuple<int, int> textSize(std::string text);
-	int textSizef(int &w, int &h, std::string text, ...);
-	std::tuple<int, int> textSizef(std::string text, ...);
-	Color color();
+	Color getColor();
 	void setColor(Color col);
-	TextAlign align();
+	TextAlign getAlign();
 	void setAlign(TextAlign align);
 
 	static const int NORMAL        =  0;
@@ -76,7 +73,7 @@ public:
 	// TODO
 	std::string *getSystemFonts(SystemFontQuery query = { "", "", "" });
 	// TODO
-	static Font createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::left);
+	static Font createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
 };
 
 } // namespace Astrum

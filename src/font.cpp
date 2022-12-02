@@ -81,40 +81,19 @@ Image Font::renderText(std::string text, Color color) {
 	return Image(data);
 }
 
-int Font::textSize(std::string text, int &w, int &h) {
+std::tuple<int, int> Font::textSize(std::string text) {
 	if (this->data->font == nullptr) {
-		return -1;
+		return std::make_tuple(0, 0);
 	}
 	int width, height;
 	int out = TTF_SizeUTF8(this->data->font, text.c_str(), &width, &height);
-	w = width;
-	h = height;
-	return out;
-}
-std::tuple<int, int> Font::textSize(std::string text) {
-	int w, h;
-	int out = this->textSize(text, w, h);
-	if (out != 0)
+	if (out != 0) {
 		return std::make_tuple(0, 0);
-	return std::make_tuple(w, h);
+	}
+	return std::make_tuple(width, height);
 }
 
-int Font::textSizef(int &w, int &h, std::string text, ...) {
-	std::va_list args;
-	va_start(args, text);
-	std::string str = util::vstrformat(text, args);
-	va_end(args);
-	return this->textSize(str, w, h);
-}
-std::tuple<int, int> Font::textSizef(std::string text, ...) {
-	std::va_list args;
-	va_start(args, text);
-	std::string str = util::vstrformat(text, args);
-	va_end(args);
-	return this->textSize(str);
-}
-
-Color Font::color() {
+Color Font::getColor() {
 	return this->data->defaultColor;
 }
 
@@ -122,7 +101,7 @@ void Font::setColor(Color col) {
 	this->data->defaultColor = col;
 }
 
-TextAlign Font::align() {
+TextAlign Font::getAlign() {
 	return this->data->defaultAlign;
 }
 

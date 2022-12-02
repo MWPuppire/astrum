@@ -16,7 +16,7 @@ namespace window {
 		int windowWidth;
 	};
 
-	int InitWindow(Config &conf) {
+	int InitWindow(const Config &conf) {
 		if (conf.windowHeadless) {
 			window = nullptr;
 			return 0;
@@ -124,11 +124,6 @@ namespace window {
 
 		return std::make_tuple(windowWidth, windowHeight);
 	}
-	void getDimensions(int &width, int &height) {
-		auto [ w, h ] = getDimensions();
-		width  = w;
-		height = h;
-	}
 
 	std::tuple<int, int> getDesktopDimensions() {
 		if (window == nullptr) {
@@ -141,11 +136,6 @@ namespace window {
 		int displayIdx = SDL_GetWindowDisplayIndex(window);
 		SDL_GetDesktopDisplayMode(displayIdx, &mode);
 		return std::make_tuple(mode.w, mode.h);
-	}
-	void getDesktopDimensions(int &width, int &height) {
-		auto [ w, h ] = getDesktopDimensions();
-		width  = w;
-		height = h;
 	}
 
 	void setPosition(int x, int y) {
@@ -162,11 +152,6 @@ namespace window {
 		int x, y;
 		SDL_GetWindowPosition(window, &x, &y);
 		return std::make_tuple(x, y);
-	}
-	void getPosition(int &x, int &y) {
-		auto [ tX, tY ] = getPosition();
-		x = tX;
-		y = tY;
 	}
 
 	int getMinWidth() {
@@ -194,12 +179,6 @@ namespace window {
 		int w, h;
 		SDL_GetWindowMinimumSize(window, &w, &h);
 		return std::make_tuple(w, h);
-	}
-
-	void getMinDimensions(int &width, int &height) {
-		auto [ w, h ] = getMinDimensions();
-		width  = w;
-		height = h;
 	}
 
 	bool isResizable() {

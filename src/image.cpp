@@ -46,48 +46,48 @@ std::shared_ptr<ImageData> Image::getData() {
 	return this->data;
 }
 
-Transforms *Image::getTransforms() {
+Transforms &Image::getTransforms() {
 	return this->data->tran;
 }
 
-int Image::width() {
+int Image::getWidth() {
 	return this->data->image->w;
 }
 
-int Image::height() {
+int Image::getHeight() {
 	return this->data->image->h;
 }
 
 void Image::scale(double factor) {
-	this->data->tran->sx = this->data->tran->sy = factor;
+	this->data->tran.sx = this->data->tran.sy = factor;
 }
 void Image::scale(double sx, double sy) {
-	this->data->tran->sx = sx;
-	this->data->tran->sy = sy;
+	this->data->tran.sx = sx;
+	this->data->tran.sy = sy;
 }
 
 void Image::translate(int dx, int dy) {
-	this->data->tran->dx = dx;
-	this->data->tran->dy = dy;
+	this->data->tran.dx = dx;
+	this->data->tran.dy = dy;
 }
 
 void Image::rotate(double degrees) {
-	this->data->tran->degrees = degrees;
+	this->data->tran.degrees = degrees;
 }
 
 void Image::shear(double kx, double ky) {
-	this->data->tran->kx = kx;
-	this->data->tran->ky = ky;
+	this->data->tran.kx = kx;
+	this->data->tran.ky = ky;
 }
 
 void Image::resetTransforms() {
-	this->data->tran->sx = 1.0;
-	this->data->tran->sy = 1.0;
-	this->data->tran->dx = 0;
-	this->data->tran->dy = 0;
-	this->data->tran->degrees = 0.0;
-	this->data->tran->kx = 0.0;
-	this->data->tran->ky = 0.0;
+	this->data->tran.sx = 1.0;
+	this->data->tran.sy = 1.0;
+	this->data->tran.dx = 0;
+	this->data->tran.dy = 0;
+	this->data->tran.degrees = 0.0;
+	this->data->tran.kx = 0.0;
+	this->data->tran.ky = 0.0;
 }
 
 }

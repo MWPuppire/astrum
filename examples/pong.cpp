@@ -182,7 +182,7 @@ void draw() {
 	auto font = Astrum::graphics::getFont();
 	std::string str = Astrum::util::strformat("Player: %d - Computer: %d",
 		playerScore, computerScore);
-	auto [ textWidth, textHeight ] = font.textSize(str);
+	auto [textWidth, textHeight] = font.textSize(str);
 	Astrum::graphics::print(str, (width - textWidth) / 2, 5, white);
 }
 

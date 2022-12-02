@@ -99,20 +99,20 @@ void handleEvent(const SDL_Event &e) {
 			(*textinputCb)(e.edit.text);
 		break;
 	case SDL_MOUSEMOTION:
-		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
+		std::tie(virtX, virtY) = graphics::getVirtualCoords(e.motion.x, e.motion.y);
 		if (mousemovedCb)
 			(*mousemovedCb)(virtX, virtY, e.motion.xrel, e.motion.yrel);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		btn = fromMouseBtn(e.button.button);
-		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
+		std::tie(virtX, virtY) = graphics::getVirtualCoords(e.button.x, e.button.y);
 		mouse::addMousedown(btn);
 		if (mousepressedCb)
 			(*mousepressedCb)(btn, virtX, virtY, e.button.clicks);
 		break;
 	case SDL_MOUSEBUTTONUP:
 		btn = fromMouseBtn(e.button.button);
-		graphics::getVirtualCoords(e.motion.x, e.motion.y, virtX, virtY);
+		std::tie(virtX, virtY) = graphics::getVirtualCoords(e.button.x, e.button.y);
 		mouse::removeMousedown(btn);
 		if (mousereleasedCb)
 			(*mousereleasedCb)(btn, virtX, virtY, e.button.clicks);
@@ -179,7 +179,7 @@ void handleEvent(const SDL_Event &e) {
 	}
 }
 
-int init(Config &conf) {
+int init(const Config &conf) {
 	if (hasInit)
 		return 0;
 
@@ -246,7 +246,7 @@ int init(Config &conf) {
 		return init;
 	}
 
-	for (auto [ ptr, dropFunc ] : dropQueue) {
+	for (auto [ptr, dropFunc] : dropQueue) {
 		dropFunc(ptr);
 	}
 	dropQueue.clear();

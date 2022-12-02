@@ -58,26 +58,20 @@ struct FontData {
 
 struct ImageData {
 	SDL_Surface *image = nullptr;
-	Transforms *tran = nullptr;
-	ImageData(SDL_Surface *surf) : image(surf) {
-		this->tran = new Transforms();
-	}
+	Transforms tran;
+	ImageData(SDL_Surface *surf) : image(surf) { }
 	ImageData(const ImageData &src) = delete;
 	ImageData(ImageData &&src) : image(src.image), tran(src.tran) {
 		src.image = nullptr;
-		src.tran = nullptr;
 	}
 	ImageData &operator=(const ImageData &src) = delete;
 	ImageData &operator=(ImageData &&src) {
 		this->image = src.image;
 		this->tran = src.tran;
 		src.image = nullptr;
-		src.tran = nullptr;
 		return *this;
 	}
 	~ImageData() {
-		if (this->tran != nullptr)
-			delete this->tran;
 		if (this->image == nullptr) {
 			return;
 		} else if (hasInit) {
@@ -134,7 +128,7 @@ struct SoundData {
 
 namespace window {
 	extern SDL_Window *window;
-	int InitWindow(Config &conf);
+	int InitWindow(const Config &conf);
 	void QuitWindow();
 	void recalculateDimensions();
 };
@@ -144,7 +138,7 @@ namespace mouse {
 	void removeMousedown(MouseButton btn);
 };
 namespace graphics {
-	int InitGraphics(Config &conf);
+	int InitGraphics(const Config &conf);
 	void QuitGraphics();
 	void drawframe();
 };
@@ -153,7 +147,7 @@ namespace keyboard {
 	void removeKeydown(Key key);
 };
 namespace filesystem {
-	int InitFS(Config &conf);
+	int InitFS(const Config &conf);
 	void QuitFS();
 };
 namespace timer {

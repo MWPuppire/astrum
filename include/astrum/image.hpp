@@ -26,9 +26,6 @@ struct Transforms {
 
 	Transforms()
 		: sx(1.0), sy(1.0), dx(0), dy(0), degrees(0.0), kx(0), ky(0) { }
-	Transforms(Transforms &tran)
-		: sx(tran.sx), sy(tran.sy), dx(tran.dx), dy(tran.dy),
-		degrees(tran.degrees), kx(tran.kx), ky(tran.ky) { }
 	Transforms(double sx, double sy, double dx, double dy, double degrees,
 		double kx, double ky)
 		: sx(sx), sy(sy), dx(dx), dy(dy), degrees(degrees), kx(kx),
@@ -51,9 +48,9 @@ public:
 
 	std::shared_ptr<struct ImageData> getData();
 
-	Transforms *getTransforms();
-	int width();
-	int height();
+	Transforms &getTransforms();
+	int getWidth();
+	int getHeight();
 	void scale(double factor);
 	void scale(double sx, double sy);
 	void translate(int dx, int dy);
