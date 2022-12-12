@@ -23,9 +23,8 @@ namespace timer {
 		std::shared_mutex termMutex;
 	};
 
-	int InitTimer() {
+	void InitTimer() {
 		performanceFrequency = (double) SDL_GetPerformanceFrequency();
-		return 0;
 	}
 
 	void sleep(size_t ms) {

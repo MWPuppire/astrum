@@ -65,7 +65,7 @@ namespace mouse {
 	std::optional<Cursor> CURSOR_NO = std::nullopt;
 	std::optional<Cursor> CURSOR_HAND = std::nullopt;
 
-	int InitMouse() {
+	void InitMouse() {
 		CURSOR_ARROW     = createSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 		CURSOR_IBEAM     = createSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 		CURSOR_WAIT      = createSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
@@ -78,8 +78,6 @@ namespace mouse {
 		CURSOR_SIZEALL   = createSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 		CURSOR_NO        = createSystemCursor(SDL_SYSTEM_CURSOR_NO);
 		CURSOR_HAND      = createSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-
-		return 0;
 	}
 
 	bool isdown(MouseButton button) {

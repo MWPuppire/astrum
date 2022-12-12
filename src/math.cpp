@@ -17,12 +17,10 @@ namespace math {
 
 	// uses a Mersenne Twister, so is not
 	// suitable for cryptographic purposes
-	int InitMath() {
+	void InitMath() {
 		std::random_device rd;
 		seed = rd();
 		rng = std::mt19937(seed);
-
-		return 0;
 	}
 
 	unsigned random() {

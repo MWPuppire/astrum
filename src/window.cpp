@@ -16,7 +16,7 @@ namespace window {
 		int windowWidth;
 	};
 
-	int InitWindow(const Config &conf) {
+	void InitWindow(const Config &conf) {
 		if (conf.existingWindow != nullptr) {
 			window = (SDL_Window *) conf.existingWindow;
 		} else {
@@ -35,7 +35,7 @@ namespace window {
 
 		if (window == nullptr) {
 			log::error("Could not create window: %s\n", SDL_GetError());
-			return -1;
+			throw std::runtime_error("Failed to create window");
 		}
 		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 
@@ -48,8 +48,6 @@ namespace window {
 			SDL_Surface *surf = data->image;
 			SDL_SetWindowIcon(window, surf);
 		}
-
-		return 0;
 	}
 
 	void QuitWindow() {

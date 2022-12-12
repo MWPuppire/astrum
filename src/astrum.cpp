@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <stdexcept>
 
 #include "sdl.hpp"
 #include "internals.hpp"
@@ -178,22 +179,22 @@ bool handleEvent(const SDL_Event &e) {
 	return doquit;
 }
 
-int init(const Config &conf) {
+void init(const Config &conf) {
 	if (hasInit)
-		return 0;
+		return;
 
 	SDL_SetMainReady();
 	int init = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO
 		| SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 	if (init != 0) {
 		log::error("Unable to initialize SDL: %s\n", SDL_GetError());
-		return init;
+		throw std::runtime_error("Unable to initialize SDL");
 	}
 
 	init = TTF_Init();
 	if (init != 0) {
 		log::error("Unable to initialize SDL_TTF: %s\n", TTF_GetError());
-		return init;
+		throw std::runtime_error("Unable to initialize SDL_TTF");
 	}
 
 #ifdef __EMSCRIPTEN__
@@ -204,44 +205,15 @@ int init(const Config &conf) {
 	int imageInit = IMG_Init(imageFlags);
 	if ((imageInit & imageFlags) != imageFlags) {
 		log::error("Failed to initialize SDL_image: %s\n", IMG_GetError());
-		return 1;
+		throw std::runtime_error("Failed to initialize SDL_image");
 	}
 
-	init = window::InitWindow(conf);
-	if (init != 0) {
-		log::error("Unable to initialize window submodule\n");
-		return init;
-	}
-
-	init = graphics::InitGraphics(conf);
-	if (init != 0) {
-		log::error("Unable to initialize graphics submodule\n");
-		return init;
-	}
-
-	init = mouse::InitMouse();
-	if (init != 0) {
-		log::error("Unable to initialize mouse submodule\n");
-		return init;
-	}
-
-	init = math::InitMath();
-	if (init != 0) {
-		log::error("Unable to initialize math submodule\n");
-		return init;
-	}
-
-	init = filesystem::InitFS(conf);
-	if (init != 0) {
-		log::error("Unable to initialize filesystem submodule\n");
-		return init;
-	}
-
-	init = timer::InitTimer();
-	if (init != 0) {
-		log::error("Unable to initialize timer submodule\n");
-		return init;
-	}
+	window::InitWindow(conf);
+	graphics::InitGraphics(conf);
+	filesystem::InitFS(conf);
+	mouse::InitMouse();
+	math::InitMath();
+	timer::InitTimer();
 
 	for (auto [ptr, dropFunc] : dropQueue) {
 		dropFunc(ptr);
@@ -253,7 +225,6 @@ int init(const Config &conf) {
 #endif
 
 	hasInit = true;
-	return 0;
 }
 
 void exit() {
@@ -275,14 +246,14 @@ void mainLoop() {
 	SDL_Event e;
 	double dt = timer::step();
 
-	bool doquit = false;
 	while (SDL_PollEvent(&e)) {
-		doquit |= handleEvent(e);
+		bool doquit = handleEvent(e);
 		if (doquit) {
-			isrunning = false;
 #ifdef __EMSCRIPTEN__
 			emscripten_cancel_main_loop();
 #endif
+			isrunning = false;
+			return;
 		}
 	}
 

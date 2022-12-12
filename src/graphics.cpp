@@ -45,7 +45,7 @@ namespace graphics {
 		SDL_RenderClear(renderer);
 	}
 
-	int InitGraphics(const Config &conf) {
+	void InitGraphics(const Config &conf) {
 //		if (window::window != nullptr)
 //			glcontext = SDL_GL_CreateContext(window::window);
 //		else
@@ -67,16 +67,13 @@ namespace graphics {
 			renderer = SDL_CreateRenderer(window::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 		// if renderer is still null, there's something wrong
-		if (renderer == nullptr) {
-			return -1;
-		}
+		if (renderer == nullptr)
+			throw std::runtime_error("Failed to create renderer");
 
 		if (conf.scaleToSize) {
 			SDL_RenderSetLogicalSize(renderer, conf.windowWidth, conf.windowHeight);
 			SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
 		}
-
-		return 0;
 	}
 
 	void QuitGraphics() {

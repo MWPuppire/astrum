@@ -12,8 +12,6 @@ namespace Astrum {
 
 namespace math {
 
-	int InitMath();
-
 	unsigned random();
 	unsigned random(unsigned max);
 	unsigned random(unsigned min, unsigned max);

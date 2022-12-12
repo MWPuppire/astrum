@@ -27,7 +27,7 @@
 
 namespace Astrum {
 
-int init(const Config &conf);
+void init(const Config &conf);
 void exit();
 
 void run(std::function<void(double)> update);

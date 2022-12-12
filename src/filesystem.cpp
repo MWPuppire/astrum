@@ -25,7 +25,7 @@ namespace filesystem {
 		std::filesystem::path appDirectory;
 		std::filesystem::path sourceDirectory;
 	};
-	int InitFS(const Config &conf) {
+	void InitFS(const Config &conf) {
 #ifdef __EMSCRIPTEN__
 		(void) conf;
 		appDirectory = std::filesystem::path("/offline");
@@ -39,7 +39,6 @@ namespace filesystem {
 				}
 			});
 		);
-		return 0;
 #else
 		char *rawstr;
 		std::string str;
@@ -62,7 +61,6 @@ namespace filesystem {
 			sourceDirectory = std::filesystem::path(str);
 			SDL_free((void *) rawstr);
 		}
-		return 0;
 #endif
 	}
 	void QuitFS() {

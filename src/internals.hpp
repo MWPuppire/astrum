@@ -139,17 +139,17 @@ struct SoundData {
 
 namespace window {
 	extern SDL_Window *window;
-	int InitWindow(const Config &conf);
+	void InitWindow(const Config &conf);
 	void QuitWindow();
 	void recalculateDimensions();
 };
 namespace mouse {
-	int InitMouse();
+	void InitMouse();
 	void addMousedown(MouseButton btn);
 	void removeMousedown(MouseButton btn);
 };
 namespace graphics {
-	int InitGraphics(const Config &conf);
+	void InitGraphics(const Config &conf);
 	void QuitGraphics();
 	void drawframe();
 };
@@ -158,11 +158,14 @@ namespace keyboard {
 	void removeKeydown(Key key);
 };
 namespace filesystem {
-	int InitFS(const Config &conf);
+	void InitFS(const Config &conf);
 	void QuitFS();
 };
 namespace timer {
-	int InitTimer();
+	void InitTimer();
+};
+namespace math {
+	void InitMath();
 };
 
 static constexpr MouseButton fromMouseBtn(int button) {
