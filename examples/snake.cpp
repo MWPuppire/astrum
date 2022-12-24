@@ -55,6 +55,9 @@ void reset(GameState &game) {
 }
 
 void tick(GameState &game) {
+	if (game.dead) {
+		return;
+	}
 	game.can_move = true;
 	auto &snake = game.snake;
 	Position head = snake.front();
