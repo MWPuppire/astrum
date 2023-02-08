@@ -14,8 +14,6 @@ namespace Astrum {
 
 enum class TextAlign {
 	Left, Center, Right,
-//	leftWrap, centerWrap, rightWrap,
-//	leftWrapWord, centerWrapWord, rightWrapWord
 };
 
 struct SystemFontQuery {
@@ -62,18 +60,6 @@ public:
 	static const int UNDERLINE     =  4;
 	static const int STRIKETHROUGH =  8;
 	static const int OUTLINE       = 16;
-
-	/**
-	 * @brief Releases resources associated with `font`.
-	 *
-	 * This function is normally not necessary; the destructor for a font
-	 * will release its associated resources in most cases. However, font
-	 * data cannot be released after `Astrum::exit()` is called; to avoid a
-	 * potential memory leak, it's best to call this function in cases of
-	 * e.g. global variables storing fonts where the font won't naturally be
-	 * destroyed before calling `Astrum::exit()`.
-	 */
-	static void close(Font &font);
 
 	// TODO
 	std::string *getSystemFonts(SystemFontQuery query = { "", "", "" });

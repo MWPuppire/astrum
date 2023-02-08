@@ -61,10 +61,12 @@ namespace graphics {
 		defaultFont = Font{ std::shared_ptr<FontData>() };
 #endif
 
+		// if a window is supplied, there may be already be a renderer,
+		// but there may not be, so continue to create if not
 		if (conf.existingWindow != nullptr)
 			renderer = SDL_GetRenderer(window::window);
 		if (renderer == nullptr)
-			renderer = SDL_CreateRenderer(window::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			renderer = SDL_CreateRenderer(window::window, -1, SDL_RENDERER_PRESENTVSYNC);
 
 		// if renderer is still null, there's something wrong
 		if (renderer == nullptr)

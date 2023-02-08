@@ -211,6 +211,15 @@ bool solve(short sudoku[81], int x, int y) {
 	}
 	return false;
 }
+bool solve(short sudoku[81], int x, int y, short fixed_possible) {
+	if (!duplicateNumber(sudoku, x, y, fixed_possible)) {
+		sudoku[x + y * 9] = fixed_possible;
+		if (solve(sudoku, x + 1, y))
+			return true;
+		sudoku[x + y * 9] = 0;
+	}
+	return false;
+}
 bool solve(short sudoku[81]) {
 	return solve(sudoku, 0, 0);
 }
@@ -235,18 +244,29 @@ void generate(short sudoku[81], Difficulty difficulty) {
 
 	int boxesToDrop = 0;
 	switch (difficulty) {
-		case EASY: boxesToDrop = 30; break;
-		case MEDIUM: boxesToDrop = 40; break;
-		case HARD: boxesToDrop = 50; break;
+		case EASY: boxesToDrop = 40; break;
+		case MEDIUM: boxesToDrop = 55; break;
+		case HARD: boxesToDrop = 70; break;
 	}
 
 	short drop, counter;
+	short copy[81];
 	for (int i = 0; i < boxesToDrop; i++) {
 		drop = randint(0, 81);
 		counter = 0;
-		while (sudoku[drop] == 0 && counter++ < 10)
+		while (copy[drop] == 0 && counter++ < 10)
 			drop = randint(0, 81);
-		sudoku[drop] = 0;
+		int solutions = 0;
+		for (int i = 1; i <= 9; i++) {
+			memcpy(copy, sudoku, 81 * sizeof(short));
+			copy[drop] = 0;
+			if (solve(copy, drop % 9, drop / 9, i)) {
+				solutions++;
+			}
+		}
+		if (solutions == 1) {
+			sudoku[drop] = 0;
+		}
 	}
 }
 

@@ -74,9 +74,6 @@ Image Font::renderText(std::string text) const {
 	return this->renderText(text, this->data->defaultColor);
 }
 Image Font::renderText(std::string text, Color color) const {
-	if (this->data == nullptr) {
-		throw std::runtime_error("Method called on closed font");
-	}
 	SDL_Color scol = { color.r, color.g, color.b, color.a };
 	SDL_Surface *surf = TTF_RenderUTF8_Solid(this->data->font, text.c_str(),
 		scol);
@@ -85,9 +82,6 @@ Image Font::renderText(std::string text, Color color) const {
 }
 
 std::tuple<int, int> Font::textSize(std::string text) const {
-	if (this->data == nullptr) {
-		throw std::runtime_error("Method called on closed font");
-	}
 	int width, height;
 	int out = TTF_SizeUTF8(this->data->font, text.c_str(), &width, &height);
 	if (out != 0) {
@@ -97,36 +91,19 @@ std::tuple<int, int> Font::textSize(std::string text) const {
 }
 
 Color Font::getColor() const {
-	if (this->data == nullptr) {
-		throw std::runtime_error("Method called on closed font");
-	}
 	return this->data->defaultColor;
 }
 
 void Font::setColor(Color col) {
-	if (this->data == nullptr) {
-		throw std::runtime_error("Method called on closed font");
-	}
 	this->data->defaultColor = col;
 }
 
 TextAlign Font::getAlign() const {
-	if (this->data == nullptr) {
-		throw std::runtime_error("Method called on closed font");
-	}
 	return this->data->defaultAlign;
 }
 
 void Font::setAlign(TextAlign align) {
-	if (this->data == nullptr) {
-		throw std::runtime_error("Method called on closed font");
-	}
 	this->data->defaultAlign = align;
-}
-
-void Font::close(Font &font) {
-	// release resources associated with `font`
-	font.data.reset();
 }
 
 }; // namespace Astrum
