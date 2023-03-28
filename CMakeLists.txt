@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-if(WIN64)
-	set(CMAKE_TOOLCHAIN_FILE platform/win64.cmake)
-elseif(WIN32)
-	set(CMAKE_TOOLCHAIN_FILE platform/win32.cmake)
-endif(WIN64)
-
 project(astrum VERSION 0.1.0)
 
 include(CheckIPOSupported)
@@ -50,7 +44,6 @@ target_sources(astrum PRIVATE src/astrum.cpp src/font.cpp src/graphics.cpp
 	src/image.cpp src/timer.cpp src/log.cpp src/filesystem.cpp src/audio.cpp
 	src/sound.cpp src/system.cpp)
 target_include_directories(astrum PUBLIC include)
-target_include_directories(astrum PRIVATE assets)
 
 if(ipo_supported AND CMAKE_BUILD_TYPE STREQUAL "Release")
 	set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)

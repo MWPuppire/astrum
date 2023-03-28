@@ -727,9 +727,6 @@ int main() {
 
 	Astrum::run(update);
 
-	Astrum::Font::close(smallFont);
-	Astrum::Font::close(bigFont);
-
 	Astrum::exit();
 
 	return 0;

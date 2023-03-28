@@ -81,7 +81,6 @@ namespace graphics {
 	void QuitGraphics() {
 //		SDL_GL_DeleteContext(glcontext);
 		SDL_DestroyRenderer(renderer);
-		Font::close(defaultFont);
 	}
 
 	Color getBackgroundColor() {

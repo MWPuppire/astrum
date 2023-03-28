@@ -106,4 +106,11 @@ void Font::setAlign(TextAlign align) {
 	this->data->defaultAlign = align;
 }
 
+// notes for system fonts:
+// some repos on GitHub could provide a starting point (both C++ + Node.js):
+// https://github.com/foliojs/font-manager (MIT)
+// https://github.com/oldj/node-font-list (MIT)
+// the problem with those is that Astrum tries to target web as well
+// web doesn't provide a way to query provided fonts
+
 }; // namespace Astrum

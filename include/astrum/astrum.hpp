@@ -119,23 +119,15 @@ void ondirectorydropped(std::function<void(std::filesystem::path)> cb);
 void ondirectorydropped(std::function<void(std::string)> cb);
 
 // TODO
-void ongamepadaxis();
-// TODO
-void ongamepadpressed();
-// TODO
-void ongamepadreleased();
-// TODO
-void onjoystickadded();
-// TODO
-void onjoystickaxis();
-// TODO
-void onjoystickhat();
-// TODO
-void onjoystickpressed();
-// TODO
-void onjoystickreleased();
-// TODO
-void onjoystickremoved();
+// void ongamepadaxis();
+// void ongamepadpressed();
+// void ongamepadreleased();
+// void onjoystickadded();
+// void onjoystickaxis();
+// void onjoystickhat();
+// void onjoystickpressed();
+// void onjoystickreleased();
+// void onjoystickremoved();
 
 } // namespace Astrum
 

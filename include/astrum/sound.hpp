@@ -12,33 +12,24 @@ enum class AudioFileType {
 	wav, ogg, mp3, flac
 };
 
+// TODO sound API
 class Sound {
 private:
 	std::shared_ptr<struct SoundData> data;
 public:
-	// TODO
-	Sound(std::shared_ptr<struct SoundData> data);
-	// TODO
-	Sound(std::filesystem::path filename);
-	// TODO
-	Sound(std::filesystem::path filename, AudioFileType type);
-	// TODO
-	Sound(const unsigned char *buf, AudioFileType type);
-	// TODO
-	const std::shared_ptr<struct SoundData> getData() const;
-	// TODO
+	// Sound(std::shared_ptr<struct SoundData> data);
+	// Sound(std::filesystem::path filename);
+	// Sound(std::filesystem::path filename, AudioFileType type);
+	// Sound(const unsigned char *buf, AudioFileType type);
+	// const std::shared_ptr<struct SoundData> getData() const;
 	/**
 	 * @overload
 	 */
-	std::shared_ptr<struct SoundData> getData();
-	// TODO
-	static Sound beep(double duration = 0.2, int hertz = 800);
-	// TODO
-	int getDuration();
-	// TODO
-	double volume();
-	// TODO
-	void setVolume(double volume);
+	// std::shared_ptr<struct SoundData> getData();
+	// static Sound beep(double duration = 0.2, int hertz = 800);
+	// int getDuration();
+	// double volume();
+	// void setVolume(double volume);
 };
 
 }; // namespace Astrum

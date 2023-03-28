@@ -62,9 +62,8 @@ public:
 	static const int OUTLINE       = 16;
 
 	// TODO
-	std::string *getSystemFonts(SystemFontQuery query = { "", "", "" });
-	// TODO
-	static Font createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
+	// std::string *getSystemFonts(SystemFontQuery query = { "", "", "" });
+	// static Font createSystemFont(std::string name, int size = 18, Color color = Color(0), int style = NORMAL, TextAlign align = TextAlign::Left);
 };
 
 } // namespace Astrum

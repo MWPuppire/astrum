@@ -11,11 +11,11 @@ namespace system {
 
 	// vibrates the system for `seconds` seconds, if it supports that
 	// TODO
-	void vibrate(double seconds);
+	// void vibrate(double seconds);
 
 	// returns the current user's username
 	// TODO
-	std::string getUsername();
+	// std::string getUsername();
 
 	// returns the name of the running operating system
 	std::string getPlatformName();
@@ -54,7 +54,7 @@ namespace system {
 
 	// returns the configured system language code
 	// TODO
-	std::string getLanguage();
+	// std::string getLanguage();
 
 }
 

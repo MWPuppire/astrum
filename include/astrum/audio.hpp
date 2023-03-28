@@ -6,34 +6,22 @@
 
 namespace Astrum {
 
+// TODO audio API
 namespace audio {
 
-	// TODO
-	void play(Sound &source);
-	// TODO
-	void loop(Sound &source, bool loop = true);
-	// TODO
-	void pause(Sound &source);
-	// TODO
-	void stop(Sound &source);
-	// TODO
-	void pauseAll();
-	// TODO
-	void resumeAll();
-	// TODO
-	void stopAll();
-	// TODO
-	bool isPlaying(const Sound source);
-	// TODO
-	bool isLooping(const Sound source);
-	// TODO
-	void seek(Sound &source, int position);
-	// TODO
-	int currentPosition(const Sound source);
-	// TODO
-	double masterVolume();
-	// TODO
-	void setMasterVolume(double volume);
+	// void play(Sound &source);
+	// void loop(Sound &source, bool loop = true);
+	// void pause(Sound &source);
+	// void stop(Sound &source);
+	// void pauseAll();
+	// void resumeAll();
+	// void stopAll();
+	// bool isPlaying(const Sound source);
+	// bool isLooping(const Sound source);
+	// void seek(Sound &source, int position);
+	// int currentPosition(const Sound source);
+	// double masterVolume();
+	// void setMasterVolume(double volume);
 };
 
 }; // namespace Astrum
